@@ -24,8 +24,8 @@ const LoginPage = () => {
         borderRadius="1.5rem"
         backgroundColor={theme.palette.background.alt}
       >
-        <Typography fontWeight="500" variant="h5" sx={{ mb: "1.5rem" }}>
-          Welcome to Alumni's World
+        <Typography fontSize="25px" fontWeight="500" variant="h5" sx={{ mb: "1.5rem" }}>
+          Welcome to <Typography fontSize="25px" fontWeight="500" component="span" sx={{ color: 'primary.main', mb: "1.5rem" }}>Alumni's World</Typography> 
         </Typography>
         <Form />
       </Box>

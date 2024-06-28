@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -6,15 +6,17 @@ import {
   useMediaQuery,
   Typography,
   useTheme,
+  IconButton, // Make sure IconButton is imported from Material-UI
 } from "@mui/material";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { Formik } from "formik";
 import * as yup from "yup";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setLogin } from "../../state/index";
 import Dropzone from "react-dropzone";
-import FlexBetween from "../../components/FlexBetween";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const registerSchema = yup.object().shape({
   // yup is a JavaScript schema builder
@@ -56,45 +58,67 @@ const Form = () => {
   const isLogin = pageType === "login";
   const isRegister = pageType === "register";
 
-  const register = async (values, onSubmitProps) => { 
-    // this allows us to send form info with image
-    const formData = new FormData();
-    for (let value in values) {
-      formData.append(value, values[value]);
-    }
-    formData.append("picturePath", values.picture.name);
-
-    const savedUserResponse = await fetch(
-      "http://localhost:3001/auth/register",
-      {
-        method: "POST",
-        body: formData,
+  const register = async (values, onSubmitProps) => {
+    try {
+      // this allows us to send form info with image
+      const formData = new FormData();
+      for (let value in values) {
+        formData.append(value, values[value]);
       }
-    );
-    const savedUser = await savedUserResponse.json();
-    onSubmitProps.resetForm();
+      formData.append("picturePath", values.picture.name);
 
-    if (savedUser) {
-      setPageType("login");
+      const savedUserResponse = await fetch(
+        "http://localhost:3001/auth/register",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      const savedUser = await savedUserResponse.json();
+      onSubmitProps.resetForm();
+
+      if (savedUser) {
+        setPageType("login");
+        toast.success(savedUser.message || "Registration successful!");
+      } else {
+        toast.error("Registration failed. Please try again.");
+      }
+    } catch (error) {
+      console.error("Registration error:", error);
+      toast.error("An error occurred during registration. Please try again.");
     }
   };
 
   const login = async (values, onSubmitProps) => {
-    const loggedInResponse = await fetch("http://localhost:3001/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(values),
-    });
-    const loggedIn = await loggedInResponse.json();
-    onSubmitProps.resetForm();
-    if (loggedIn) {
-      dispatch(
-        setLogin({
-          user: loggedIn.user,
-          token: loggedIn.token,
-        })
-      );
-      navigate("/home");
+    try {
+      const loggedInResponse = await fetch("http://localhost:3001/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
+
+      const loggedIn = await loggedInResponse.json();
+      console.log(loggedIn);
+
+      onSubmitProps.resetForm();
+
+      if (loggedIn && loggedIn.user && loggedIn.token) {
+        dispatch(
+          setLogin({
+            user: loggedIn.user,
+            token: loggedIn.token,
+          })
+        );
+
+        navigate("/home");
+        toast.success(loggedIn.message || "Login successful!");
+      } else {
+        toast.error("Login failed. Please try again.");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      toast.error("An error occurred. Please try again.");
     }
   };
 
@@ -196,12 +220,30 @@ const Form = () => {
                       >
                         <input {...getInputProps()} />
                         {!values.picture ? (
-                          <p>Add Picture Here</p>
+                          <Typography>Add Picture Here</Typography>
                         ) : (
-                          <FlexBetween>
-                            <Typography>{values.picture.name}</Typography>
-                            <EditOutlinedIcon />
-                          </FlexBetween>
+                          <Box sx={{ display: "flex", alignItems: "center" }}>
+                            <img
+                              src={URL.createObjectURL(values.picture)}
+                              alt="Selected"
+                              style={{
+                                maxWidth: "100%",
+                                maxHeight: "200px",
+                                borderRadius: "5px",
+                                marginBottom: "1rem",
+                              }}
+                            />
+                            <Box sx={{ marginLeft: "1rem" }}>
+                              <Typography>{values.picture.name}</Typography>
+                              <IconButton
+                                component="span"
+                                onClick={() => setFieldValue("picture", null)}
+                                sx={{ marginLeft: "0.5rem" }}
+                              >
+                                <DeleteIcon />
+                              </IconButton>
+                            </Box>
+                          </Box>
                         )}
                       </Box>
                     )}

@@ -44,7 +44,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 /*ROUTES WITH FILES */
-app.post("/auth/register", upload.single("picture"), register);
+app.post("/auth/register", upload.single("picture"), register);  // we we add new picture to our project
 app.post("/posts", verifyToken, upload.single("picture"), createPost);
 
 /* ROUTES */
@@ -63,6 +63,7 @@ const connectDB = async () => {
   }
 };
 
+// Listening to the requests
 app.listen(PORT, () => {
   connectDB();
   console.log("Server is running on port " + PORT);
