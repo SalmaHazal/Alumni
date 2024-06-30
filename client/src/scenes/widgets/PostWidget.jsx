@@ -11,6 +11,7 @@ import WidgetWrapper from "../../components/WidgetWrapper";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setPost } from "../../state/index";
+import Comment from "./Comment";
 
 const PostWidget = ({
   postId,
@@ -27,6 +28,7 @@ const PostWidget = ({
   const dispatch = useDispatch();
   const token = useSelector((state) => state.token);
   const loggedInUserId = useSelector((state) => state.user._id);
+  const loggedInUser = useSelector((state) => state.user);
   const isLiked = Boolean(likes[loggedInUserId]);
   const likeCount = Object.keys(likes).length;
 
@@ -93,17 +95,19 @@ const PostWidget = ({
         </IconButton>
       </FlexBetween>
       {isComments && (
-        <Box mt="0.5rem">
-          {comments.map((comment, i) => (
-            <Box key={`${name}-${i}`}>
-              <Divider />
-              <Typography sx={{ color: main, m: "0.5rem 0", pl: "1rem" }}>
-                {comment}
-              </Typography>
-            </Box>
-          ))}
-          <Divider />
-        </Box>
+        <Comment postId={postId} user={loggedInUser}/>
+        // <Box mt="0.5rem">
+        //   {comments.map((comment, i) => (
+        //     <Box key={`${name}-${i}`}>
+        //       <Divider />
+        //       <Typography sx={{ color: main, m: "0.5rem 0", pl: "1rem" }}>
+        //         {comment}
+        //       </Typography>
+        //     </Box>
+        //   ))}
+        //   <Divider />
+        // </Box>
+
       )}
     </WidgetWrapper>
   );
