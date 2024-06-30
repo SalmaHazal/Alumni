@@ -3,12 +3,13 @@ import {
   getComments,
   addComment,
   deleteComment,
-} from "../controllers/comment.js";
+} from "../controllers/comments.js";
+import { verifyToken } from "../middleware/auth.js";
 
 const router = express.Router();
 
 router.get("/", getComments);
 router.post("/", addComment);
-router.delete("/:id", deleteComment);
+router.delete("/:id", verifyToken, deleteComment);
 
 export default router;

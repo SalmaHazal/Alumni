@@ -1,42 +1,55 @@
-import { useState } from "react";
-import { makeRequest } from "../../axios";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import React, { useState, useEffect } from "react";
 import moment from "moment";
+import { makeRequest } from "../../axios";
+import {
+  Box,
+  Avatar,
+  InputBase,
+  Button,
+  Typography,
+  CircularProgress,
+} from "@mui/material"; // Assuming you're using Material-UI components
 
-const Comment = ({ postId, user }) => {
+const Comment = ({ postId, user, userId }) => {
   const [desc, setDesc] = useState("");
+  const [comments, setComments] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  // getting comments
-  const { isLoading, error, data } = useQuery(["comments"], () =>
-    makeRequest.get("/comments?postId=" + postId).then((res) => {
-      return res.data;
-    })
-  );
+  useEffect(() => {
+    const fetchComments = async () => {
+      setIsLoading(true);
+      try {
+        const response = await makeRequest.get(`/comments?postId=${postId}`);
+        setComments(response.data);
+      } catch (error) {
+        setError("Error fetching comments");
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  const queryClient = useQueryClient();
+    fetchComments();
+  }, [postId]);
 
-  const mutation = useMutation(
-    (newComment) => {
-      return makeRequest.post("/comments", newComment);
-    },
-    {
-      onSuccess: () => {
-        // Invalidate and refetch
-        queryClient.invalidateQueries(["comments"]);
-      },
-    }
-  );
-
-  const handleClick = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    mutation.mutate({ desc, postId });
-    setDesc("");
+    try {
+      const newComment = { desc, userId, postId };
+      await makeRequest.post("/comments", newComment);
+      // Refresh comments
+      const response = await makeRequest.get(`/comments?postId=${postId}`);
+      setComments(response.data);
+      setDesc(""); // Clear input field
+    } catch (error) {
+      console.error("Error adding comment", error);
+      setError("Error adding comment");
+    }
   };
 
   return (
-    <Box className="comments">
+    <Box>
       <Box
-        className="write"
         display="flex"
         alignItems="center"
         justifyContent="space-between"
@@ -44,7 +57,7 @@ const Comment = ({ postId, user }) => {
         margin="20px 0"
       >
         <Avatar
-          src={"/upload/" + user.picturePath}
+          src={`http://localhost:3001/assets/${user.picturePath}`}
           alt=""
           sx={{ width: 40, height: 40 }}
         />
@@ -55,13 +68,13 @@ const Comment = ({ postId, user }) => {
           sx={{
             flex: 5,
             padding: "10px",
-            border: `1px solid ${theme.palette.divider}`,
+            border: `1px solid #ccc`,
             backgroundColor: "transparent",
-            color: theme.palette.text.primary,
+            color: "#333",
           }}
         />
         <Button
-          onClick={handleClick}
+          onClick={handleSubmit}
           variant="contained"
           color="primary"
           sx={{ padding: "10px", borderRadius: "3px" }}
@@ -70,26 +83,24 @@ const Comment = ({ postId, user }) => {
         </Button>
       </Box>
       {error ? (
-        <Typography color="error">Something went wrong</Typography>
+        <Typography color="error">{error}</Typography>
       ) : isLoading ? (
         <CircularProgress />
       ) : (
-        data.map((comment) => (
+        comments.map((comment) => (
           <Box
-            key={comment.id}
-            className="comment"
+            key={comment._id}
             display="flex"
             justifyContent="space-between"
             gap="20px"
             margin="30px 0"
           >
             <Avatar
-              src={"/upload/" + comment.profilePic}
+              src={`http://localhost:3001/assets/${comment.user.picturePath}`}
               alt=""
               sx={{ width: 40, height: 40 }}
             />
             <Box
-              className="info"
               flex={5}
               display="flex"
               flexDirection="column"
@@ -97,10 +108,10 @@ const Comment = ({ postId, user }) => {
               alignItems="flex-start"
             >
               <Typography variant="body1" fontWeight="500">
-                {comment.name}
+                {`${comment.user.firstName} ${comment.user.lastName}`}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                {comment.desc}
+                {comment.text}
               </Typography>
             </Box>
             <Typography

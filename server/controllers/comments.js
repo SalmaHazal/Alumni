@@ -1,54 +1,61 @@
-import { db } from "../connect.js";
-import jwt from "jsonwebtoken";
+import Comment from "../models/Comment.js";
+import User from "../models/User.js";
 import moment from "moment";
 
-export const getComments = (req, res) => {
-  const q = `SELECT c.*, u.id AS userId, name, profilePic FROM comments AS c JOIN users AS u ON (u.id = c.userId)
-    WHERE c.postId = ? ORDER BY c.createdAt DESC
-    `;
+export const getComments = async (req, res) => {
+    try {
+      const postId = req.query.postId;
+  
+      // Fetch comments for the given post ID and populate user information
+      const comments = await Comment.find({ postId })
+        .populate("user", "firstName lastName picturePath")
+        .sort({ createdAt: -1 }); // Sort by createdAt in descending order
+  
+      res.status(200).json(comments);
+    } catch (err) {
+      res.status(500).json(err);
+    }
+  };
 
-  db.query(q, [req.query.postId], (err, data) => {
-    if (err) return res.status(500).json(err);
-    return res.status(200).json(data);
-  });
-};
 
-export const addComment = (req, res) => {
-  const token = req.cookies.accessToken;
-  if (!token) return res.status(401).json("Not logged in!");
+  export const addComment = async (req, res) => {
+    try {
+      const newComment = new Comment({
+        text: req.body.desc,
+        user: req.body.userId, 
+        postId: req.body.postId,
+        createdAt: moment(Date.now()).toDate(),
+      });
+  
+      await newComment.save();
+      res.status(200).json("Comment has been created.");
+    } catch (err) {
+      res.status(500).json({message : err});
+    }
+  };
 
-  jwt.verify(token, "secretkey", (err, userInfo) => {
-    if (err) return res.status(403).json("Token is not valid!");
 
-    const q = "INSERT INTO comments(`desc`, `createdAt`, `userId`, `postId`) VALUES (?)";
-    const values = [
-      req.body.desc,
-      moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
-      userInfo.id,
-      req.body.postId
-    ];
 
-    db.query(q, [values], (err, data) => {
-      if (err) return res.status(500).json(err);
-      return res.status(200).json("Comment has been created.");
-    });
-  });
-};
-
-export const deleteComment = (req, res) => {
-  const token = req.cookies.access_token;
-  if (!token) return res.status(401).json("Not authenticated!");
-
-  jwt.verify(token, "jwtkey", (err, userInfo) => {
-    if (err) return res.status(403).json("Token is not valid!");
-
+export const deleteComment = async (req, res) => {
+  try {
     const commentId = req.params.id;
-    const q = "DELETE FROM comments WHERE `id` = ? AND `userId` = ?";
 
-    db.query(q, [commentId, userInfo.id], (err, data) => {
-      if (err) return res.status(500).json(err);
-      if (data.affectedRows > 0) return res.json("Comment has been deleted!");
+    // Assuming req.user is populated by verifyToken middleware
+    const userId = req.user.id;
+
+    // Check if the comment exists and if the user is authorized to delete it
+    const comment = await Comment.findOne({ _id: commentId });
+    if (!comment) {
+      return res.status(404).json("Comment not found.");
+    }
+
+    if (comment.user.toString() !== userId) {
       return res.status(403).json("You can delete only your comment!");
-    });
-  });
+    }
+
+    await Comment.findByIdAndDelete(commentId);
+    res.json("Comment has been deleted!");
+  } catch (err) {
+    res.status(500).json(err);
+  }
 };

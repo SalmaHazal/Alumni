@@ -95,19 +95,7 @@ const PostWidget = ({
         </IconButton>
       </FlexBetween>
       {isComments && (
-        <Comment postId={postId} user={loggedInUser}/>
-        // <Box mt="0.5rem">
-        //   {comments.map((comment, i) => (
-        //     <Box key={`${name}-${i}`}>
-        //       <Divider />
-        //       <Typography sx={{ color: main, m: "0.5rem 0", pl: "1rem" }}>
-        //         {comment}
-        //       </Typography>
-        //     </Box>
-        //   ))}
-        //   <Divider />
-        // </Box>
-
+        <Comment postId={postId} user={loggedInUser} userId={loggedInUserId}/>
       )}
     </WidgetWrapper>
   );
