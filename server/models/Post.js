@@ -22,7 +22,7 @@ const postSchema = mongoose.Schema(
       type: Map,
       of: Boolean,
     },
-    comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }],
+    comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment", default: [] }],
     createdAt: { type: Date, default: Date.now },
   },
   { timestamps: true }

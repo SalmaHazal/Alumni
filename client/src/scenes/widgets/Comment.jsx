@@ -9,6 +9,8 @@ import {
   Typography,
   CircularProgress,
 } from "@mui/material"; // Assuming you're using Material-UI components
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Comment = ({ postId, user, userId }) => {
   const [desc, setDesc] = useState("");
@@ -37,6 +39,7 @@ const Comment = ({ postId, user, userId }) => {
     try {
       const newComment = { desc, userId, postId };
       await makeRequest.post("/comments", newComment);
+      toast.success("Comment added successfully");
       // Fetch the comments again to include the new one
       const response = await makeRequest.get(`/comments?postId=${postId}`);
       setComments(response.data);

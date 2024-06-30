@@ -8,7 +8,7 @@ import { Box, Divider, IconButton, Typography, useTheme } from "@mui/material";
 import FlexBetween from "../../components/FlexBetween";
 import Friend from "../../components/Friend";
 import WidgetWrapper from "../../components/WidgetWrapper";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setPost } from "../../state/index";
 import Comment from "./Comment";
@@ -22,7 +22,7 @@ const PostWidget = ({
   picturePath,
   userPicturePath,
   likes,
-  comments = [], // Ensure comments has a default value of an empty array
+  comments , // Ensure comments has a default value of an empty array
 }) => {
   const [isComments, setIsComments] = useState(false);
   const dispatch = useDispatch();
@@ -86,7 +86,7 @@ const PostWidget = ({
             <IconButton onClick={() => setIsComments(!isComments)}>
               <ChatBubbleOutlineOutlined />
             </IconButton>
-            <Typography>{comments.length}</Typography>
+            <Typography>Comments</Typography>
           </FlexBetween>
         </FlexBetween>
 
