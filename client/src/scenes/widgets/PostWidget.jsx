@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setPost } from "../../state/index";
 import Comment from "./Comment";
+import SharePopup from "./SharePopup";
 
 const PostWidget = ({
   postId,
@@ -25,6 +26,7 @@ const PostWidget = ({
   comments , // Ensure comments has a default value of an empty array
 }) => {
   const [isComments, setIsComments] = useState(false);
+  const [sharePopupOpen, setSharePopupOpen] = useState(false);
   const dispatch = useDispatch();
   const token = useSelector((state) => state.token);
   const loggedInUserId = useSelector((state) => state.user._id);
@@ -47,6 +49,14 @@ const PostWidget = ({
     });
     const updatedPost = await response.json();
     dispatch(setPost({ post: updatedPost }));
+  };
+
+  const handleShareClick = () => {
+    setSharePopupOpen(true);
+  };
+
+  const handleShareClose = () => {
+    setSharePopupOpen(false);
   };
 
   return (
@@ -90,13 +100,18 @@ const PostWidget = ({
           </FlexBetween>
         </FlexBetween>
 
-        <IconButton>
+        <IconButton onClick={handleShareClick}>
           <ShareOutlined />
         </IconButton>
       </FlexBetween>
       {isComments && (
         <Comment postId={postId} user={loggedInUser} userId={loggedInUserId}/>
       )}
+      <SharePopup
+        open={sharePopupOpen}
+        handleClose={handleShareClose}
+        url={`http://localhost:5173/posts/${postId}`} // Adjust the URL as needed
+      />
     </WidgetWrapper>
   );
 };
