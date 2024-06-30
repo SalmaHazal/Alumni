@@ -37,7 +37,7 @@ const Comment = ({ postId, user, userId }) => {
     try {
       const newComment = { desc, userId, postId };
       await makeRequest.post("/comments", newComment);
-      // Refresh comments
+      // Fetch the comments again to include the new one
       const response = await makeRequest.get(`/comments?postId=${postId}`);
       setComments(response.data);
       setDesc(""); // Clear input field
