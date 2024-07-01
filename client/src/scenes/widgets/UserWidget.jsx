@@ -11,7 +11,8 @@ import {
   import { useSelector } from "react-redux";
   import { useEffect, useState } from "react";
   import { useNavigate } from "react-router-dom";
-  
+  import '../../index.css';
+
   const UserWidget = ({ userId, picturePath }) => {
     const [user, setUser] = useState(null);
     const { palette } = useTheme();
@@ -49,7 +50,7 @@ import {
     } = user;
   
     return (
-      <WidgetWrapper>
+      <WidgetWrapper className="fixed-widgettt">
         {/* FIRST ROW */}
         <FlexBetween
           gap="0.5rem"

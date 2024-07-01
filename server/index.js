@@ -17,6 +17,15 @@ import { verifyToken } from "./middleware/auth.js";
 import User from "./models/User.js";
 import Post from "./models/Post.js";
 import { users, posts } from "./data/index.js";
+//jdid
+const locationsRouter = require('./routes/locations');
+const MONGO_URI = 'mongodb://localhost:27017/Alumni';
+app.use('/locations', locationsRouter);
+
+mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('MongoDB connected'))
+  .catch(err => console.error(err));
+
 
 /* CONFIGURATIONS */
 const __filename = fileURLToPath(import.meta.url);

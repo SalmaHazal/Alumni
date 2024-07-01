@@ -90,4 +90,30 @@ body,
   .main-content {
     margin-top: 4rem; /* Adjust this value to the height of your Navbar */
   }
-  
+.fixed-widget {
+    position: fixed;
+    top: 106px; /* Adjust based on where you want it positioned vertically */
+    right: 40px; /* Adjust based on where you want it positioned horizontally */
+    width: 350px; /* Adjust the width as necessary */
+    z-index: 1000;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  .fixed-widgett {
+    position: fixed;
+    top: 444px; /* Adjust based on where you want it positioned vertically */
+    right: 40px; /* Adjust based on where you want it positioned horizontally */
+    width: 350px; /* Adjust the width as necessary */
+    z-index: 1000;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  .fixed-widgettt {
+    position: fixed;
+    top: 106px; /* Adjust based on where you want it positioned vertically */
+    left: 40px; /* Adjust based on where you want it positioned horizontally */
+    width: 350px; /* Adjust the width as necessary */
+    z-index: 1000;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }

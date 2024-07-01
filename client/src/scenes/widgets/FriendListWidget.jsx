@@ -4,6 +4,7 @@ import WidgetWrapper from "../../components/WidgetWrapper";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setFriends } from "../../state/index";
+import '../../index.css';
 
 const FriendListWidget = ({ userId }) => {
   const dispatch = useDispatch();
@@ -28,7 +29,7 @@ const FriendListWidget = ({ userId }) => {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <WidgetWrapper>
+    <WidgetWrapper className="fixed-widgett">
       <Typography
         color={palette.neutral.dark}
         variant="h5"
