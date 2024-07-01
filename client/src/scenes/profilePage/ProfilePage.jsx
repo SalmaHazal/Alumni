@@ -7,6 +7,7 @@ import FriendListWidget from "../widgets/FriendListWidget";
 import MyPostWidget from "../widgets/MyPostWidget";
 import PostsWidget from "../widgets/PostsWidget";
 import UserWidget from "../widgets/UserWidget";
+import '../../index.css';
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null);
@@ -31,13 +32,17 @@ const ProfilePage = () => {
 
   return (
     <Box>
+      <Box className="fixed-navbar">
       <Navbar />
+      </Box>
+      
       <Box
         width="100%"
         padding="2rem 6%"
         display={isNonMobileScreens ? "flex" : "block"}
         gap="2rem"
         justifyContent="center"
+        marginTop="70px"
       >
         <Box flexBasis={isNonMobileScreens ? "26%" : undefined}>
           <UserWidget userId={userId} picturePath={user.picturePath} />

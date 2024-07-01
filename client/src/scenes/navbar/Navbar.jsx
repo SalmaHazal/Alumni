@@ -1,4 +1,6 @@
 import { useState } from "react";
+import Logoalumni from "/public/assets/logoalumni.png"
+import Grid from '@mui/material/Grid';
 import {
   Box,
   IconButton,
@@ -9,21 +11,36 @@ import {
   FormControl,
   useTheme,
   useMediaQuery,
+  makeStyles,
+  List,
+  ListItem,
+  Button,
 } from "@mui/material";
 import {
   Search,
   Message,
   DarkMode,
   LightMode,
-  Notifications,
   Help,
   Menu,
   Close,
+  Grade,
+  
 } from "@mui/icons-material";
+import AccountCircle from '@mui/icons-material/AccountCircle';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
+import WorkHistoryIcon from '@mui/icons-material/WorkHistory';
+import HomeIcon from '@mui/icons-material/Home';
 import { useDispatch, useSelector } from "react-redux";
 import { setMode, setLogout } from "../../state/index";
 import { useNavigate } from "react-router-dom";
 import FlexBetween from "../../components/FlexBetween";
+import { Link, useLocation } from 'react-router-dom';
+import AccountMenu from '../prof/prof';
+
+
+
 
 const Navbar = () => {
   const [isMobileMenuToggled, setIsMobileMenuToggled] = useState(false);
@@ -31,6 +48,8 @@ const Navbar = () => {
   const navigate = useNavigate();
   const user = useSelector((state) => state.user);
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
+ 
+  const location = useLocation();
 
   const theme = useTheme();
   const neutralLight = theme.palette.neutral.light;
@@ -38,84 +57,77 @@ const Navbar = () => {
   const background = theme.palette.background.default;
   const primaryLight = theme.palette.primary.light;
   const alt = theme.palette.background.alt;
+  
 
   const fullName = `${user.firstName} ${user.lastName}`;
 
   return (
-    <FlexBetween padding="1rem 6%" backgroundColor={alt}>
+    <FlexBetween padding="1rem 6%" backgroundColor={alt} sx={{ boxShadow: 3 }}>
       <FlexBetween gap="1.75rem">
         {/* logo */}
-        <Typography
-          fontWeight="bold"
-          fontSize="clamp(1rem, 2rem, 2.25rem)" // it always try to be 2 but if the screen got smaller it may be 1...
-          color="primary"
-          onClick={() => navigate("/home")}
-          sx={{
-            // here we put some css styles
-            "&:hover": {
-              color: primaryLight,
-              cursor: "pointer",
-            },
-          }}
-        >
-          Alumni's World
+        <Typography>
+          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+              <img 
+              src={Logoalumni} 
+              alt="Logo" 
+              style={{ marginRight: '60px', width: '100px', height: 'auto',borderRadius: "6px" }} 
+            />
+          </Box>
         </Typography>
-
-        {/* search box */}
-        {isNonMobileScreens && (
-          <FlexBetween
-            backgroundColor={neutralLight}
-            borderRadius="9px"
-            gap="3rem"
-            padding="0.1rem 1.5rem"
-          >
-            <InputBase placeholder="Search..." />
-            <IconButton>
-              <Search />
-            </IconButton>
-          </FlexBetween>
-        )}
-      </FlexBetween>
-
-      {/* DESKTOP NAV */}
+        {/* DESKTOP NAV */}
       {isNonMobileScreens ? (
-        <FlexBetween gap="2rem">
-          <IconButton onClick={() => dispatch(setMode())}>
-            {/* dispatch is used to send actions to the Redux store, which then updates the state based on the action type and payload */}
-            
-            {theme.palette.mode === "dark" ? (
-              <DarkMode sx={{ fontSize: "25px" }} />
-            ) : (
-              <LightMode sx={{ color: dark, fontSize: "25px" }} />
-            )}
-          </IconButton>
-          <Message sx={{ fontSize: "25px" }} />
-          <Notifications sx={{ fontSize: "25px" }} />
-          <Help sx={{ fontSize: "25px" }} />
-          <FormControl variant="standard" value={fullName}>
+        <FlexBetween gap="2rem" style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginLeft: '100px',
+              paddingRight: '100px',
+              width: '100%',}} >
+            <List style={{ display: 'flex', flexDirection: 'row', padding: 0 }}>
+                <ListItem  button component={Link}to="/home" sx={location.pathname === '/home' ? { background: "#C7C8CC" , borderRadius: '10px' } : null} ><HomeIcon  sx={{ fontSize: "25px"}} style={{ margin: '0 17px'} }/></ListItem>
+                <ListItem button ><Message sx={{ fontSize: "25px"}} style={{ margin: '0 17px'}}/></ListItem>
+                <ListItem button><NotificationsActiveIcon sx={{ fontSize: "25px" }} style={{ margin: '0 17px'}} /></ListItem>
+                <ListItem button><WorkHistoryIcon sx={{ fontSize: "25px" }} style={{ margin: '0 17px'}}/></ListItem>
+                <ListItem button onClick={() => dispatch(setMode())}>
+                      {theme.palette.mode === "dark" ? (
+                      <DarkMode sx={{ fontSize: "25px" }} />
+                    ) : (
+                      <LightMode sx={{ color: dark, fontSize: "25px" }} />
+                    )}
+                </ListItem>
+            </List>
+          
+          <AccountMenu />
+
+          {/*<FormControl variant="standard" value={fullName} style={{width:"0px"}}>
             <Select
-              value={fullName}
+              
               sx={{
-                backgroundColor: neutralLight,
-                width: "150px",
+                marginLeft:"72px",
+                width: "15px",
                 borderRadius: "0.25rem",
                 p: "0.25rem 1rem",
+                
                 "& .MuiSvgIcon-root": {
                   pr: "0.25rem",
                   width: "3rem",
                 },
                 "& .MuiSelect-select:focus": {
-                  backgroundColor: neutralLight,
+                  
                 },
               }}
               input={<InputBase />}
-            >
-              <MenuItem value={fullName}>
-                <Typography>{fullName}</Typography>
+            > 
+             
+              
+              <MenuItem >
+                <Typography variant="h9">
+                {fullName}
+                </Typography>
               </MenuItem>
               <MenuItem onClick={() => dispatch(setLogout())}>Log Out</MenuItem>
             </Select>
-          </FormControl>
+          </FormControl>*/}
         </FlexBetween>
       ) : (
         <IconButton
@@ -124,6 +136,24 @@ const Navbar = () => {
           <Menu />
         </IconButton>
       )}
+        {/* search box */}
+        {isNonMobileScreens && (
+          <FlexBetween
+            backgroundColor={neutralLight}
+            borderRadius="9px"
+            gap="3rem"
+            padding="0.1rem 1.2rem"
+            
+          >
+            <InputBase placeholder="Search..." />
+            <IconButton>
+              <Search style={{marginRight:"-10px"}} />
+            </IconButton>
+          </FlexBetween>
+        )}
+      </FlexBetween>
+
+      
 
       {/* MOBILE NAV */}
       {!isNonMobileScreens && isMobileMenuToggled && (
@@ -171,8 +201,9 @@ const Navbar = () => {
               <Select
                 value={fullName}
                 sx={{
+
                   backgroundColor: neutralLight,
-                  width: "150px",
+                  width: "0px",
                   borderRadius: "0.25rem",
                   p: "0.25rem 1rem", 
                   "& .MuiSvgIcon-root": { //target this specific className
