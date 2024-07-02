@@ -11,6 +11,7 @@ import { fileURLToPath } from "url";
 import authRoutes from "./routes/auth.js";
 import userRoutes from "./routes/users.js";
 import postRoutes from "./routes/posts.js";
+import locationRoutes from "./routes/locations.js";
 import commentRoutes from "./routes/comments.js";
 import { register } from "./controllers/auth.js";
 import { createPost } from "./controllers/posts.js";
@@ -24,6 +25,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 dotenv.config();
 const app = express();
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:5173');
+  // Other headers and options as needed
+  next();
+});
 app.use(express.json());
 app.use(helmet());
 app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
@@ -57,6 +63,7 @@ app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
 app.use("/posts", postRoutes);
 app.use("/api/comments", commentRoutes);
+app.use("/locations", locationRoutes);
 
 /* MONGOOSE SETUP */
 const PORT = process.env.PORT || 6001;
