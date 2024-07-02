@@ -63,7 +63,7 @@ const EditProfilePage = () => {
     }
 
     try {
-        const response = await fetch(`http://localhost:3001/users/${userId}`, {
+      const response = await fetch(`http://localhost:3001/users/${userId}`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
