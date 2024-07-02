@@ -13,8 +13,10 @@ import userRoutes from "./routes/users.js";
 import postRoutes from "./routes/posts.js";
 import locationRoutes from "./routes/locations.js";
 import commentRoutes from "./routes/comments.js";
+import searchRoutes from "./routes/search.js";
 import { register } from "./controllers/auth.js";
 import { createPost } from "./controllers/posts.js";
+import { updateUserProfile } from "./controllers/users.js";
 import { verifyToken } from "./middleware/auth.js";
 import User from "./models/User.js";
 import Post from "./models/Post.js";
@@ -57,6 +59,7 @@ const upload = multer({ storage });
 /*ROUTES WITH FILES */
 app.post("/auth/register", upload.single("picture"), register);  // we we add new picture to our project
 app.post("/posts", verifyToken, upload.single("picture"), createPost);
+app.put("/users/:id", verifyToken, upload.single("picture"), updateUserProfile);
 
 /* ROUTES */
 app.use("/auth", authRoutes);
@@ -64,6 +67,7 @@ app.use("/users", userRoutes);
 app.use("/posts", postRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/locations", locationRoutes);
+app.use("/search", searchRoutes);
 
 /* MONGOOSE SETUP */
 const PORT = process.env.PORT || 6001;
