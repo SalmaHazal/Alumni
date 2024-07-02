@@ -12,7 +12,10 @@ import authRoutes from "./routes/auth.js";
 import userRoutes from "./routes/users.js";
 import postRoutes from "./routes/posts.js";
 import commentRoutes from "./routes/comments.js";
+import searchRoutes from "./routes/search.js";
 import { register } from "./controllers/auth.js";
+
+
 import { createPost } from "./controllers/posts.js";
 import { verifyToken } from "./middleware/auth.js";
 import User from "./models/User.js";
@@ -57,6 +60,7 @@ app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
 app.use("/posts", postRoutes);
 app.use("/api/comments", commentRoutes);
+app.use("/search", searchRoutes);
 
 /* MONGOOSE SETUP */
 const PORT = process.env.PORT || 6001;
