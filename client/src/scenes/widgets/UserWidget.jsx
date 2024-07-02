@@ -22,13 +22,16 @@ const UserWidget = ({ userId, picturePath }) => {
   const main = palette.primary.main;
 
   const getUser = async () => {
-    const response = await fetch(`http://localhost:3001/users/${userId}`, {
-      //call an api
-      method: "GET",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await response.json();
-    setUser(data);
+    try {
+      const response = await fetch(`http://localhost:3001/users/${userId}`, {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+      setUser(data);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+    }
   };
 
   useEffect(() => {
@@ -52,12 +55,8 @@ const UserWidget = ({ userId, picturePath }) => {
   return (
     <WidgetWrapper>
       {/* FIRST ROW */}
-      <FlexBetween
-        gap="0.5rem"
-        pb="1.1rem"
-        onClick={() => navigate(`/profile/${userId}`)}
-      >
-        <FlexBetween gap="1rem">
+      <FlexBetween gap="0.5rem" pb="1.1rem" >
+        <FlexBetween gap="1rem" onClick={() => navigate(`/profile/${userId}`)}>
           <UserImage image={picturePath} />
           <Box>
             <Typography
@@ -80,7 +79,6 @@ const UserWidget = ({ userId, picturePath }) => {
           <ManageAccountsOutlined />
         </IconButton>
       </FlexBetween>
-
       <Divider />
 
       {/* SECOND ROW */}
@@ -121,6 +119,7 @@ const UserWidget = ({ userId, picturePath }) => {
           Social Profiles
         </Typography>
 
+        {/* Example of social profile */}
         <FlexBetween gap="1rem" mb="0.5rem">
           <FlexBetween gap="1rem">
             <img src="../../../public/assets/twitter.png" alt="twitter" />
@@ -131,9 +130,12 @@ const UserWidget = ({ userId, picturePath }) => {
               <Typography color={medium}>Social Network</Typography>
             </Box>
           </FlexBetween>
-          <EditOutlined sx={{ color: main }} />
+          <IconButton>
+            <EditOutlined sx={{ color: main }} />
+          </IconButton>
         </FlexBetween>
 
+        {/* Example of another social profile */}
         <FlexBetween gap="1rem">
           <FlexBetween gap="1rem">
             <img src="../../../public/assets/linkedin.png" alt="linkedin" />
@@ -144,7 +146,9 @@ const UserWidget = ({ userId, picturePath }) => {
               <Typography color={medium}>Network Platform</Typography>
             </Box>
           </FlexBetween>
-          <EditOutlined sx={{ color: main }} />
+          <IconButton>
+            <EditOutlined sx={{ color: main }} />
+          </IconButton>
         </FlexBetween>
       </Box>
     </WidgetWrapper>
