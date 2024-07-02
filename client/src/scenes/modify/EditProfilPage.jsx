@@ -148,7 +148,24 @@ const EditProfilePage = () => {
             Add Picture Here
           </Button>
         </label>
-        {selectedFile && <Typography>{selectedFile.name}</Typography>}
+        {selectedFile && (
+          <Box mt={2}>
+            <img
+              src={URL.createObjectURL(selectedFile)}
+              alt="Selected"
+              style={{
+                maxWidth: "100%",
+                maxHeight: "200px",
+                borderRadius: "5px",
+                marginBottom: "1rem",
+              }}
+            />
+            <Typography>{selectedFile.name}</Typography>
+          </Box>
+        )}
+        <br />
+        <br />
+        
         <Button type="submit" variant="contained" color="primary" fullWidth disabled={loading}>
           {loading ? <CircularProgress size={24} /> : "Save Changes"}
         </Button>

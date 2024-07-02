@@ -14,7 +14,7 @@ import postRoutes from "./routes/posts.js";
 import commentRoutes from "./routes/comments.js";
 import searchRoutes from "./routes/search.js";
 import { register } from "./controllers/auth.js";
-
+import { updateUserProfile } from "./controllers/users.js";
 
 import { createPost } from "./controllers/posts.js";
 import { verifyToken } from "./middleware/auth.js";
@@ -33,12 +33,13 @@ app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 app.use(morgan("common"));
 app.use(bodyParser.json({ limit: "30mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
-app.use(cors({
-  origin: "http://localhost:5173", // Replace with your frontend URL
-  credentials: true  // Enable credentials
-}));
+app.use(
+  cors({
+    origin: "http://localhost:5173", // Replace with your frontend URL
+    credentials: true, // Enable credentials
+  })
+);
 app.use("/assets", express.static(path.join(__dirname, "public/assets")));
-
 
 /* FILE STORAGE */
 const storage = multer.diskStorage({
@@ -52,8 +53,9 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 /*ROUTES WITH FILES */
-app.post("/auth/register", upload.single("picture"), register);  // we we add new picture to our project
+app.post("/auth/register", upload.single("picture"), register); // we we add new picture to our project
 app.post("/posts", verifyToken, upload.single("picture"), createPost);
+app.put("/users/:id", verifyToken, upload.single("picture"), updateUserProfile);
 
 /* ROUTES */
 app.use("/auth", authRoutes);

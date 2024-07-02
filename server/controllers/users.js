@@ -1,4 +1,5 @@
 import User from "../models/User.js";
+import Post from "../models/Post.js";
 
 /* READ */
 export const getUser = async (req, res) => {
@@ -63,22 +64,28 @@ export const addRemoveFriend = async (req, res) => {
 };
 
 export const updateUserProfile = async (req, res) => {
-  console.log(`Updating user profile for ID: ${req.params.id}`);
   try {
     const { firstName, lastName, email, location, occupation } = req.body;
-    console.log(`Request body: ${JSON.stringify(req.body)}`);
     const updateData = { firstName, lastName, email, location, occupation };
 
     if (req.file) {
-      updateData.picturePath = req.file.path;
-      console.log(`Picture path: ${req.file.path}`);
+      updateData.picturePath = req.file.filename;
     }
 
-    const user = await User.findByIdAndUpdate(req.params.id, updateData, { new: true });
+    const user = await User.findByIdAndUpdate(req.params.id, updateData, {
+      new: true,
+    });
+    const userId = req.params.id;
+    const filter = { userId }; // Filter posts by userId
+    const update = { userPicturePath: req.file.filename }; 
+    const options = { multi: true }; // Update multiple documents
+
+    await Post.updateMany(filter, update, options);
+
     if (!user) {
-      console.log(`User with ID: ${req.params.id} not found`);
       return res.status(404).json({ message: "User not found" });
     }
+
     res.status(200).json(user);
   } catch (err) {
     console.error(`Error updating user profile: ${err}`);
