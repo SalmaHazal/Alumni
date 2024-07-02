@@ -16,7 +16,7 @@ export const searchContent = async (req, res) => {
       $or: [
         { firstName: { $regex: query, $options: 'i' } },
         { lastName: { $regex: query, $options: 'i' } },
-        { userName: { $regex: query, $options: 'i' } },
+        { occupation: { $regex: query, $options: 'i' } },
       ],
     });
     res.json({ posts, users });
