@@ -78,7 +78,14 @@ export const updateUserProfile = async (req, res) => {
     });
     const userId = req.params.id;
     const filter = { userId }; // Filter posts by userId
-    const update = { userPicturePath: req.file.filename }; 
+    const update = {
+      firstName: firstName,
+      lastName: lastName,
+      location: location,
+    };
+    if (req.file) {
+      update.userPicturePath = req.file.filename;
+    }
     const options = { multi: true }; // Update multiple documents
 
     await Post.updateMany(filter, update, options);
