@@ -27,9 +27,10 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 dotenv.config();
 const app = express();
+const frontendURL = process.env.FRONTEND_URL || 'http://localhost:3000';
+
 app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', process.env.FRONTEND_URL);
-  
+  res.setHeader('Access-Control-Allow-Origin', frontendURL);
   next();
 });
 app.use(express.json());
