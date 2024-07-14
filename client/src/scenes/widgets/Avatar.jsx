@@ -1,9 +1,9 @@
 import React from "react";
 import { PiUserCircle } from "react-icons/pi";
-import { useSelector } from "react-redux";
+import { useSocketContext } from "../../context/SocketContext";
 
 const Avatar = ({ userId, name, imageUrl, width, height }) => {
-  const onlineUser = useSelector((state) => state.onlineUser);
+  const { onlineUsers } = useSocketContext();
 
   let avatarName = "";
 
@@ -31,7 +31,7 @@ const Avatar = ({ userId, name, imageUrl, width, height }) => {
 
   const randomNumber = Math.floor(Math.random() * 9);
 
-  const isOnline = onlineUser.includes(userId);
+  const isOnline = onlineUsers.includes(userId);
   return (
     <div
       style={{

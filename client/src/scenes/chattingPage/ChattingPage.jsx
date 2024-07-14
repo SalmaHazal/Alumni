@@ -1,39 +1,15 @@
-import React, { useEffect } from "react";
+import React from "react";
 import Navbar from "../navbar/Navbar";
-import { useDispatch, useSelector } from "react-redux";
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { setOnlineUser, setSocketConnection } from "../../state/index.js";
+import { Outlet, useLocation} from "react-router-dom";
 import SideBar from "../widgets/SideBar";
 import { FiUsers } from "react-icons/fi";
-import { AiOutlineSelect } from "react-icons/ai";
-import io from "socket.io-client";
 
 const ChattingPage = () => {
-  const dispatch = useDispatch();
   const location = useLocation();
   const persistRootString = localStorage.getItem("persist:root");
 
   const persistRootObject = JSON.parse(persistRootString);
   const token = JSON.parse(persistRootObject.token);
-
-  // socket connection
-  useEffect(() => {
-    const socketConnection = io("http://localhost:3001", {
-      auth: {
-        token: token,
-      },
-    });
-
-    socketConnection.on("onlineUser", (data) => {
-      dispatch(setOnlineUser(data));
-    });
-
-    // dispatch(setSocketConnection(socketConnection));
-    console.log(socketConnection)
-    return () => {
-      socketConnection.disconnect();
-    };
-  }, []);
 
   const basePath = location.pathname === "/chat";
   return (

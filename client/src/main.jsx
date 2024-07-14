@@ -19,7 +19,8 @@ import {
 } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import { PersistGate } from "redux-persist/integration/react";
-import 'bootstrap/dist/css/bootstrap.min.css';
+import "bootstrap/dist/css/bootstrap.min.css";
+import { SocketContextProvider } from "./context/SocketContext.jsx";
 
 const persistConfig = { key: "root", storage, version: 1 };
 const persistedReducer = persistReducer(persistConfig, authReducer);
@@ -43,8 +44,10 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           autoClose={3000}
           closeOnClick
           pauseOnHover={false}
-        />        
-        <App />
+        />
+        <SocketContextProvider>
+          <App />
+        </SocketContextProvider>
       </PersistGate>
     </Provider>
   </React.StrictMode>

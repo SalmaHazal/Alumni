@@ -29,7 +29,7 @@ io.on("connection", async (socket) => {
   socket.join(user._id);
   onlineUser.add(user._id);
 
-  io.emit("onlineUser", Array.from(onlineUser));
+  io.emit("getOnlineUsers", Array.from(onlineUser));
 
   // disconnect
   socket.on("disconnect", () => {
