@@ -129,7 +129,7 @@ const Navbar = () => {
                 component={Link}
                 to="/chat"
                 sx={
-                  location.pathname === "/chat"
+                  location.pathname === "/chat" 
                     ? { background: "#C7C8CC", borderRadius: "10px" }
                     : null
                 }

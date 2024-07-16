@@ -200,7 +200,7 @@ const MessagePage = () => {
           {allMessage.map((msg, index) => {
             return (
               <div
-                className={` p-1 py-1 rounded w-fit max-x-[230px] md:max-w-sm lg:max-w-md shadow px-3 ${
+                className={`px-3 py-1 rounded w-fit max-x-[230px] md:max-w-sm lg:max-w-md shadow ${
                   user._id === msg.msgByUserId
                     ? "ml-auto bg-teal-100"
                     : "bg-white"
@@ -225,7 +225,7 @@ const MessagePage = () => {
                   )}
                 </div>
                 <p className="px-2">{msg.text}</p>
-                <p className="text-xs ml-auto w-fit">
+                <p className="pt-0 text-xs ml-auto w-fit">
                   {moment(msg.createdAt).format("hh:mm")}
                 </p>
               </div>

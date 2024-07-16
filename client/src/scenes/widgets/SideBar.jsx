@@ -123,6 +123,7 @@ const Sidebar = () => {
                     name={`${conv?.userDetails?.firstName} ${conv?.userDetails?.lastName}`}
                     width={40}
                     height={40}
+                    userId={conv?.userDetails?._id}
                   />
                 </div>
                 <div>
