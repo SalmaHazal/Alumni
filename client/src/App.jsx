@@ -1,4 +1,8 @@
-import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
+import {
+  createBrowserRouter,
+  Navigate,
+  RouterProvider,
+} from "react-router-dom";
 import HomePage from "./scenes/homePage/HomePage";
 import LoginPage from "./scenes/loginPage/LoginPage";
 import ProfilePage from "./scenes/profilePage/ProfilePage";
@@ -8,34 +12,52 @@ import { useSelector } from "react-redux";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { createTheme } from "@mui/material/styles";
 import { themeSettings } from "./theme";
+import ChattingPage from "./scenes/chattingPage/ChattingPage";
+import MessagePage from "./scenes/widgets/MessagePage";
+import "bootstrap/dist/css/bootstrap.min.css";
+import './App.css';
 
 function App() {
   const mode = useSelector((state) => state.mode);
   const theme = useMemo(() => createTheme(themeSettings(mode)), [mode]);
   const isAuth = Boolean(useSelector((state) => state.token));
 
+  const router = createBrowserRouter([
+    {
+      path: "/",
+      element: <LoginPage />,
+    },
+    {
+      path: "/home",
+      element: isAuth ? <HomePage /> : <Navigate to="/" />,
+    },
+    {
+      path: "/profile/:userId",
+      element: <ProfilePage />,
+    },
+    {
+      path: "/edit-profile",
+      element: <EditProfilePage />,
+    },
+    {
+      path: "/chat",
+      element: <ChattingPage />,
+      children: [
+        {
+          path: ":userId",
+          element: <MessagePage />,
+        },
+      ],
+    },
+  ]);
+
   return (
     <div className="app">
-      <BrowserRouter>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <Routes>
-            <Route path="/" element={<LoginPage />} />
-            <Route
-              path="/home"
-              element={isAuth ? <HomePage /> : <Navigate to="/" />}
-            />
-            <Route
-              path="/profile/:userId"
-              element={isAuth ? <ProfilePage /> : <Navigate to="/" />}
-            />
-            <Route
-              path="/edit-profile"
-              element={isAuth ? <EditProfilePage /> : <Navigate to="/" />}
-            />
-          </Routes>
-        </ThemeProvider>
-      </BrowserRouter>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+
+        <RouterProvider router={router} />
+      </ThemeProvider>
     </div>
   );
 }

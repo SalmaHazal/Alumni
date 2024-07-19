@@ -21,21 +21,22 @@ import { verifyToken } from "./middleware/auth.js";
 import User from "./models/User.js";
 import Post from "./models/Post.js";
 import { users, posts } from "./data/index.js";
+import { app, server } from './socket/index.js';
 
 /* CONFIGURATIONS */
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 dotenv.config();
-const app = express();
+// const app = express();
+
 app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', process.env.FRONTEND_URL);
-  
+  res.setHeader('Access-Control-Allow-Origin', "http://localhost:5173");
   next();
 });
 app.use(express.json());
 app.use(helmet());
 app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
-app.use(morgan("common"));
+// app.use(morgan("common"));
 app.use(bodyParser.json({ limit: "30mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 app.use(cors({
@@ -81,7 +82,7 @@ const connectDB = async () => {
 };
 
 // Listening to the requests
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   connectDB();
   console.log("Server is running on port " + PORT);
 

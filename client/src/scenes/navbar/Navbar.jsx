@@ -123,12 +123,23 @@ const Navbar = () => {
                   style={{ margin: "0 17px" }}
                 />
               </ListItem>
-              <ListItem button>
+              
+              <ListItem
+                button
+                component={Link}
+                to="/chat"
+                sx={
+                  location.pathname === "/chat" 
+                    ? { background: "#C7C8CC", borderRadius: "10px" }
+                    : null
+                }
+              >
                 <Message
                   sx={{ fontSize: "25px" }}
                   style={{ margin: "0 17px" }}
                 />
               </ListItem>
+
               <ListItem button>
                 <NotificationsActiveIcon
                   sx={{ fontSize: "25px" }}
