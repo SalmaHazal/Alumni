@@ -13,23 +13,12 @@ const AdvertWidget = () => {
   return (
     <WidgetWrapper className="fixed-widget">
       <FlexBetween>
-        <Typography color={dark} variant="h5" fontWeight="500">
-          Sponsored
+        <Typography color="#37B7C3" variant="h5" fontWeight="500">
+          SUD Map   🗺 
         </Typography>
-        <Typography color={medium}>Create Ad</Typography>
+        <Typography color={medium}>laureate position</Typography>
       </FlexBetween>
       <Map />
-      {/*<img
-        width="100%"
-        height="auto"
-        alt="advert"
-        src="http://localhost:3001/assets/info4.jpeg"
-        style={{ borderRadius: "0.75rem", margin: "0.75rem 0" }}
-      />*/}
-      <FlexBetween>
-        <Typography color={main}>MikaCosmetics</Typography>
-        <Typography color={medium}>mikacosmetics.com</Typography>
-      </FlexBetween>
     </WidgetWrapper>
   );
 };

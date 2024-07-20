@@ -1,5 +1,6 @@
 import { Box, Typography, useTheme, useMediaQuery } from "@mui/material";
 import Form from "./Form";
+import Logoalumni from "/public/assets/logoalumni.png";
 
 const LoginPage = () => {
   const theme = useTheme();
@@ -12,8 +13,8 @@ const LoginPage = () => {
         p="1rem 6%"
         textAlign="center"
       >
-        <Typography fontWeight="bold" fontSize="32px" color="primary">
-          Alumni's World
+        <Typography >
+          <img src={Logoalumni} style={{borderRadius: "7px", height:"70px"}}></img>
         </Typography>
       </Box>
 
@@ -25,7 +26,7 @@ const LoginPage = () => {
         backgroundColor={theme.palette.background.alt}
       >
         <Typography fontSize="25px" fontWeight="500" variant="h5" sx={{ mb: "1.5rem" }}>
-          Welcome to <Typography fontSize="25px" fontWeight="500" component="span" sx={{ color: 'primary.main', mb: "1.5rem" }}>Alumni's World</Typography> 
+          Welcome to <Typography fontSize="25px" fontWeight="500" component="span" sx={{ color: 'primary.main', mb: "1.5rem" }}>Alumni SUD</Typography> 
         </Typography>
         <Form />
       </Box>

@@ -179,7 +179,7 @@ const Navbar = () => {
             <IconButton
               onClick={() => setIsMobileMenuToggled(!isMobileMenuToggled)}
             >
-              <Hamburger direction="right" size={30} duration={0.2} color="#2e3e4d"  />
+              <Hamburger direction="right" size={25} duration={0.2} color="#2e3e4d"  />
             </IconButton>
           </div>
         )}
