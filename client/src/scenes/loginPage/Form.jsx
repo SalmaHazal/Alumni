@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -17,6 +17,11 @@ import { setLogin } from "../../state/index";
 import Dropzone from "react-dropzone";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Select, MenuItem, FormControl, InputLabel, FormHelperText } from '@mui/material';
+import villes from "../../Data/locat.json";
+
+
+
 
 const registerSchema = yup.object().shape({
   // yup is a JavaScript schema builder
@@ -25,6 +30,7 @@ const registerSchema = yup.object().shape({
   email: yup.string().email("invalid email").required("required"),
   password: yup.string().required("required"),
   location: yup.string().required("required"),
+  promotion: yup.string().required("required"),
   occupation: yup.string().required("required"),
   picture: yup.string().required("required"),
 });
@@ -40,7 +46,9 @@ const initialValuesRegister = {
   email: "",
   password: "",
   location: "",
+  promotion: "",
   occupation: "",
+  phonenumber:"",
   picture: "",
 };
 
@@ -57,6 +65,14 @@ const Form = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const isLogin = pageType === "login";
   const isRegister = pageType === "register";
+  const [sortedCities, setSortedCities] = useState([]);
+  const promo= ["2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024"]
+
+  useEffect(() => {
+    const cities = villes.map(city => city.city);
+    cities.sort((a, b) => a.localeCompare(b));
+    setSortedCities(cities);
+  }, []);
 
   const register = async (values, onSubmitProps) => {
     try {
@@ -176,16 +192,60 @@ const Form = () => {
                   helperText={touched.lastName && errors.lastName}
                   sx={{ gridColumn: "span 2" }}
                 />
-                <TextField
-                  label="Location"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  value={values.location}
-                  name="location"
-                  error={Boolean(touched.location) && Boolean(errors.location)}
-                  helperText={touched.location && errors.location}
+                
+                <FormControl 
+                  error={Boolean(touched.location) && Boolean(errors.location)} 
                   sx={{ gridColumn: "span 4" }}
-                />
+                  fullWidth
+                >
+                <InputLabel id="promotion-label">Promotion</InputLabel>
+                <Select
+                     labelId="promotion"
+                     id="promotion"
+                     value={values.promotion}
+                     name="promotion"
+                     onBlur={handleBlur}
+                     onChange={handleChange}
+                     label="promotion"
+                >
+                {promo.map((city, index) => (
+                <MenuItem key={index} value={city}>
+                {city}
+                </MenuItem>
+                ))}
+                </Select>
+                {Boolean(touched.promotion) && Boolean(errors.promotion) && (
+                  <FormHelperText>{errors.promotion}</FormHelperText>
+                )}
+                </FormControl>
+                <FormControl 
+                  error={Boolean(touched.location) && Boolean(errors.location)} 
+                  sx={{ gridColumn: "span 4" }}
+                  fullWidth
+                >
+                <InputLabel id="location-label">Location</InputLabel>
+                <Select
+                     labelId="location-label"
+                     id="location"
+                     value={values.location}
+                     name="location"
+                     onBlur={handleBlur}
+                     onChange={handleChange}
+                     label="Location"
+                >
+                <MenuItem value="">
+                  <em>None</em>
+                </MenuItem>
+                {sortedCities.map((city, index) => (
+                <MenuItem key={index} value={city}>
+                {city}
+                </MenuItem>
+                ))}
+                </Select>
+                {Boolean(touched.location) && Boolean(errors.location) && (
+                  <FormHelperText>{errors.location}</FormHelperText>
+                )}
+                </FormControl>
                 <TextField
                   label="Occupation"
                   onBlur={handleBlur}
@@ -198,6 +258,20 @@ const Form = () => {
                   helperText={touched.occupation && errors.occupation}
                   sx={{ gridColumn: "span 4" }}
                 />
+                <TextField
+                  label="phonenumber"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.phonenumber}
+                  name="phonenumber"
+                  error={
+                    Boolean(touched.phonenumber) && Boolean(errors.phonenumber)
+                  }
+                  helperText={touched.phonenumber && errors.phonenumber}
+                  sx={{ gridColumn: "span 4" }}
+                />
+                
+                
                 <Box
                   gridColumn="span 4"
                   border={`1px solid ${palette.neutral.medium}`}
