@@ -5,6 +5,8 @@ import {
 } from "react-router-dom";
 import HomePage from "./scenes/homePage/HomePage";
 import LoginPage from "./scenes/loginPage/LoginPage";
+import ForgotPassword from "./scenes/loginPage/ForgotPassword";
+import ResetPassword from "./scenes/loginPage/ResetPassword";
 import ProfilePage from "./scenes/profilePage/ProfilePage";
 import EditProfilePage from "./scenes/modify/EditProfilePage";
 import { useMemo } from "react";
@@ -38,6 +40,16 @@ function App() {
     {
       path: "/edit-profile",
       element: <EditProfilePage />,
+    },
+    {
+      path: "/forgot-password",
+      element: <ForgotPassword />,
+
+    },
+    {
+      path: "/reset_password/:id/:token",
+      element: <ResetPassword />
+
     },
     {
       path: "/chat",

@@ -1,5 +1,6 @@
 import { Box, Typography, useTheme, useMediaQuery } from "@mui/material";
 import Form from "./Form";
+import { Link } from "react-router-dom";
 import Logoalumni from "/public/assets/logoalumni.png";
 
 const LoginPage = () => {
@@ -14,7 +15,7 @@ const LoginPage = () => {
         textAlign="center"
       >
         <Typography >
-          <img src={Logoalumni} style={{borderRadius: "7px", height:"70px"}}></img>
+          <img src={Logoalumni} style={{borderRadius: "7px", height:"70px"}} alt="Alumni Logo" />
         </Typography>
       </Box>
 
@@ -29,6 +30,11 @@ const LoginPage = () => {
           Welcome to <Typography fontSize="25px" fontWeight="500" component="span" sx={{ color: 'primary.main', mb: "1.5rem" }}>Alumni SUD</Typography> 
         </Typography>
         <Form />
+        <Box textAlign="center" mt="1rem">
+          <Link to="/forgot-password" style={{ textDecoration: 'none', color: theme.palette.primary.main }}>
+            Forgot Password?
+          </Link>
+        </Box>
       </Box>
     </Box>
   );
