@@ -55,6 +55,8 @@ const Navbar = () => {
   const primaryLight = theme.palette.primary.light;
   const alt = theme.palette.background.alt;
 
+  const isChatPath = /\/chat(\/\d+)?/.test(location.pathname);
+
   const fullName = `${user.firstName} ${user.lastName}`;
 
   const handleSearch = async () => {
@@ -123,11 +125,10 @@ const Navbar = () => {
                 button
                 component={Link}
                 to="/home"
-                sx={
-                  location.pathname === "/home"
-                    ? { background: "#C7C8CC", borderRadius: "10px" }
-                    : null
-                }
+                sx={{
+                  borderRadius: "10px",
+                  background: location.pathname === "/home" ? "#C7C8CC" : "transparent"
+                }}
               >
                 <HomeIcon
                   sx={{ fontSize: "25px" }}
@@ -139,11 +140,10 @@ const Navbar = () => {
                 button
                 component={Link}
                 to="/chat"
-                sx={
-                  location.pathname === "/chat"
-                    ? { background: "#C7C8CC", borderRadius: "10px" }
-                    : null
-                }
+                sx={{
+                  borderRadius: "10px",
+                  background: isChatPath ? "#C7C8CC" : "transparent"
+                }}
               >
                 <Message
                   sx={{ fontSize: "25px" }}
@@ -234,11 +234,10 @@ const Navbar = () => {
                   button
                   component={Link}
                   to="/home"
-                  sx={
-                    location.pathname === "/home"
-                      ? { background: "#C7C8CC", borderRadius: "10px" }
-                      : null
-                  }
+                  sx={{
+                    borderRadius: "10px",
+                    background: location.pathname === "/home" ? "#C7C8CC" : "transparent"
+                  }}
                 >
                   <HomeIcon
                     sx={{ fontSize: "25px" }}
@@ -250,11 +249,11 @@ const Navbar = () => {
                   button
                   component={Link}
                   to="/chat"
-                  sx={
-                    location.pathname === "/chat"
-                      ? { background: "#C7C8CC", borderRadius: "10px" }
-                      : null
-                  }
+                  sx={{
+                    borderRadius: "10px",
+                    background: isChatPath ? "#C7C8CC" : "transparent"
+                  }}
+                  
                 >
                   <Message
                     sx={{ fontSize: "25px" }}

@@ -172,6 +172,7 @@ const Form = () => {
               <>
                 <TextField
                   label="First Name"
+                  title="Example : Ahmed"
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.firstName}
@@ -184,6 +185,7 @@ const Form = () => {
                 />
                 <TextField
                   label="Last Name"
+                  title="Example : EL IDRISSI"
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.lastName}
@@ -201,6 +203,7 @@ const Form = () => {
                 <InputLabel id="promotion-label">Promotion</InputLabel>
                 <Select
                      labelId="promotion"
+                     title="Select a field"
                      id="promotion"
                      value={values.promotion}
                      name="promotion"
@@ -226,6 +229,7 @@ const Form = () => {
                 <InputLabel id="location-label">Location</InputLabel>
                 <Select
                      labelId="location-label"
+                     title="Select a field"
                      id="location"
                      value={values.location}
                      name="location"
@@ -248,6 +252,7 @@ const Form = () => {
                 </FormControl>
                 <TextField
                   label="Occupation"
+                  title="Example : Engineer"
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.occupation}
@@ -259,7 +264,8 @@ const Form = () => {
                   sx={{ gridColumn: "span 4" }}
                 />
                 <TextField
-                  label="phonenumber"
+                  label="Phone Number"
+                  title="Example : 0666666666"
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.phonenumber}
@@ -328,6 +334,7 @@ const Form = () => {
 
             <TextField
               label="Email"
+              title="Example : John@gmail.com"
               onBlur={handleBlur}
               onChange={handleChange}
               value={values.email}
@@ -338,6 +345,7 @@ const Form = () => {
             />
             <TextField
               label="Password"
+              title="Example : 1234A567B8"
               type="password"
               onBlur={handleBlur}
               onChange={handleChange}

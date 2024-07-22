@@ -13,10 +13,12 @@ import "leaflet/dist/leaflet.css";
 import hadi from "../Data/locat.json";
 import "../index.css";
 import Avatar from "../scenes/widgets/Avatar";
+import { useNavigate } from "react-router-dom";
 
 const UserLocations = () => {
   const [locations, setLocations] = useState([]);
   const [list, setList] = useState([]);
+  const navigate = useNavigate();
 
   const addItem = (item) => {
     setList((prevList) => [...prevList, item]);
@@ -106,7 +108,7 @@ const UserLocations = () => {
           onClick={handleClick}
           style={{ display: isVisible ? "inline-block" : "none" }}
         >
-          Laureat Location
+          Laureate Location
         </Button>
       </form>
 
@@ -118,7 +120,6 @@ const UserLocations = () => {
       >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         <LocationMarker />
-        {console.log("me", list)}
         {list.map((item, index) => (
           <Marker key={index} position={item.position}>
             <Popup
@@ -135,21 +136,31 @@ const UserLocations = () => {
                   height={40}
                   name={`${item?.firstName} ${item?.lastName}`}
                   imageUrl={item?.picturePath}
-                  userId={item?.id}
+                  userId={item.id}
                 />
                 <div className="text-content">
                   <div>
-                    <strong style={{ marginTop: "-4px", marginLeft: "-20px" }}>
+                    <strong style={{ marginTop: "-4px", marginLeft: "-10px" }}>
                       {item.firstName} {item.lastName}
                     </strong>
                     <br />
                     <br />
                   </div>
-                  <ul style={{marginLeft: "-18px", cursor: "pointer"}}>
+                  <ul style={{ marginLeft: "-18px", cursor: "pointer" }}>
                     <li title={item.city}>City: {item.city}</li>
                     <li title={item.promotion}>Promo: {item.promotion}</li>
-                    <li title={item.email}>e-mail: {truncateEmail(item.email)}</li>
+                    <li title={item.email}>
+                      e-mail: {truncateEmail(item.email)}
+                    </li>
                   </ul>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    sx={{ padding: "5px 10px", fontSize: "12px", marginLeft: "-30px" }}
+                    onClick={() => navigate(`/chat/${item.id}`)}
+                  >
+                    Send A Message
+                  </Button>
                 </div>
               </div>
             </Popup>
