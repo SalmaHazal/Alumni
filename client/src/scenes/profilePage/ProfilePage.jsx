@@ -25,7 +25,7 @@ const ProfilePage = () => {
 
   useEffect(() => {
     getUser();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []); // Now includes userId and token
 
   if (!user) return null;
 

@@ -1,16 +1,25 @@
+import React, { useEffect, useState } from "react";
 import {
   ManageAccountsOutlined,
   EditOutlined,
   LocationOnOutlined,
   WorkOutlineOutlined,
 } from "@mui/icons-material";
-import { Box, Typography, Divider, useTheme, IconButton } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Divider,
+  useTheme,
+  IconButton,
+  Dialog,
+  CircularProgress,
+} from "@mui/material";
 import UserImage from "../../components/UserImage";
 import FlexBetween from "../../components/FlexBetween";
 import WidgetWrapper from "../../components/WidgetWrapper";
 import { useSelector } from "react-redux";
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import EditProfilePage from "../modify/EditProfilePage";
 
 const UserWidget = ({ userId, picturePath }) => {
   const [user, setUser] = useState(null);
@@ -20,26 +29,42 @@ const UserWidget = ({ userId, picturePath }) => {
   const dark = palette.text.primary;
   const medium = palette.text.secondary;
   const main = palette.primary.main;
+  const [openEditProfile, setOpenEditProfile] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const getUser = async () => {
+    setLoading(true);
     try {
       const response = await fetch(`http://localhost:3001/users/${userId}`, {
         method: "GET",
         headers: { Authorization: `Bearer ${token}` },
       });
+      if (!response.ok) {
+        throw new Error("Failed to fetch user data");
+      }
       const data = await response.json();
       setUser(data);
     } catch (error) {
       console.error("Error fetching user:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     getUser();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [userId, token]);
+
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   if (!user) {
-    return null;
+    return <Typography>No user data available.</Typography>;
   }
 
   const {
@@ -52,10 +77,21 @@ const UserWidget = ({ userId, picturePath }) => {
     friends,
   } = user;
 
+  const handleEditProfileOpen = () => {
+    setOpenEditProfile(true);
+  };
+
+  const handleEditProfileClose = (updated) => {
+    setOpenEditProfile(false);
+    if (updated) {
+      getUser();
+      navigate(`/profile/${userId}`);
+    }
+  };
+
   return (
     <WidgetWrapper>
-      {/* FIRST ROW */}
-      <FlexBetween gap="0.5rem" pb="1.1rem" >
+      <FlexBetween gap="0.5rem" pb="1.1rem">
         <FlexBetween gap="1rem" onClick={() => navigate(`/profile/${userId}`)}>
           <UserImage image={picturePath} />
           <Box>
@@ -75,13 +111,12 @@ const UserWidget = ({ userId, picturePath }) => {
             <Typography color={medium}>{friends.length} friends</Typography>
           </Box>
         </FlexBetween>
-        <IconButton onClick={() => navigate("/edit-profile")}>
+        <IconButton onClick={handleEditProfileOpen}>
           <ManageAccountsOutlined />
         </IconButton>
       </FlexBetween>
       <Divider />
 
-      {/* SECOND ROW */}
       <Box p="1rem 0">
         <Box display="flex" alignItems="center" gap="1rem" mb="0.5rem">
           <LocationOnOutlined fontSize="large" sx={{ color: main }} />
@@ -95,7 +130,6 @@ const UserWidget = ({ userId, picturePath }) => {
 
       <Divider />
 
-      {/* THIRD ROW */}
       <Box p="1rem 0">
         <FlexBetween mb="0.5rem">
           <Typography color={medium}>Who's viewed your profile</Typography>
@@ -113,16 +147,14 @@ const UserWidget = ({ userId, picturePath }) => {
 
       <Divider />
 
-      {/* FOURTH ROW */}
       <Box p="1rem 0">
         <Typography fontSize="1rem" color={main} fontWeight="500" mb="1rem">
           Social Profiles
         </Typography>
 
-        {/* Example of social profile */}
         <FlexBetween gap="1rem" mb="0.5rem">
           <FlexBetween gap="1rem">
-            <img src="../../../public/assets/twitter.png" alt="twitter" />
+            <img src="/assets/twitter.png" alt="twitter" />
             <Box>
               <Typography color={main} fontWeight="500">
                 Twitter
@@ -135,10 +167,9 @@ const UserWidget = ({ userId, picturePath }) => {
           </IconButton>
         </FlexBetween>
 
-        {/* Example of another social profile */}
         <FlexBetween gap="1rem">
           <FlexBetween gap="1rem">
-            <img src="../../../public/assets/linkedin.png" alt="linkedin" />
+            <img src="/assets/linkedin.png" alt="linkedin" />
             <Box>
               <Typography color={main} fontWeight="500">
                 Linkedin
@@ -151,6 +182,15 @@ const UserWidget = ({ userId, picturePath }) => {
           </IconButton>
         </FlexBetween>
       </Box>
+
+      <Dialog
+        open={openEditProfile}
+        onClose={() => handleEditProfileClose(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <EditProfilePage onClose={handleEditProfileClose} />
+      </Dialog>
     </WidgetWrapper>
   );
 };

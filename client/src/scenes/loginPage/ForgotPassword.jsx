@@ -19,10 +19,16 @@ function ForgotPassword() {
             }).catch(err => console.log(err));
     }
 
+    const handleCancel = () => {
+        navigate('/'); // Change this path to your desired route
+    };
+
     return (
         <Box className="d-flex justify-content-center align-items-center bg-secondary vh-100">
             <Box className="bg-white p-3 rounded" sx={{ width: '25%' }}>
-                <Typography variant="h4">Forgot Password</Typography>
+                <Typography variant="h4" align="center" gutterBottom>
+                    Forgot Password
+                </Typography>
                 <form onSubmit={handleSubmit}>
                     <Box mb={3}>
                         <Typography variant="body1" component="label" htmlFor="email" fontWeight="bold">
@@ -38,19 +44,25 @@ function ForgotPassword() {
                             onChange={(e) => setEmail(e.target.value)}
                         />
                     </Box>
-                    <Button 
-                        type="submit" 
-                        variant="contained" 
-                        fullWidth 
-                        sx={{ 
-                            borderRadius: 0, 
-                            backgroundColor: '#87CEEB', // Sky blue color
-                            '&:hover': { 
-                                backgroundColor: '#00BFFF' // Deep sky blue color for hover
-                            } 
-                        }}>
-                        Send
-                    </Button>
+                    <Box sx={{ display: 'flex', gap: 2 }}>
+                        <Button
+                            type="submit"
+                            variant="contained"
+                            fullWidth
+                            sx={{ flexGrow: 1 }}
+                        >
+                            Send
+                        </Button>
+                        <Button
+                            type="button"
+                            variant="outlined"
+                            fullWidth
+                            onClick={handleCancel}
+                            sx={{ flexGrow: 1 }}
+                        >
+                            Cancel
+                        </Button>
+                    </Box>
                 </form>
             </Box>
         </Box>

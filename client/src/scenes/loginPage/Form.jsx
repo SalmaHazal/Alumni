@@ -11,7 +11,7 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import { Formik } from "formik";
 import * as yup from "yup";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link} from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setLogin } from "../../state/index";
 import Dropzone from "react-dropzone";
@@ -347,6 +347,13 @@ const Form = () => {
               helperText={touched.password && errors.password}
               sx={{ gridColumn: "span 4" }}
             />
+            {isLogin && (
+              <Box sx={{ gridColumn: "span 4", textAlign: "right" }}>
+                <Link to="/forgot-password" style={{ textDecoration: 'none', color: palette.primary.main }}>
+                  Forgot Password?
+                </Link>
+              </Box>
+            )}
           </Box>
 
           {/* BUTTONS */}

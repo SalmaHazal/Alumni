@@ -30,11 +30,7 @@ const LoginPage = () => {
           Welcome to <Typography fontSize="25px" fontWeight="500" component="span" sx={{ color: 'primary.main', mb: "1.5rem" }}>Alumni SUD</Typography> 
         </Typography>
         <Form />
-        <Box textAlign="center" mt="1rem">
-          <Link to="/forgot-password" style={{ textDecoration: 'none', color: theme.palette.primary.main }}>
-            Forgot Password?
-          </Link>
-        </Box>
+  
       </Box>
     </Box>
   );
