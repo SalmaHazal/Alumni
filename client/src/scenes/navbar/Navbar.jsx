@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Logoalumni from "/public/assets/logoalumni.png";
+import hashtag from "/public/assets/hashtag.01.png";
 import Grid from "@mui/material/Grid";
 import {
   Box,
@@ -34,7 +35,7 @@ import { useNavigate } from "react-router-dom";
 import FlexBetween from "../../components/FlexBetween";
 import { Link, useLocation } from "react-router-dom";
 import AccountMenu from "../prof/prof";
-import { Fade as Hamburger } from 'hamburger-react'
+import { Fade as Hamburger } from "hamburger-react";
 import { useTransition, animated } from "@react-spring/web";
 
 const Navbar = () => {
@@ -93,14 +94,23 @@ const Navbar = () => {
     >
       <FlexBetween gap="1.75rem">
         {/* logo */}
-        <Typography>
-          <Box sx={{ flexGrow: 1, display: { md: "flex" } }}>
+        <Typography component="div">
+          <Box sx={{ display: "flex", alignItems: "center" }}>
             <img
               src={Logoalumni}
               alt="Logo"
               style={{
-                marginRight: "60px",
+                marginRight: "20px",
                 width: "100px",
+                height: "auto",
+                borderRadius: "6px",
+              }}
+            />
+            <img
+              src={hashtag}
+              alt="hashtag"
+              style={{
+                width: "200px",
                 height: "auto",
                 borderRadius: "6px",
               }}
@@ -127,7 +137,8 @@ const Navbar = () => {
                 to="/home"
                 sx={{
                   borderRadius: "10px",
-                  background: location.pathname === "/home" ? "#C7C8CC" : "transparent"
+                  background:
+                    location.pathname === "/home" ? "#C7C8CC" : "transparent",
                 }}
               >
                 <HomeIcon
@@ -142,7 +153,7 @@ const Navbar = () => {
                 to="/chat"
                 sx={{
                   borderRadius: "10px",
-                  background: isChatPath ? "#C7C8CC" : "transparent"
+                  background: isChatPath ? "#C7C8CC" : "transparent",
                 }}
               >
                 <Message
@@ -179,7 +190,12 @@ const Navbar = () => {
             <IconButton
               onClick={() => setIsMobileMenuToggled(!isMobileMenuToggled)}
             >
-              <Hamburger direction="right" size={25} duration={0.2} color="#2e3e4d"  />
+              <Hamburger
+                direction="right"
+                size={25}
+                duration={0.2}
+                color="#526482"
+              />
             </IconButton>
           </div>
         )}
@@ -209,18 +225,20 @@ const Navbar = () => {
           <animated.div
             style={{
               ...style,
-              position: 'fixed',
+              position: "fixed",
               right: 0,
-              top: '70px',
+              top: "70px",
               bottom: 0,
-              height: '100%',
+              height: "100%",
               zIndex: 10,
-              maxWidth: '500px',
-              minWidth: '300px',
+              maxWidth: "500px",
+              minWidth: "300px",
               backgroundColor: background,
             }}
           >
-            <FlexBetween style={{ marginTop: "15px", justifyContent: "center" }}>
+            <FlexBetween
+              style={{ marginTop: "15px", justifyContent: "center" }}
+            >
               <List
                 style={{
                   display: "flex",
@@ -236,7 +254,8 @@ const Navbar = () => {
                   to="/home"
                   sx={{
                     borderRadius: "10px",
-                    background: location.pathname === "/home" ? "#C7C8CC" : "transparent"
+                    background:
+                      location.pathname === "/home" ? "#C7C8CC" : "transparent",
                   }}
                 >
                   <HomeIcon
@@ -251,9 +270,8 @@ const Navbar = () => {
                   to="/chat"
                   sx={{
                     borderRadius: "10px",
-                    background: isChatPath ? "#C7C8CC" : "transparent"
+                    background: isChatPath ? "#C7C8CC" : "transparent",
                   }}
-                  
                 >
                   <Message
                     sx={{ fontSize: "25px" }}
@@ -275,9 +293,15 @@ const Navbar = () => {
                 </ListItem>
                 <ListItem button onClick={() => dispatch(setMode())}>
                   {theme.palette.mode === "dark" ? (
-                    <DarkMode style={{ margin: "0 17px" }} sx={{ fontSize: "25px" }} />
+                    <DarkMode
+                      style={{ margin: "0 17px" }}
+                      sx={{ fontSize: "25px" }}
+                    />
                   ) : (
-                    <LightMode style={{ margin: "0 17px" }} sx={{ color: dark, fontSize: "25px" }} />
+                    <LightMode
+                      style={{ margin: "0 17px" }}
+                      sx={{ color: dark, fontSize: "25px" }}
+                    />
                   )}
                 </ListItem>
 
