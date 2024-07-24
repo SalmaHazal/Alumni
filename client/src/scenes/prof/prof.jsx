@@ -122,6 +122,7 @@ export default function AccountMenu() {
         </MenuItem>
         <MenuItem onClick={() => {
           dispatch(setLogout());
+          navigate('/');
           handleClose();
         }}>
           <ListItemIcon>
