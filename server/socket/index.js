@@ -6,6 +6,7 @@ import User from "../models/User.js";
 import Conversation from "../models/Conversation.js";
 import Message from "../models/Message.js";
 import getConversation from "../helpers/getConversation.js";
+import CommunityConversation from "../models/CommunityConversation.js";
 
 const app = express();
 
@@ -24,10 +25,79 @@ const io = new Server(server, {
 io.on("connection", async (socket) => {
   console.log("A user has connected", socket.id);
 
+  // Get the id of the community Conversation
+  const communityConversationID = async () => {
+    const getConversationMessage = await CommunityConversation.find();
+    return getConversationMessage[0]._id;
+  };
+  const ID = await communityConversationID();
+
   const token = socket.handshake.auth.token;
 
   // current user detail
   const user = await getUserDetailsFromToken(token);
+
+  // Community Messages
+  socket.on("community", async () => {
+    // get previous message
+    const getConversationMessage = await CommunityConversation.findById(ID)
+      .populate({
+        path: "messages",
+        populate: {
+          path: "msgByUserId",
+          model: "User",
+        },
+      })
+      .sort({ updatedAt: -1 });
+
+    socket.emit("community messages", getConversationMessage?.messages || []);
+  });
+
+  socket.on("new community message", async (data) => {
+    const message = new Message({
+      text: data.text,
+      imageUrl: data.imageUrl,
+      videoUrl: data.videoUrl,
+      msgByUserId: data?.msgByUserId,
+    });
+    const saveMessage = await message.save();
+
+    await CommunityConversation.updateOne(
+      { _id: ID },
+      {
+        $push: { messages: saveMessage._id },
+      }
+    );
+
+    const getConversationMessage = await CommunityConversation.findById(ID)
+      .populate({
+        path: "messages",
+        populate: {
+          path: "msgByUserId",
+          model: "User",
+        },
+      })
+      .sort({ updatedAt: -1 });
+
+    io.emit("community messages", getConversationMessage?.messages || []);
+  });
+
+  // Community Side Bar
+  const getLastMessage = await CommunityConversation.findById(ID).populate({
+    path: "messages",
+    populate: {
+      path: "msgByUserId",
+      model: "User",
+    },
+    options: {
+      sort: { updatedAt: -1 },
+      limit: 1,
+    },
+  });
+
+  const lastMessage = getLastMessage.messages[0];
+
+  socket.emit("community last message", lastMessage);
 
   //create a room
   socket.join(user?._id.toString());
@@ -113,8 +183,7 @@ io.on("connection", async (socket) => {
     const conversationReceiver = await getConversation(data?.receiver);
 
     io.to(data?.sender).emit("conversation", conversationSender);
-    io.to(data?.receiver).emit("conversation",conversationReceiver);
-    
+    io.to(data?.receiver).emit("conversation", conversationReceiver);
   });
 
   // sidebar
@@ -124,7 +193,7 @@ io.on("connection", async (socket) => {
     socket.emit("conversation", conversation);
   });
 
-  socket.on('seen', async (msgByUserId) => {
+  socket.on("seen", async (msgByUserId) => {
     let conversation = await Conversation.findOne({
       $or: [
         { sender: user?._id, receiver: msgByUserId },
@@ -132,20 +201,20 @@ io.on("connection", async (socket) => {
       ],
     });
 
-    const conversationMessageId = conversation?.messages || []
+    const conversationMessageId = conversation?.messages || [];
 
-    const updateMessages  = await Message.updateMany(
-      { _id : { "$in" : conversationMessageId }, msgByUserId : msgByUserId },
-      { "$set" : { seen : true }}
-  )
+    const updateMessages = await Message.updateMany(
+      { _id: { $in: conversationMessageId }, msgByUserId: msgByUserId },
+      { $set: { seen: true } }
+    );
 
-  //send conversation
-  const conversationSender = await getConversation(user?._id?.toString())
-  const conversationReceiver = await getConversation(msgByUserId)
+    //send conversation
+    const conversationSender = await getConversation(user?._id?.toString());
+    const conversationReceiver = await getConversation(msgByUserId);
 
-  io.to(user?._id?.toString()).emit('conversation',conversationSender)
-  io.to(msgByUserId).emit('conversation',conversationReceiver)
-  })
+    io.to(user?._id?.toString()).emit("conversation", conversationSender);
+    io.to(msgByUserId).emit("conversation", conversationReceiver);
+  });
 
   // disconnect
   socket.on("disconnect", () => {

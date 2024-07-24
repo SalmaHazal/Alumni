@@ -15,7 +15,7 @@ const ChattingPage = () => {
   return (
     <>
       <Navbar />
-      <div className="grid lg:grid-cols-[300px,1fr] h-[90%]">
+      <div className="grid lg:grid-cols-[400px,1fr] h-[90%]">
         <section className={`bg-white ${!basePath && "hidden"} lg:block`}>
           <SideBar />
         </section>

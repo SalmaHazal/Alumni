@@ -16,6 +16,7 @@ import ChattingPage from "./scenes/chattingPage/ChattingPage";
 import MessagePage from "./scenes/widgets/MessagePage";
 import "bootstrap/dist/css/bootstrap.min.css";
 import './App.css';
+import CommunityMessages from "./scenes/widgets/CommunityMessages";
 
 function App() {
   const mode = useSelector((state) => state.mode);
@@ -47,6 +48,11 @@ function App() {
           path: ":userId",
           element: <MessagePage />,
         },
+        {
+          path: "community",
+          element: < CommunityMessages />
+        },
+
       ],
     },
   ]);
