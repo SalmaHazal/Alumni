@@ -1,13 +1,16 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setPosts } from "../../state/index";
 import PostWidget from "./PostWidget";
+import { useTheme, Typography } from "@mui/material";
 
 const PostsWidget = ({ userId, isProfile = false }) => {
   const dispatch = useDispatch();
   const posts = useSelector((state) => state.posts);
   const token = useSelector((state) => state.token);
-
+  const { palette } = useTheme();
+  const [visiblePosts, setVisiblePosts] = useState(5); // Initial number of visible posts
+  const main = palette.primary.main;
   const getPosts = async () => {
     const response = await fetch("http://localhost:3001/posts", {
       method: "GET",
@@ -37,9 +40,13 @@ const PostsWidget = ({ userId, isProfile = false }) => {
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const handleShowMore = () => {
+    setVisiblePosts((prevVisiblePosts) => prevVisiblePosts + 5);
+  };
+
   return (
     <>
-      {posts.map(
+      {posts.slice(0, visiblePosts).map(
         ({
           _id,
           userId,
@@ -65,6 +72,15 @@ const PostsWidget = ({ userId, isProfile = false }) => {
             comments={comments}
           />
         )
+      )}
+      {visiblePosts < posts.length && (
+        <div style={{ textAlign: 'center', margin: '20px 0' }}>
+          <button onClick={handleShowMore} >
+          <Typography color={main} >
+             Show more posts
+          </Typography>
+          </button>
+        </div>
       )}
     </>
   );
