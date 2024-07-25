@@ -14,7 +14,7 @@ const LoginPage = () => {
         textAlign="center"
       >
         <Typography >
-          <img src={Logoalumni} style={{borderRadius: "7px", height:"70px"}}></img>
+          <img src={Logoalumni} style={{borderRadius: "7px", height:"70px"}} alt="Alumni Logo" />
         </Typography>
       </Box>
 
