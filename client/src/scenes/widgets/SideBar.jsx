@@ -11,6 +11,7 @@ import { FaRegImage } from "react-icons/fa6";
 import { FaVideo } from "react-icons/fa6";
 import { RiUserSearchFill } from "react-icons/ri";
 import { useSocketContext } from "../../context/SocketContext";
+import { useTheme } from "@mui/material/styles";
 
 const Sidebar = () => {
   const user = useSelector((state) => state?.user);
@@ -21,6 +22,7 @@ const Sidebar = () => {
   const [activeTab, setActiveTab] = useState("personal");
 
   const { socket } = useSocketContext();
+  const theme = useTheme();
 
   useEffect(() => {
     if (socket) {
@@ -55,15 +57,25 @@ const Sidebar = () => {
   }, [socket, user, communityConv]);
 
   return (
-    <div className="w-full h-full grid grid-cols-[48px,1fr] bg-white">
+    <div
+      className={`${
+        theme.palette.mode === "light" ? "bg-white" : "bg-[#2b2b2b]"
+      } w-full h-full grid grid-cols-[48px,1fr] `}
+    >
       {/* First column */}
-      <div className="bg-slate-100 w-full max-w-[300px] h-full rounded-tr-lg rounded-br-lg py-5 text-slate-600 flex flex-col justify-between">
+      <div
+        className={`${
+          theme.palette.mode === "light" ? "bg-slate-100" : "bg-[#212121]"
+        } w-full max-w-[300px] h-full rounded-tr-lg rounded-br-lg py-5 text-slate-600 flex flex-col justify-between`}
+      >
         <div>
           <NavLink
             className={({ isActive }) =>
-              `w-12 h-12 flex justify-center items-center cursor-pointer hover:bg-slate-200 rounded ${
-                isActive && "bg-slate-200"
-              }`
+              `w-12 h-12 flex justify-center items-center cursor-pointer ${
+                theme.palette.mode === "light"
+                  ? "hover:bg-slate-200"
+                  : "hover:bg-[#3b3b3b]"
+              }  rounded `
             }
             title="chat"
           >
@@ -73,7 +85,11 @@ const Sidebar = () => {
           <div
             title="search friend"
             onClick={() => setOpenSearchUser(true)}
-            className="w-12 h-12 flex justify-center items-center cursor-pointer hover:bg-slate-200 rounded"
+            className={`w-12 h-12 flex justify-center items-center cursor-pointer ${
+              theme.palette.mode === "light"
+                ? "hover:bg-slate-200"
+                : "hover:bg-[#3b3b3b]"
+            } rounded`}
           >
             <RiUserSearchFill size={20} />
           </div>
@@ -83,7 +99,7 @@ const Sidebar = () => {
           <button
             className="mx-auto"
             title={`${user?.firstName} ${user?.lastName}`}
-            onClick={() => setEditUserOpen(true)}
+            // onClick={() => setEditUserOpen(true)}
           >
             <Avatar
               width={40}
@@ -98,13 +114,13 @@ const Sidebar = () => {
 
       {/* Second column */}
       <div className="w-full">
-        <div className="bg-slate-200 p-[0.5px]"></div>
+        <div className="p-[0.5px]"></div>
         <div className="h-16 flex items-center justify-around px-4 text-[15px]">
           <button
             className={`py-1 px-3 rounded ${
               activeTab === "personal"
-                ? "bg-blue-500 text-white"
-                : "bg-white text-blue-500"
+                ? "bg-[#4682B4] text-white"
+                : "text-[#4682B4]"
             }`}
             onClick={() => setActiveTab("personal")}
           >
@@ -113,15 +129,15 @@ const Sidebar = () => {
           <button
             className={`py-1 px-3 rounded ${
               activeTab === "community"
-                ? "bg-blue-500 text-white"
-                : "bg-white text-blue-500"
+                ? "bg-[#4682B4] text-white"
+                : "text-[#4682B4]"
             }`}
             onClick={() => setActiveTab("community")}
           >
             Community Messages
           </button>
         </div>
-        <div className="bg-slate-200 p-[0.5px]"></div>
+        <div className={`${theme.palette.mode === "light" ? "bg-slate-200" : "bg-slate-600"} p-[0.5px]`}></div>
 
         <div className="h-[calc(90vh-65px)] overflow-x-hidden overflow-y-auto scrollbar">
           {activeTab === "personal" ? (
@@ -139,7 +155,11 @@ const Sidebar = () => {
                 <NavLink
                   to={"/chat/" + conv?.userDetails?._id}
                   key={conv?._id}
-                  className="flex items-center gap-3 py-3 px-2 hover:bg-slate-100 cursor-pointer rounded no-underline"
+                  className={`flex items-center gap-3 py-3 px-2 cursor-pointer rounded no-underline ${
+                    theme.palette.mode === "light"
+                      ? "hover:bg-slate-100"
+                      : "hover:bg-[#383838]"
+                  }`}
                 >
                   <div>
                     <Avatar
@@ -151,7 +171,7 @@ const Sidebar = () => {
                     />
                   </div>
                   <div>
-                    <h6 className="text-ellipsis line-clamp-1 font-semibold text-base text-black">{`${conv?.userDetails?.firstName} ${conv?.userDetails?.lastName}`}</h6>
+                    <h6 className={`text-ellipsis line-clamp-1 font-semibold text-base ${theme.palette.mode === "light" ? "text-black" : "text-white"} `}>{`${conv?.userDetails?.firstName} ${conv?.userDetails?.lastName}`}</h6>
                     <div className="text-slate-500 text-sm flex items-center gap-1">
                       <div>
                         {conv?.lastMsg?.imageUrl && (
@@ -188,7 +208,11 @@ const Sidebar = () => {
           ) : (
             <NavLink
               to={"/chat/community"}
-              className="flex items-center gap-3 py-3 px-2 hover:bg-slate-100 cursor-pointer rounded no-underline"
+              className={`flex items-center gap-3 py-3 px-2 cursor-pointer rounded no-underline ${
+                    theme.palette.mode === "light"
+                      ? "hover:bg-slate-100"
+                      : "hover:bg-[#383838]"
+                  }`}
             >
               <div>
                 <Avatar
@@ -199,36 +223,39 @@ const Sidebar = () => {
                 />
               </div>
               <div>
-                <h6 className="text-ellipsis line-clamp-1 font-semibold text-base text-black">
+                <h6 className={`text-ellipsis line-clamp-1 font-semibold text-base ${theme.palette.mode === "light" ? "text-black" : "text-white"}`}>
                   Cloud Community
                 </h6>
-                <div className="text-slate-500 text-sm flex items-center gap-1">
-                  
+                {/* <div className="text-slate-500 text-sm flex items-center gap-1">
                   <div className="flex gap-2">
                     <strong>{communityConv?.msgByUserId?.firstName}: </strong>
                     <div className="flex gap-2">
-                    {communityConv?.imageUrl && (
-                      <div className="flex items-center gap-1">
-                        <span className={`${communityConv?.text && "-mt-4"} `}>
-                          <FaRegImage />
-                        </span>
-                        {!communityConv?.text && <span>Image</span>}
-                      </div>
-                    )}
-                    {communityConv?.videoUrl && (
-                      <div className="flex items-center gap-1">
-                        <span className={`${communityConv?.text && "-mt-4"} `}>
-                          <FaVideo />
-                        </span>
-                        {!communityConv?.text && <span>Video</span>}
-                      </div>
-                    )}
-                    <p className="text-ellipsis line-clamp-1">
-                      {communityConv?.text}
-                    </p>
+                      {communityConv?.imageUrl && (
+                        <div className="flex items-center gap-1">
+                          <span
+                            className={`${communityConv?.text && "-mt-4"} `}
+                          >
+                            <FaRegImage />
+                          </span>
+                          {!communityConv?.text && <span>Image</span>}
+                        </div>
+                      )}
+                      {communityConv?.videoUrl && (
+                        <div className="flex items-center gap-1">
+                          <span
+                            className={`${communityConv?.text && "-mt-4"} `}
+                          >
+                            <FaVideo />
+                          </span>
+                          {!communityConv?.text && <span>Video</span>}
+                        </div>
+                      )}
+                      <p className="text-ellipsis line-clamp-1">
+                        {communityConv?.text}
+                      </p>
+                    </div>
                   </div>
-                  </div>
-                </div>
+                </div> */}
               </div>
 
               {/* {Boolean(conv?.unseenMsg) && (

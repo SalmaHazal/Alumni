@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Logoalumni from "/public/assets/logoalumni.png";
 import hashtag from "/public/assets/hashtag.01.png";
 import Grid from "@mui/material/Grid";
@@ -37,12 +37,12 @@ import { Link, useLocation } from "react-router-dom";
 import AccountMenu from "../prof/prof";
 import { Fade as Hamburger } from "hamburger-react";
 import { useTransition, animated } from "@react-spring/web";
+import Badge from "@mui/material/Badge";
 
 const Navbar = () => {
   const [isMobileMenuToggled, setIsMobileMenuToggled] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const user = useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
@@ -53,12 +53,13 @@ const Navbar = () => {
   const neutralLight = theme.palette.neutral.light;
   const dark = theme.palette.neutral.dark;
   const background = theme.palette.background.default;
-  const primaryLight = theme.palette.primary.light;
   const alt = theme.palette.background.alt;
+  const backgroundColor =
+    theme.palette.mode === "light" ? "#C7C8CC" : "#3b3b3b";
 
   const isChatPath = /\/chat(\/\d+)?/.test(location.pathname);
 
-  const fullName = `${user.firstName} ${user.lastName}`;
+  const posts = useSelector((state) => state.posts);
 
   const handleSearch = async () => {
     try {
@@ -138,13 +139,20 @@ const Navbar = () => {
                 sx={{
                   borderRadius: "10px",
                   background:
-                    location.pathname === "/home" ? "#C7C8CC" : "transparent",
+                    location.pathname === "/home"
+                      ? backgroundColor
+                      : "transparent",
                 }}
               >
-                <HomeIcon
-                  sx={{ fontSize: "25px" }}
-                  style={{ margin: "0 17px" }}
-                />
+                <Badge
+                  badgeContent={posts.length <= 15 ? posts.length : "+15"}
+                  color="error"
+                >
+                  <HomeIcon
+                    sx={{ fontSize: "25px" }}
+                    style={{ margin: "0 17px" }}
+                  />
+                </Badge>
               </ListItem>
 
               <ListItem
@@ -153,7 +161,7 @@ const Navbar = () => {
                 to="/chat"
                 sx={{
                   borderRadius: "10px",
-                  background: isChatPath ? "#C7C8CC" : "transparent",
+                  background: isChatPath ? backgroundColor : "transparent",
                 }}
               >
                 <Message
@@ -255,13 +263,20 @@ const Navbar = () => {
                   sx={{
                     borderRadius: "10px",
                     background:
-                      location.pathname === "/home" ? "#C7C8CC" : "transparent",
+                      location.pathname === "/home"
+                        ? backgroundColor
+                        : "transparent",
                   }}
                 >
-                  <HomeIcon
-                    sx={{ fontSize: "25px" }}
-                    style={{ margin: "0 17px" }}
-                  />
+                  <Badge
+                    badgeContent={posts.length <= 15 ? posts.length : "+15"}
+                    color="error"
+                  >
+                    <HomeIcon
+                      sx={{ fontSize: "25px" }}
+                      style={{ margin: "0 17px" }}
+                    />
+                  </Badge>
                 </ListItem>
 
                 <ListItem
@@ -270,7 +285,7 @@ const Navbar = () => {
                   to="/chat"
                   sx={{
                     borderRadius: "10px",
-                    background: isChatPath ? "#C7C8CC" : "transparent",
+                    background: isChatPath ? backgroundColor : "transparent",
                   }}
                 >
                   <Message

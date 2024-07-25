@@ -15,10 +15,13 @@ import moment from "moment";
 import Avatar from "./Avatar";
 import { useSelector } from "react-redux";
 import Loading from "./Loading";
-import backgtoundImage from "../../assets/wallpaper.jpeg";
+import backgroundImage from "../../assets/wallpaper.jpeg";
+import backgroundImage1 from "../../assets/blackbaground.png";
+import { useTheme } from "@mui/material/styles";
 
 const CommunityMessages = () => {
   const user = useSelector((state) => state?.user);
+  const theme = useTheme();
   const [openImageVideoUpload, setOpenImageVideoUpload] = useState(false);
   const [message, setMessage] = useState({
     text: "",
@@ -93,7 +96,7 @@ const CommunityMessages = () => {
   useEffect(() => {
     if (socket) {
       socket.emit("community");
-  
+
       socket.on("community messages", (data) => {
         console.log(data);
         setAllMessage(data);
@@ -104,19 +107,19 @@ const CommunityMessages = () => {
       };
     }
   }, [socket, user]);
-  
+
   const handleOnChange = (e) => {
     const { name, value } = e.target;
-  
+
     setMessage((prev) => ({
       ...prev,
       text: value,
     }));
   };
-  
+
   const handleSendMessage = (e) => {
     e.preventDefault();
-  
+
     if (message.text || message.imageUrl || message.videoUrl) {
       if (socket) {
         socket.emit("new community message", {
@@ -134,13 +137,20 @@ const CommunityMessages = () => {
       }
     }
   };
-  
+
+  const style11 = {
+    backgroundImage:
+      theme.palette.mode === "dark"
+        ? `url(${backgroundImage1})`
+        : `url(${backgroundImage})`,
+  };
+
   return (
-    <div
-      style={{ backgroundImage: `url(${backgtoundImage})` }}
-      className="bg-no-repeat bg-cover"
-    >
-      <header className="sticky top-0 h-16 bg-white border-t-2 flex justify-between items-center px-4">
+    <div style={{ ...style11 }} className="bg-no-repeat bg-cover">
+      <header
+        style={{ backgroundColor: theme.palette.background.alt }}
+        className="sticky top-0 h-16 border-t-2 shadow-xl flex justify-between items-center px-4"
+      >
         <div className="flex items-center gap-4 mt-1">
           <Link to={"/chat"} className="lg:hidden">
             <FaAngleLeft size={25} />
@@ -168,7 +178,11 @@ const CommunityMessages = () => {
       </header>
 
       {/* Show all messages */}
-      <section className="h-[calc(90vh-128px)] overflow-x-hidden overflow-y-scroll scrollbar relative bg-slate-200 bg-opacity-50">
+      <section
+        className={`h-[calc(90vh-128px)] overflow-x-hidden overflow-y-scroll scrollbar relative ${
+          theme.palette.mode === "light" && "bg-slate-200"
+        } bg-opacity-50`}
+      >
         {/* all messages */}
         <div
           className="flex flex-col gap-2 ml-4 py-2 mx-2"
@@ -179,8 +193,16 @@ const CommunityMessages = () => {
               <div
                 className={`flex gap-3 px-3 py-1 rounded w-fit max-x-[230px] md:max-w-sm lg:max-w-md shadow ${
                   user._id === msg.msgByUserId._id
-                    ? "ml-auto bg-teal-100"
-                    : "bg-white"
+                    ? `ml-auto ${
+                        theme.palette.mode === "light"
+                          ? "bg-teal-100"
+                          : "bg-[#005c4b]"
+                      } `
+                    : `${
+                        theme.palette.mode === "light"
+                          ? "bg-white"
+                          : "bg-[#363636]"
+                      }`
                 }`}
               >
                 <div>
@@ -233,7 +255,10 @@ const CommunityMessages = () => {
             >
               <IoClose size={25} />
             </div>
-            <div className="bg-white p-3">
+            <div
+              style={{ backgroundColor: theme.palette.background.alt }}
+              className="p-3"
+            >
               <img
                 src={message.imageUrl}
                 alt="uploaded image"
@@ -251,7 +276,10 @@ const CommunityMessages = () => {
             >
               <IoClose size={25} />
             </div>
-            <div className="bg-white p-3">
+            <div
+              style={{ backgroundColor: theme.palette.background.alt }}
+              className="p-3"
+            >
               <video
                 src={message.videoUrl}
                 className="aspect-square w-full h-full max-w-sm m-2 object-scale-down"
@@ -270,10 +298,17 @@ const CommunityMessages = () => {
       </section>
 
       {/* Send message Field */}
-      <section className="h-16 bg-white flex items-center px-4">
+      <section
+        style={{ backgroundColor: theme.palette.background.alt }}
+        className="h-16 flex items-center px-4"
+      >
         <div className="relative">
           <button
-            className="flex justify-center items-center w-16 h-16 rounded hover:bg-slate-100"
+            className={`flex justify-center items-center w-16 h-16 rounded ${
+              theme.palette.mode === "light"
+                ? "hover:bg-slate-100"
+                : "hover:bg-[#3b3b3b]"
+            } `}
             onClick={handleOpenImageVideo}
           >
             <GrAttachment size={23} />
@@ -282,11 +317,18 @@ const CommunityMessages = () => {
           {/* video and image */}
 
           {openImageVideoUpload && (
-            <div className="bg-white shadow rounded absolute bottom-14 w-36 p-2">
+            <div
+              style={{ backgroundColor: theme.palette.background.alt }}
+              className="shadow rounded absolute bottom-14 w-36 p-2"
+            >
               <form>
                 <label
                   htmlFor="uploadImage"
-                  className="flex items-center  px-3 gap-3 rounded hover:bg-slate-200 cursor-pointer"
+                  className={`flex items-center  px-3 gap-3 rounded cursor-pointer ${
+                    theme.palette.mode === "light"
+                      ? "hover:bg-slate-100"
+                      : "hover:bg-[#3b3b3b]"
+                  }`}
                 >
                   <div className="text-slate-600">
                     <FaRegImage size={20} />
@@ -295,7 +337,11 @@ const CommunityMessages = () => {
                 </label>
                 <label
                   htmlFor="uploadVideo"
-                  className="flex items-center px-3 gap-3 rounded hover:bg-slate-200 cursor-pointer"
+                  className={`flex items-center  px-3 gap-3 rounded cursor-pointer ${
+                    theme.palette.mode === "light"
+                      ? "hover:bg-slate-100"
+                      : "hover:bg-[#3b3b3b]"
+                  }`}
                 >
                   <div className="text-slate-600">
                     <FaVideo size={20} />
@@ -321,15 +367,26 @@ const CommunityMessages = () => {
         </div>
 
         {/* input box */}
-        <form className="h-full w-full flex gap-2" onSubmit={handleSendMessage}>
+        <form
+          style={{ backgroundColor: theme.palette.background.alt }}
+          className="h-full w-full flex gap-2"
+          onSubmit={handleSendMessage}
+        >
           <input
+            style={{ backgroundColor: theme.palette.background.alt }}
             type="text"
             placeholder="Type a message here..."
             className="py-1 px-4 outline-none w-full h-full"
             value={message.text}
             onChange={handleOnChange}
           />
-          <button className="p-3 rounded hover:bg-slate-100">
+          <button
+            className={`p-3 rounded ${
+              theme.palette.mode === "light"
+                ? "hover:bg-slate-100"
+                : "hover:bg-[#3b3b3b]"
+            }`}
+          >
             <IoMdSend size={28} />
           </button>
         </form>

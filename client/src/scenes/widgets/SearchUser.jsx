@@ -6,11 +6,13 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import { IoClose } from "react-icons/io5";
+import { useTheme } from "@mui/material/styles";
 
 const SearchUser = ({ onClose }) => {
   const [searchUser, setSearchUser] = useState([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
+  const theme = useTheme();
 
   const handleSearchUser = async () => {
     const URL = "http://localhost:3001/search/users";
@@ -36,8 +38,9 @@ const SearchUser = ({ onClose }) => {
     <div className="fixed top-0 bottom-0 left-0 right-0 bg-slate-700 bg-opacity-40 p-2 z-10">
       <div className="w-full max-w-lg mx-auto mt-10">
         {/**input search user */}
-        <div className="bg-white rounded h-14 overflow-hidden flex ">
+        <div style={{ backgroundColor: theme.palette.sidebar.background}} className=" rounded h-14 overflow-hidden flex ">
           <input
+            style={{ backgroundColor: theme.palette.sidebar.background}}
             type="text"
             placeholder="Search user by name, email...."
             className="w-full outline-none py-1 h-full px-4"
@@ -50,7 +53,7 @@ const SearchUser = ({ onClose }) => {
         </div>
 
         {/**display search user */}
-        <div className="bg-white mt-2 w-full p-4 rounded h-full max-h-[70vh] overflow-auto">
+        <div style={{ backgroundColor: theme.palette.sidebar.background }} className="mt-2 w-full p-4 rounded h-full max-h-[70vh] overflow-auto text-slate-400 scrollbar">
           {/**no user found */}
           {searchUser.length === 0 && !loading && (
             <p className="text-center text-slate-500">no user found!</p>

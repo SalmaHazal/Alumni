@@ -40,7 +40,7 @@ import {
   faBriefcase,
   faHandsHelping,
 } from "@fortawesome/free-solid-svg-icons";
-//
+
 
 const MyPostWidget = ({ picturePath }) => {
   const dispatch = useDispatch();

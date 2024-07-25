@@ -1,8 +1,10 @@
 import React from "react";
 import Avatar from "./Avatar";
 import { Link } from "react-router-dom";
+import { useTheme } from "@mui/material/styles";
 
 const UserSearchCard = ({ user, onClose }) => {
+  const theme = useTheme();
   return (
     <Link
       to={"/chat/" + user?._id}
@@ -18,11 +20,11 @@ const UserSearchCard = ({ user, onClose }) => {
           imageUrl={user?.picturePath}
         />
       </div>
-      <div>
-        <div className="font-semibold text-ellipsis line-clamp-1 no-underline text-black">
+      <div className={`flex flex-column gap-2 ${theme.palette.mode === "light" ? "text-black" : "text-slate-300" }`}>
+        <div className="font-semibold text-ellipsis line-clamp-1 no-underline ">
           {`${user?.firstName} ${user?.lastName}`}
         </div>
-        <p className="text-sm text-ellipsis line-clamp-1 no-underline text-black">
+        <p className="text-sm text-ellipsis line-clamp-1 no-underline">
           {user?.email}
         </p>
       </div>
