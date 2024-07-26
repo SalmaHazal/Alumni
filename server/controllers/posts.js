@@ -1,11 +1,16 @@
 import Post from "../models/Post.js";
 import User from "../models/User.js";
+import Notification from "../models/Notification.js";
 
 /* CREATE */
 export const createPost = async (req, res) => {
   try {
     const { userId, description, picturePath } = req.body;
     const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
     const newPost = new Post({
       userId,
       firstName: user.firstName,
@@ -19,7 +24,23 @@ export const createPost = async (req, res) => {
     });
     await newPost.save();
 
-    const post = await Post.find();  //all posts
+    // Send notifications to all friends
+    const friends = await User.find({ friends: userId });
+    for (const friend of friends) {
+      const newNotification = new Notification({
+        userId: friend._id,
+        type: "post",
+        text: `${user.firstName} created a new post`,
+        link: `/posts/${newPost._id}`,
+        senderPhoto: user.picturePath,
+        createdAt: new Date(),
+        read: false,
+      });
+
+      await newNotification.save();
+    }
+
+    const post = await Post.find(); // all posts
     res.status(201).json(post);
   } catch (err) {
     res.status(409).json({ message: err.message });
@@ -52,6 +73,10 @@ export const likePost = async (req, res) => {
     const { id } = req.params;
     const { userId } = req.body;
     const post = await Post.findById(id);
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
     const isLiked = post.likes.get(userId);
 
     if (isLiked) {
@@ -65,6 +90,23 @@ export const likePost = async (req, res) => {
       { likes: post.likes },
       { new: true }
     );
+
+    // Send a notification to the post's author if liker is a different user
+    if (post.userId.toString() !== userId) {
+      const likingUser = await User.findById(userId);
+
+      const newNotification = new Notification({
+        userId: post.userId,
+        type: "like",
+        text: `${likingUser.firstName} liked your post`,
+        link: `/posts/${id}`,
+        senderPhoto: likingUser.picturePath,
+        createdAt: new Date(),
+        read: false,
+      });
+
+      await newNotification.save();
+    }
 
     res.status(200).json(updatedPost);
   } catch (err) {

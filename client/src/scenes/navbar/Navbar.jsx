@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Logoalumni from "/public/assets/logoalumni.png";
 import hashtag from "/public/assets/hashtag.01.png";
 import Grid from "@mui/material/Grid";
@@ -7,25 +7,17 @@ import {
   IconButton,
   InputBase,
   Typography,
-  Select,
-  MenuItem,
-  FormControl,
   useTheme,
   useMediaQuery,
   List,
   ListItem,
-  Button,
 } from "@mui/material";
 import {
   Search,
   Message,
   DarkMode,
   LightMode,
-  Menu,
-  Grade,
 } from "@mui/icons-material";
-import AccountCircle from "@mui/icons-material/AccountCircle";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import WorkHistoryIcon from "@mui/icons-material/WorkHistory";
 import HomeIcon from "@mui/icons-material/Home";
@@ -37,10 +29,12 @@ import { Link, useLocation } from "react-router-dom";
 import AccountMenu from "../prof/prof";
 import { Fade as Hamburger } from "hamburger-react";
 import { useTransition, animated } from "@react-spring/web";
+import Badge from "@mui/material/Badge"; // Import the Badge component
 
 const Navbar = () => {
   const [isMobileMenuToggled, setIsMobileMenuToggled] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [unreadCount, setUnreadCount] = useState(0); // State to track unread notifications
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((state) => state.user);
@@ -77,6 +71,33 @@ const Navbar = () => {
       console.error("Error searching posts:", error);
     }
   };
+
+  // Fetch notifications and update unread count
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      if (!user?._id) return;
+
+      try {
+        const response = await fetch(
+          `http://localhost:3001/notifications/${user._id}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        const data = await response.json();
+
+        const unreadNotifications = data.filter((notification) => !notification.read).length;
+        setUnreadCount(unreadNotifications);
+      } catch (error) {
+        console.error("Failed to fetch notifications:", error);
+      }
+    };
+
+    fetchNotifications();
+  }, [user, token]);
 
   const transitions = useTransition(isMobileMenuToggled, {
     from: { transform: "translateX(100%)" },
@@ -162,11 +183,29 @@ const Navbar = () => {
                 />
               </ListItem>
 
-              <ListItem button>
-                <NotificationsActiveIcon
-                  sx={{ fontSize: "25px" }}
-                  style={{ margin: "0 17px" }}
-                />
+              <ListItem
+                button
+                component={Link}
+                to="/notifications"
+                sx={{
+                  borderRadius: "10px",
+                  background:
+                    location.pathname === "/notifications"
+                      ? "#C7C8CC"
+                      : "transparent",
+                }}
+              >
+                {/* Badge Component around Notifications Icon */}
+                <Badge
+                  badgeContent={unreadCount} // Display unread count
+                  color="error" // Set the color of the badge to red
+                  max={99} // Maximum number to display before showing '+'
+                >
+                  <NotificationsActiveIcon
+                    sx={{ fontSize: "25px" }}
+                    style={{ margin: "0 17px" }}
+                  />
+                </Badge>
               </ListItem>
               <ListItem button>
                 <WorkHistoryIcon
@@ -279,11 +318,29 @@ const Navbar = () => {
                   />
                 </ListItem>
 
-                <ListItem button>
-                  <NotificationsActiveIcon
-                    sx={{ fontSize: "25px" }}
-                    style={{ margin: "0 17px" }}
-                  />
+                <ListItem
+                  button
+                  component={Link}
+                  to="/notifications"
+                  sx={{
+                    borderRadius: "10px",
+                    background:
+                      location.pathname === "/notifications"
+                        ? "#C7C8CC"
+                        : "transparent",
+                  }}
+                >
+                  {/* Badge Component around Notifications Icon */}
+                  <Badge
+                    badgeContent={unreadCount} // Display unread count
+                    color="error" // Set the color of the badge to red
+                    max={99} // Maximum number to display before showing '+'
+                  >
+                    <NotificationsActiveIcon
+                      sx={{ fontSize: "25px" }}
+                      style={{ margin: "0 17px" }}
+                    />
+                  </Badge>
                 </ListItem>
                 <ListItem button>
                   <WorkHistoryIcon

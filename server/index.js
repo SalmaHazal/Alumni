@@ -18,6 +18,7 @@ import { register } from "./controllers/auth.js";
 import { createPost } from "./controllers/posts.js";
 import { updateUserProfile } from "./controllers/users.js";
 import { verifyToken } from "./middleware/auth.js";
+import notificationRoutes from "./routes/notification.js";
 import User from "./models/User.js";
 import Post from "./models/Post.js";
 import { users, posts } from "./data/index.js";
@@ -36,12 +37,13 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(helmet());
 app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
+
 // app.use(morgan("common"));
 app.use(bodyParser.json({ limit: "30mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 app.use(cors({
   origin: process.env.FRONTEND_URL,
-  credentials: true  // Enable credentials
+  credentials: true, // Enable credentials
 }));
 app.use("/assets", express.static(path.join(__dirname, "public/assets")));
 
@@ -69,6 +71,7 @@ app.use("/posts", postRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/locations", locationRoutes);
 app.use("/search", searchRoutes);
+app.use("/notifications", notificationRoutes);
 
 /* MONGOOSE SETUP */
 const PORT = process.env.PORT || 6001;
