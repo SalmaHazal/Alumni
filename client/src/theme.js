@@ -53,6 +53,9 @@ export const themeSettings = (mode) => {
               default: colorTokens.grey[900],
               alt: colorTokens.grey[800],
             },
+            sidebar: {
+              background: colorTokens.grey[700],
+            },
           }
         : {
             // palette values for light mode
@@ -71,6 +74,9 @@ export const themeSettings = (mode) => {
             background: {
               default: colorTokens.grey[10],
               alt: colorTokens.grey[0],
+            },
+            sidebar: {
+              background: colorTokens.grey[100],
             },
           }),
     },

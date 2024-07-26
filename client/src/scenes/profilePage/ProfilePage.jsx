@@ -31,13 +31,16 @@ const ProfilePage = () => {
 
   return (
     <Box>
-      <Navbar />
+      <Box className="fixed-navbar">
+         <Navbar />
+      </Box>
       <Box
         width="100%"
         padding="2rem 6%"
         display={isNonMobileScreens ? "flex" : "block"}
         gap="2rem"
         justifyContent="center"
+        marginTop="70px"
       >
         <Box flexBasis={isNonMobileScreens ? "26%" : undefined}>
           <UserWidget userId={userId} picturePath={user.picturePath} />

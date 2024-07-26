@@ -20,7 +20,7 @@ const postSchema = mongoose.Schema(
     userPicturePath: String,
     likes: {
       type: Map,
-      of: Boolean,
+      of: String, // Modification ici : les valeurs sont maintenant des chaînes de caractères
     },
     comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment", default: [] }],
     createdAt: { type: Date, default: Date.now },

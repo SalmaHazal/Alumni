@@ -6,28 +6,25 @@ import {
   useMediaQuery,
   Typography,
   useTheme,
-  IconButton, // Make sure IconButton is imported from Material-UI
-} from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
-import { Formik } from "formik";
-import * as yup from "yup";
-import { Link, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { setLogin } from "../../state/index";
-import Dropzone from "react-dropzone";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import {
+  IconButton,
   Select,
   MenuItem,
   FormControl,
   InputLabel,
   FormHelperText,
 } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { Formik } from "formik";
+import * as yup from "yup";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setLogin } from "../../state";
+import Dropzone from "react-dropzone";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import villes from "../../Data/locat.json";
 
 const registerSchema = yup.object().shape({
-  // yup is a JavaScript schema builder
   firstName: yup.string().required("required"),
   lastName: yup.string().required("required"),
   email: yup.string().email("invalid email").required("required"),
@@ -95,7 +92,6 @@ const Form = () => {
 
   const register = async (values, onSubmitProps) => {
     try {
-      // this allows us to send form info with image
       const formData = new FormData();
       for (let value in values) {
         formData.append(value, values[value]);

@@ -154,6 +154,6 @@ server.listen(PORT, () => {
   console.log("Server is running on port " + PORT);
 
   /* add data at once */
-  // User.insertMany(users);
-  // Post.insertMany(posts);
+  //User.insertMany(users);
+ // Post.insertMany(posts);
 });

@@ -15,10 +15,13 @@ import moment from "moment";
 import Avatar from "./Avatar";
 import { useSelector } from "react-redux";
 import Loading from "./Loading";
-import backgtoundImage from "../../assets/wallpaper.jpeg";
+import backgroundImage from "../../assets/wallpaper.jpeg";
+import backgroundImage1 from "../../assets/blackbaground.png"
+import { useTheme } from "@mui/material/styles";
 
 const CommunityMessages = () => {
   const user = useSelector((state) => state?.user);
+  const theme = useTheme();
   const [openImageVideoUpload, setOpenImageVideoUpload] = useState(false);
   const [message, setMessage] = useState({
     text: "",
@@ -134,13 +137,17 @@ const CommunityMessages = () => {
       }
     }
   };
+   const style11 = {
+    
+  backgroundImage: theme.palette.mode === "dark" ? `url(${backgroundImage1})` : `url(${backgroundImage})`
+};
   
   return (
     <div
-      style={{ backgroundImage: `url(${backgtoundImage})` }}
+      style={{ backgroundImage: `url(${backgroundImage1})` }}
       className="bg-no-repeat bg-cover"
     >
-      <header className="sticky top-0 h-16 bg-white border-t-2 flex justify-between items-center px-4">
+      <header style={{ backgroundColor: theme.palette.background.alt }} className="sticky top-0 h-16  border-t-2 flex justify-between items-center px-4">
         <div className="flex items-center gap-4 mt-1">
           <Link to={"/chat"} className="lg:hidden">
             <FaAngleLeft size={25} />

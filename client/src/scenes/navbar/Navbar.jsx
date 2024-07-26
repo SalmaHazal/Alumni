@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Logoalumni from "/public/assets/logoalumni.png";
 import hashtag from "/public/assets/hashtag.01.png";
 import Grid from "@mui/material/Grid";
@@ -37,8 +37,9 @@ import { Link, useLocation } from "react-router-dom";
 import AccountMenu from "../prof/prof";
 import { Fade as Hamburger } from "hamburger-react";
 import { useTransition, animated } from "@react-spring/web";
+import Badge from '@mui/material/Badge';
 
-const Navbar = () => {
+const Navbar = ({userId, isProfile = false }) => {
   const [isMobileMenuToggled, setIsMobileMenuToggled] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const dispatch = useDispatch();
@@ -46,7 +47,44 @@ const Navbar = () => {
   const user = useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
+ //
+ const posts = useSelector((state) => state.posts);
+ 
+ const [visiblePosts, setVisiblePosts] = useState(5); // Initial number of visible posts
 
+ const getPosts = async () => {
+   const response = await fetch("http://localhost:3001/posts", {
+     method: "GET",
+     headers: { Authorization: `Bearer ${token}` },
+   });
+   const data = await response.json();
+   dispatch(setPosts({ posts: data }));
+ };
+
+ const getUserPosts = async () => {
+   const response = await fetch(
+     `http://localhost:3001/posts/${userId}/posts`,
+     {
+       method: "GET",
+       headers: { Authorization: `Bearer ${token}` },
+     }
+   );
+   const data = await response.json();
+   dispatch(setPosts({ posts: data }));
+ };
+
+ useEffect(() => {
+   if (isProfile) {
+     getUserPosts();
+   } else {
+     getPosts();
+   }
+ }, []);
+
+ const handleShowMore = () => {
+   setVisiblePosts((prevVisiblePosts) => prevVisiblePosts + 5);
+ };
+ //
   const location = useLocation();
 
   const theme = useTheme();
@@ -141,10 +179,9 @@ const Navbar = () => {
                     location.pathname === "/home" ? "#C7C8CC" : "transparent",
                 }}
               >
-                <HomeIcon
-                  sx={{ fontSize: "25px" }}
-                  style={{ margin: "0 17px" }}
-                />
+                <Badge badgeContent={visiblePosts < posts.length && ( <button onClick={handleShowMore}>{(posts.length <= 15 ? posts.length : "+15")}</button>)} color="error" sx={{ fontSize: "25px" }}style={{ margin: "0 17px" }}>
+                <HomeIcon onClick={handleShowMore} />
+                </Badge>
               </ListItem>
 
               <ListItem

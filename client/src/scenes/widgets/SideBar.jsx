@@ -11,6 +11,7 @@ import { FaRegImage } from "react-icons/fa6";
 import { FaVideo } from "react-icons/fa6";
 import { RiUserSearchFill } from "react-icons/ri";
 import { useSocketContext } from "../../context/SocketContext";
+import { useTheme } from "@mui/material/styles";
 
 const Sidebar = () => {
   const user = useSelector((state) => state?.user);
@@ -19,7 +20,7 @@ const Sidebar = () => {
   const [communityConv, setCommunityConv] = useState([]);
   const [openSearchUser, setOpenSearchUser] = useState(false);
   const [activeTab, setActiveTab] = useState("personal");
-
+  const theme = useTheme(); 
   const { socket } = useSocketContext();
 
   useEffect(() => {
@@ -55,9 +56,9 @@ const Sidebar = () => {
   }, [socket, user, communityConv]);
 
   return (
-    <div className="w-full h-full grid grid-cols-[48px,1fr] bg-white">
+    <div className="w-full h-full grid grid-cols-[48px,1fr] " style={{ backgroundColor: theme.palette.sidebar.background }}>
       {/* First column */}
-      <div className="bg-slate-100 w-full max-w-[300px] h-full rounded-tr-lg rounded-br-lg py-5 text-slate-600 flex flex-col justify-between">
+      <div style={{ backgroundColor: theme.palette.background.alt}} className="bg-slate-100 w-full max-w-[300px] h-full rounded-tr-lg rounded-br-lg py-5 text-slate-600 flex flex-col justify-between">
         <div>
           <NavLink
             className={({ isActive }) =>

@@ -17,11 +17,14 @@ import moment from "moment";
 import Avatar from "./Avatar";
 import { useSelector } from "react-redux";
 import Loading from "./Loading";
-import backgtoundImage from "../../assets/wallpaper.jpeg";
+import backgroundImage from "../../assets/wallpaper.jpeg";
+import backgroundImage1 from "../../assets/blackbaground.png"
+import { useTheme } from "@mui/material/styles";
 
 const MessagePage = () => {
   const params = useParams();
   const user = useSelector((state) => state?.user);
+  const theme = useTheme();
   const [dataUser, setDataUser] = useState({
     name: "",
     email: "",
@@ -127,7 +130,11 @@ const MessagePage = () => {
       };
     });
   };
-
+ //
+ const style11 = {
+  backgroundImage: theme.palette.mode === "dark" ? `url(${backgroundImage1})` : `url(${backgroundImage})`
+};
+ //
   const handleSendMessage = (e) => {
     e.preventDefault();
 
@@ -152,10 +159,9 @@ const MessagePage = () => {
 
   return (
     <div
-      style={{ backgroundImage: `url(${backgtoundImage})` }}
-      className="bg-no-repeat bg-cover"
+      style={{ ...style11 }} className="bg-no-repeat bg-cover"
     >
-      <header className="sticky top-0 h-16 bg-white border-t-2 flex justify-between items-center px-4">
+      <header style={{ backgroundColor: theme.palette.background.alt }} className="sticky top-0 h-16 shadow-xl  border-t-2 flex justify-between items-center px-4">
         <div className="flex items-center gap-4 mt-1">
           <Link to={"/chat"} className="lg:hidden">
             <FaAngleLeft size={25} />
@@ -191,22 +197,24 @@ const MessagePage = () => {
       </header>
 
       {/* Show all messages */}
-      <section className="h-[calc(90vh-128px)] overflow-x-hidden overflow-y-scroll scrollbar relative bg-slate-200 bg-opacity-50">
+      <section   className="h-[calc(90vh-128px)] overflow-x-hidden overflow-y-scroll scrollbar relative  bg-opacity-50">
         {/* all messages */}
         <div
+          
           className="flex flex-col gap-2 ml-4 py-2 mx-2"
           ref={currentMessage}
         >
           {allMessage.map((msg, index) => {
             return (
               <div
+                
                 className={`px-3 py-1 rounded w-fit max-x-[230px] md:max-w-sm lg:max-w-md shadow ${
                   user._id === msg.msgByUserId
-                    ? "ml-auto bg-teal-100"
-                    : "bg-white"
+                    ? "ml-auto bg-teal-100 text-gray-900"
+                    : "bg-gray-100 text-gray-900"
                 }`}
               >
-                <div className="w-full">
+                <div style={{ backgroundColor: theme.palette.background.alt }} className="w-full">
                   {msg?.imageUrl && (
                     <img
                       src={msg?.imageUrl}
@@ -225,7 +233,7 @@ const MessagePage = () => {
                   )}
                 </div>
                 <p className="px-2">{msg.text}</p>
-                <p className="pt-0 text-xs ml-auto w-fit">
+                <p className="pt-1 text-xs text-right text-gray-500">
                   {moment(msg.createdAt).format("hh:mm")}
                 </p>
               </div>
@@ -246,7 +254,7 @@ const MessagePage = () => {
               <img
                 src={message.imageUrl}
                 alt="uploaded image"
-                className="aspect-square w-full h-full max-w-sm m-2 object-scale-down"
+                className="aspect-square w-full h-full max-w-sm m-2 object-scale-down " 
               />
             </div>
           </div>
@@ -279,10 +287,10 @@ const MessagePage = () => {
       </section>
 
       {/* Send message Field */}
-      <section className="h-16 bg-white flex items-center px-4">
+      <section style={{ backgroundColor: theme.palette.background.alt }} className="h-16  flex items-center px-4">
         <div className="relative">
           <button
-            className="flex justify-center items-center w-16 h-16 rounded hover:bg-slate-100"
+            className="flex justify-center items-center w-16 h-16 rounded hover:bg-slate-500"
             onClick={handleOpenImageVideo}
           >
             <GrAttachment size={23} />
@@ -291,9 +299,10 @@ const MessagePage = () => {
           {/* video and image */}
 
           {openImageVideoUpload && (
-            <div className="bg-white shadow rounded absolute bottom-14 w-36 p-2">
-              <form>
+            <div style={{ backgroundColor: theme.palette.background.alt }} className=" shadow rounded absolute bottom-14 w-36 p-2">
+              <form >
                 <label
+                 style={{ backgroundColor: theme.palette.background.alt }}
                   htmlFor="uploadImage"
                   className="flex items-center  px-3 gap-3 rounded hover:bg-slate-200 cursor-pointer"
                 >
@@ -303,6 +312,7 @@ const MessagePage = () => {
                   <p className="pt-3">Image</p>
                 </label>
                 <label
+                
                   htmlFor="uploadVideo"
                   className="flex items-center px-3 gap-3 rounded hover:bg-slate-200 cursor-pointer"
                 >
@@ -313,6 +323,7 @@ const MessagePage = () => {
                 </label>
 
                 <input
+                
                   type="file"
                   id="uploadImage"
                   onChange={handleUploadImage}
@@ -330,15 +341,16 @@ const MessagePage = () => {
         </div>
 
         {/* input box */}
-        <form className="h-full w-full flex gap-2" onSubmit={handleSendMessage}>
+        <form style={{ backgroundColor: theme.palette.background.alt }} className="h-full w-full flex gap-2" onSubmit={handleSendMessage}>
           <input
+            style={{ backgroundColor: theme.palette.background.alt}}
             type="text"
             placeholder="Type a message here..."
             className="py-1 px-4 outline-none w-full h-full"
             value={message.text}
             onChange={handleOnChange}
           />
-          <button className="p-3 rounded hover:bg-slate-100">
+          <button className="p-3 rounded hover:bg-slate-500">
             <IoMdSend size={28} />
           </button>
         </form>

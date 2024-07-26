@@ -14,12 +14,12 @@ export const createPost = async (req, res) => {
       description,
       userPicturePath: user.picturePath,
       picturePath,
-      likes: {},
+      likes: new Map(), // Initialize likes as a Map
       comments: [],
     });
     await newPost.save();
 
-    const post = await Post.find();  //all posts
+    const post = await Post.find(); // all posts
     res.status(201).json(post);
   } catch (err) {
     res.status(409).json({ message: err.message });
@@ -47,17 +47,27 @@ export const getUserPosts = async (req, res) => {
 };
 
 /* UPDATE */
+const validReactions = ["like", "love", "haha", "wow", "sad", "angry"]; 
 export const likePost = async (req, res) => {
   try {
     const { id } = req.params;
-    const { userId } = req.body;
-    const post = await Post.findById(id);
-    const isLiked = post.likes.get(userId);
+    const { userId, reaction } = req.body; 
 
-    if (isLiked) {
-      post.likes.delete(userId);
+    // Valider la réaction
+    
+    if (!validReactions.includes(reaction)) {
+      return res.status(400).json({ message: "Invalid reaction type" });
+    }
+
+    const post = await Post.findById(id);
+    const existingReaction = post.likes.get(userId);
+
+    if (existingReaction) {
+      
+      post.likes.set(userId, reaction);
     } else {
-      post.likes.set(userId, true);
+      
+      post.likes.set(userId, reaction);
     }
 
     const updatedPost = await Post.findByIdAndUpdate(
