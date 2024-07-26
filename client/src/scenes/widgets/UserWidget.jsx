@@ -33,6 +33,7 @@ import portfolio from "../../assets/portfolio.png";
 import axios from "axios";
 
 const UserWidget = ({ userId, picturePath }) => {
+  const currentUser = useSelector((state) => state?.user);
   const [user, setUser] = useState(null);
   const { palette } = useTheme();
   const navigate = useNavigate();
@@ -126,6 +127,7 @@ const UserWidget = ({ userId, picturePath }) => {
   }
 
   const {
+    _id,
     firstName,
     lastName,
     email,
@@ -230,9 +232,11 @@ const UserWidget = ({ userId, picturePath }) => {
               </Typography>
             </Box>
           </FlexBetween>
-          <IconButton onClick={() => handleClickOpen("resume")}>
-            <EditOutlined sx={{ color: "primary.main" }} />
-          </IconButton>
+          {currentUser._id === _id && (
+            <IconButton onClick={() => handleClickOpen("resume")}>
+              <EditOutlined sx={{ color: "primary.main" }} />
+            </IconButton>
+          )}
         </FlexBetween>
 
         {/* Portfolio */}
@@ -242,7 +246,7 @@ const UserWidget = ({ userId, picturePath }) => {
             <Box>
               <Typography fontWeight="500">Portfolio</Typography>
               <Typography marginBottom="15px" color="textSecondary">
-                {portfoliolink ? (
+                {portfolioLink ? (
                   <a
                     href={portfolioLink}
                     target="_blank"
@@ -257,9 +261,11 @@ const UserWidget = ({ userId, picturePath }) => {
               </Typography>
             </Box>
           </FlexBetween>
-          <IconButton onClick={() => handleClickOpen("portfolio")}>
-            <EditOutlined sx={{ color: "primary.main" }} />
-          </IconButton>
+          {currentUser._id === _id && (
+            <IconButton onClick={() => handleClickOpen("portfolio")}>
+              <EditOutlined sx={{ color: "primary.main" }} />
+            </IconButton>
+          )}
         </FlexBetween>
 
         <Divider />
@@ -279,9 +285,11 @@ const UserWidget = ({ userId, picturePath }) => {
               </Typography>
             </Box>
           </FlexBetween>
-          <IconButton onClick={() => handleClickOpen("phonenumber")}>
-            <EditOutlined sx={{ color: "primary.main" }} />
-          </IconButton>
+          {currentUser._id === _id && (
+            <IconButton onClick={() => handleClickOpen("phonenumber")}>
+              <EditOutlined sx={{ color: "primary.main" }} />
+            </IconButton>
+          )}
         </FlexBetween>
 
         {/* LinkedIn */}
@@ -306,9 +314,11 @@ const UserWidget = ({ userId, picturePath }) => {
               </Typography>
             </Box>
           </FlexBetween>
-          <IconButton onClick={() => handleClickOpen("linkedin")}>
-            <EditOutlined sx={{ color: "primary.main" }} />
-          </IconButton>
+          {currentUser._id === _id && (
+            <IconButton onClick={() => handleClickOpen("linkedin")}>
+              <EditOutlined sx={{ color: "primary.main" }} />
+            </IconButton>
+          )}
         </FlexBetween>
 
         <Dialog open={open} onClose={handleClose}>
