@@ -11,6 +11,11 @@ import WidgetWrapper from "../../components/WidgetWrapper";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { PiGraduationCapFill } from "react-icons/pi";
+import { IoMailUnreadOutline } from "react-icons/io5";
+import EditProfilePage from "../modify/EditProfilePage";
+import { FaWhatsapp } from "react-icons/fa";
+import { FaLinkedinIn } from "react-icons/fa";
 
 const UserWidget = ({ userId, picturePath }) => {
   const [user, setUser] = useState(null);
@@ -20,6 +25,7 @@ const UserWidget = ({ userId, picturePath }) => {
   const dark = palette.text.primary;
   const medium = palette.text.secondary;
   const main = palette.primary.main;
+  const [openEdit, setOpenEdit] = useState(false);
 
   const getUser = async () => {
     try {
@@ -45,7 +51,10 @@ const UserWidget = ({ userId, picturePath }) => {
   const {
     firstName,
     lastName,
+    email,
     location,
+    promotion,
+    phonenumber,
     occupation,
     viewedProfile,
     impressions,
@@ -55,7 +64,7 @@ const UserWidget = ({ userId, picturePath }) => {
   return (
     <WidgetWrapper>
       {/* FIRST ROW */}
-      <FlexBetween gap="0.5rem" pb="1.1rem" >
+      <FlexBetween gap="0.5rem" pb="1.1rem">
         <FlexBetween gap="1rem" onClick={() => navigate(`/profile/${userId}`)}>
           <UserImage image={picturePath} />
           <Box>
@@ -65,7 +74,7 @@ const UserWidget = ({ userId, picturePath }) => {
               fontWeight="500"
               sx={{
                 "&:hover": {
-                  color: palette.primary.light,
+                  color: "#545557",
                   cursor: "pointer",
                 },
               }}
@@ -75,21 +84,29 @@ const UserWidget = ({ userId, picturePath }) => {
             <Typography color={medium}>{friends.length} friends</Typography>
           </Box>
         </FlexBetween>
-        <IconButton onClick={() => navigate("/edit-profile")}>
+        <IconButton onClick={() => setOpenEdit(true)}>
           <ManageAccountsOutlined />
         </IconButton>
       </FlexBetween>
       <Divider />
 
       {/* SECOND ROW */}
-      <Box p="1rem 0">
+      <Box className="flex flex-column gap-1" p="1rem 0">
         <Box display="flex" alignItems="center" gap="1rem" mb="0.5rem">
-          <LocationOnOutlined fontSize="large" sx={{ color: main }} />
+          <LocationOnOutlined sx={{ color: "#545557", fontSize: "29px" }} />
           <Typography color={medium}>{location}</Typography>
         </Box>
         <Box display="flex" alignItems="center" gap="1rem">
-          <WorkOutlineOutlined fontSize="large" sx={{ color: main }} />
+          <WorkOutlineOutlined sx={{ color: "#545557", fontSize: "25px" }} />
           <Typography color={medium}>{occupation}</Typography>
+        </Box>
+        <Box marginTop={"9px"} display="flex" alignItems="center" gap="1rem">
+          <PiGraduationCapFill size={"28px"} color="#545557" />
+          <Typography color={medium}>{promotion}</Typography>
+        </Box>
+        <Box marginTop={"9px"} display="flex" alignItems="center" gap="1rem">
+          <IoMailUnreadOutline size={"25px"} color="#545557" />
+          <Typography color={medium}>{email}</Typography>
         </Box>
       </Box>
 
@@ -97,35 +114,32 @@ const UserWidget = ({ userId, picturePath }) => {
 
       {/* THIRD ROW */}
       <Box p="1rem 0">
-        <FlexBetween mb="0.5rem">
-          <Typography color={medium}>Who's viewed your profile</Typography>
-          <Typography color={main} fontWeight="500">
-            {viewedProfile}
-          </Typography>
-        </FlexBetween>
-        <FlexBetween>
-          <Typography color={medium}>Impressions of your post</Typography>
-          <Typography color={main} fontWeight="500">
-            {impressions}
-          </Typography>
-        </FlexBetween>
-      </Box>
-
-      <Divider />
-
-      {/* FOURTH ROW */}
-      <Box p="1rem 0">
-        <Typography fontSize="1rem" color={main} fontWeight="500" mb="1rem">
-          Social Profiles
+        <Typography fontSize="1rem" fontWeight="500" mb="1rem">
+          Professional Summary
         </Typography>
 
         {/* Example of social profile */}
         <FlexBetween gap="1rem" mb="0.5rem">
           <FlexBetween gap="1rem">
-            <img src="../../../public/assets/twitter.png" alt="twitter" />
+            <FaWhatsapp size={"25px"} />
             <Box>
-              <Typography color={main} fontWeight="500">
-                Twitter
+              <Typography fontWeight="500">
+                Resume
+              </Typography>
+              <Typography color={medium}>{phonenumber}</Typography>
+            </Box>
+          </FlexBetween>
+          <IconButton>
+            <EditOutlined sx={{ color: main }} />
+          </IconButton>
+        </FlexBetween>
+
+        <FlexBetween gap="1rem" mb="0.5rem">
+          <FlexBetween gap="1rem">
+            <FaLinkedinIn size={"25px"} />
+            <Box>
+              <Typography fontWeight="500">
+                Portfolio
               </Typography>
               <Typography color={medium}>Social Network</Typography>
             </Box>
@@ -134,16 +148,39 @@ const UserWidget = ({ userId, picturePath }) => {
             <EditOutlined sx={{ color: main }} />
           </IconButton>
         </FlexBetween>
+      </Box>
 
-        {/* Example of another social profile */}
-        <FlexBetween gap="1rem">
+
+      {/* FOURTH ROW */}
+      <Box p="1rem 0">
+        <Typography fontSize="1rem" fontWeight="500" mb="1rem">
+          Social Profiles
+        </Typography>
+
+        {/* Example of social profile */}
+        <FlexBetween gap="1rem" mb="0.5rem">
           <FlexBetween gap="1rem">
-            <img src="../../../public/assets/linkedin.png" alt="linkedin" />
+            <FaWhatsapp size={"25px"} />
             <Box>
-              <Typography color={main} fontWeight="500">
-                Linkedin
+              <Typography fontWeight="500">
+                Whatsapp Number
               </Typography>
-              <Typography color={medium}>Network Platform</Typography>
+              <Typography color={medium}>{phonenumber}</Typography>
+            </Box>
+          </FlexBetween>
+          <IconButton>
+            <EditOutlined sx={{ color: main }} />
+          </IconButton>
+        </FlexBetween>
+
+        <FlexBetween gap="1rem" mb="0.5rem">
+          <FlexBetween gap="1rem">
+            <FaLinkedinIn size={"25px"} />
+            <Box>
+              <Typography fontWeight="500">
+                LinkedIn
+              </Typography>
+              <Typography color={medium}>Social Network</Typography>
             </Box>
           </FlexBetween>
           <IconButton>
@@ -151,6 +188,7 @@ const UserWidget = ({ userId, picturePath }) => {
           </IconButton>
         </FlexBetween>
       </Box>
+      {openEdit && <EditProfilePage onClose={() => setOpenEdit(false)} />}
     </WidgetWrapper>
   );
 };

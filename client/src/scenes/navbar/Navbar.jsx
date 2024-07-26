@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Logoalumni from "/public/assets/logoalumni.png";
-import hashtag from "/public/assets/hashtag.01.png";
+import hashtag from "/public/assets/hashtag.02.png";
 import Grid from "@mui/material/Grid";
 import {
   Box,
@@ -147,11 +147,10 @@ const Navbar = () => {
                 <Badge
                   badgeContent={posts.length <= 15 ? posts.length : "+15"}
                   color="error"
+                  sx={{ fontSize: "25px" }}
+                  style={{ margin: "0 17px" }}
                 >
-                  <HomeIcon
-                    sx={{ fontSize: "25px" }}
-                    style={{ margin: "0 17px" }}
-                  />
+                  <HomeIcon />
                 </Badge>
               </ListItem>
 

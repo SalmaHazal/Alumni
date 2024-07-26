@@ -63,11 +63,20 @@ app.post('/forgot-password', (req, res) => {
         }
       });
 
+      const resetLink = `http://localhost:5173/reset_password/${user._id}/${token}`;
+
       var mailOptions = {
         from: process.env.EMAIL_USER,
         to: user.email,
         subject: 'Reset Password Link',
-        text: `http://localhost:5173/reset_password/${user._id}/${token}`
+        html: `
+          <p>Dear ${user.firstName},</p>
+          <p>You requested a password reset. Click the link below to reset your password:</p>
+          <a href="${resetLink}">Reset Password</a>
+          <p>If you did not request a password reset, please ignore this email.</p>
+          <p>Best regards,</p>
+          <p>Alumni's World Team</p>
+        `
       };
 
       transporter.sendMail(mailOptions, function (error, info) {

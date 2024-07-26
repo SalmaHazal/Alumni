@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { Button, TextField, Typography, Box } from "@mui/material";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function ResetPassword() {
   const [password, setPassword] = useState("");
@@ -12,20 +14,19 @@ function ResetPassword() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Form submitted"); // Debug log
     axios
       .post(`http://localhost:3001/reset-password/${id}/${token}`, { password })
       .then((res) => {
-        console.log("Response:", res.data); // Debug log
         if (res.data.Status === "Success") {
+          toast.success("Password Successfully Updated")
           navigate("/");
         }
       })
-      .catch((err) => console.log(err));
+      .catch((err) => toast.error("An Error Occurred"));
   };
 
   const handleCancel = () => {
-    navigate("/"); // Change this path to your desired route
+    navigate("/");
   };
 
   return (
@@ -43,7 +44,7 @@ function ResetPassword() {
         className="bg-white p-3 rounded w-25"
         sx={{ backgroundColor: "white", p: 3, borderRadius: 1, width: "25%" }}
       >
-        <Typography variant="h4" gutterBottom>
+        <Typography variant="h4" align="center" gutterBottom>
           Reset Password
         </Typography>
         <form onSubmit={handleSubmit}>
