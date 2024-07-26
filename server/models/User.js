@@ -34,9 +34,24 @@ const UserSchema = new mongoose.Schema(
       default: [],
     },
     location: String,
-    promotion:String,
+    promotion: String,
     occupation: String,
-    phonenumber: Number,
+    resumeLink: {
+      type: String,
+      default: "",
+    },
+    portfolioLink: {
+      type: String,
+      default: "",
+    },
+    phonenumber: {
+      type: String,
+      default: "",
+    },
+    linkedInLink: {
+      type: String,
+      default: "",
+    },
     viewedProfile: Number,
     impressions: Number,
   },
