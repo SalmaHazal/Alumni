@@ -50,34 +50,48 @@ export const getUserPosts = async (req, res) => {
 const validReactions = ["like", "love", "haha", "wow", "sad", "angry"]; 
 export const likePost = async (req, res) => {
   try {
-    const { id } = req.params;
-    const { userId, reaction } = req.body; 
+    const { id } = req.params; // Get post ID from URL parameters
+    const { userId, reaction } = req.body; // Get userId and reaction from request body
 
-    // Valider la réaction
-    
+    // Validate the reaction
     if (!validReactions.includes(reaction)) {
       return res.status(400).json({ message: "Invalid reaction type" });
     }
 
-    const post = await Post.findById(id);
-    const existingReaction = post.likes.get(userId);
-
-    if (existingReaction) {
-      
-      post.likes.set(userId, reaction);
-    } else {
-      
-      post.likes.set(userId, reaction);
+    const post = await Post.findById(id); // Find the post by ID
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
     }
 
-    const updatedPost = await Post.findByIdAndUpdate(
-      id,
-      { likes: post.likes },
-      { new: true }
-    );
+    // Set or update the user's reaction
+    post.likes.set(userId, reaction);
 
-    res.status(200).json(updatedPost);
+    // Save the updated post
+    const updatedPost = await post.save();
+
+    res.status(200).json(updatedPost); 
   } catch (err) {
-    res.status(404).json({ message: err.message });
+    res.status(500).json({ message: err.message });
+  }
+};
+
+export const getPostReaction = async (req, res) => {
+  try {
+    const { postId } = req.params;
+    const { userId } = req.query;
+
+    const post = await Post.findById(postId);
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
+    const userReaction = post.likes.get(userId);
+    if (!userReaction) {
+      return res.status(200).json({ reaction: null }); 
+    }
+
+    res.status(200).json({ reaction: userReaction });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 };

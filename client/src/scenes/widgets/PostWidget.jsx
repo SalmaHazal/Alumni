@@ -38,7 +38,6 @@ const PostWidget = ({
   picturePath,
   userPicturePath,
   likes,
-  comments = [],
 }) => {
   const [isComments, setIsComments] = useState(false);
   const [showReactions, setShowReactions] = useState(false);
@@ -54,23 +53,26 @@ const PostWidget = ({
   const main = palette.neutral.main;
 
   // Fetch the current reaction for the post on mount
-  useEffect(() => {
-    const fetchCurrentReaction = async () => {
-      const response = await fetch(`http://localhost:3001/posts/${postId}/reaction`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-      const data = await response.json();
-      if (data.reaction) {
-        setSelectedReaction(data.reaction);
-      }
-    };
+ // Fetch the current reaction for the post on mount
+useEffect(() => {
+  const fetchCurrentReaction = async () => {
+    const response = await fetch(`http://localhost:3001/posts/${postId}/reaction?userId=${loggedInUserId}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    const data = await response.json();
+    console.log(data);
+    if (data.reaction) {
+      setSelectedReaction(data.reaction);
+    }
+  };
 
-    fetchCurrentReaction();
-  }, [postId, token]);
+  fetchCurrentReaction();
+}, [postId, token, loggedInUserId]);
+
 
   const patchLike = async (reaction) => {
     const response = await fetch(`http://localhost:3001/posts/${postId}/like`, {
