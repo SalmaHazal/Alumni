@@ -1,18 +1,33 @@
 import {
   ChatBubbleOutlineOutlined,
   FavoriteBorderOutlined,
-  FavoriteOutlined,
   ShareOutlined,
+  ThumbUp as ThumbUpIcon,
+  Favorite as LoveIcon,
+  EmojiEmotions as HahaIcon,
+  SentimentSatisfied as WowIcon,
+  SentimentDissatisfied as SadIcon,
+  SentimentVeryDissatisfied as AngryIcon,
 } from "@mui/icons-material";
-import { Box, Divider, IconButton, Typography, useTheme } from "@mui/material";
+import { Box, IconButton, Typography, useTheme } from "@mui/material";
 import FlexBetween from "../../components/FlexBetween";
 import Friend from "../../components/Friend";
 import WidgetWrapper from "../../components/WidgetWrapper";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setPost } from "../../state/index";
 import Comment from "./Comment";
 import SharePopup from "./SharePopup";
+import Reactions from '../../components/Reaction';
+
+const reactionIcons = {
+  like: <ThumbUpIcon color="primary" />,
+  love: <LoveIcon color="secondary" />,
+  haha: <HahaIcon color="warning" />,
+  wow: <WowIcon color="info" />,
+  sad: <SadIcon color="primary" />,
+  angry: <AngryIcon color="error" />,
+};
 
 const PostWidget = ({
   postId,
@@ -23,32 +38,57 @@ const PostWidget = ({
   picturePath,
   userPicturePath,
   likes,
-  comments , // Ensure comments has a default value of an empty array
+  comments = [],
 }) => {
   const [isComments, setIsComments] = useState(false);
+  const [showReactions, setShowReactions] = useState(false);
   const [sharePopupOpen, setSharePopupOpen] = useState(false);
+  const [selectedReaction, setSelectedReaction] = useState(null);
   const dispatch = useDispatch();
   const token = useSelector((state) => state.token);
   const loggedInUserId = useSelector((state) => state.user._id);
   const loggedInUser = useSelector((state) => state.user);
-  const isLiked = Boolean(likes[loggedInUserId]);
   const likeCount = Object.keys(likes).length;
 
   const { palette } = useTheme();
   const main = palette.neutral.main;
-  const primary = palette.primary.main;
 
-  const patchLike = async () => {
+  // Fetch the current reaction for the post on mount
+  useEffect(() => {
+    const fetchCurrentReaction = async () => {
+      const response = await fetch(`http://localhost:3001/posts/${postId}/reaction`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await response.json();
+      if (data.reaction) {
+        setSelectedReaction(data.reaction);
+      }
+    };
+
+    fetchCurrentReaction();
+  }, [postId, token]);
+
+  const patchLike = async (reaction) => {
     const response = await fetch(`http://localhost:3001/posts/${postId}/like`, {
       method: "PATCH",
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ userId: loggedInUserId }),
+      body: JSON.stringify({ userId: loggedInUserId, reaction }),
     });
     const updatedPost = await response.json();
     dispatch(setPost({ post: updatedPost }));
+  };
+
+  const handleReact = async (reaction) => {
+    setSelectedReaction(reaction); // Store the selected reaction
+    setShowReactions(false); // Hide reactions after selection
+    await patchLike(reaction); // Update the reaction on the backend
   };
 
   const handleShareClick = () => {
@@ -82,9 +122,12 @@ const PostWidget = ({
       <FlexBetween mt="0.25rem">
         <FlexBetween gap="1rem">
           <FlexBetween gap="0.3rem">
-            <IconButton onClick={patchLike}>
-              {isLiked ? (
-                <FavoriteOutlined sx={{ color: primary }} />
+            <IconButton
+              onClick={() => setShowReactions((prev) => !prev)}
+              onMouseEnter={() => setShowReactions(true)}
+            >
+              {selectedReaction ? (
+                reactionIcons[selectedReaction]
               ) : (
                 <FavoriteBorderOutlined />
               )}
@@ -104,8 +147,22 @@ const PostWidget = ({
           <ShareOutlined />
         </IconButton>
       </FlexBetween>
+      {showReactions && (
+        <Box
+          position="absolute"
+          mt="0.5rem"
+          p="0.5rem"
+          bgcolor="background.paper"
+          borderRadius="0.75rem"
+          boxShadow={3}
+          onMouseEnter={() => setShowReactions(true)}
+          onMouseLeave={() => setShowReactions(false)}
+        >
+          <Reactions onReact={handleReact} />
+        </Box>
+      )}
       {isComments && (
-        <Comment postId={postId} user={loggedInUser} userId={loggedInUserId}/>
+        <Comment postId={postId} user={loggedInUser} userId={loggedInUserId} />
       )}
       <SharePopup
         open={sharePopupOpen}

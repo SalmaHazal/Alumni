@@ -22,7 +22,7 @@ const HomePage = () => {
         display={isNonMobileScreens ? "flex" : "block"}
         gap="0.5rem"
         justifyContent="space-between"
-        marginTop="70px"
+        marginTop="85px"
       >
         <Box flexBasis={isNonMobileScreens ? "26%" : undefined}>
           <UserWidget userId={_id} picturePath={picturePath} />

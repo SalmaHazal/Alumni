@@ -12,9 +12,10 @@ const LoginPage = () => {
         backgroundColor={theme.palette.background.alt}
         p="1rem 6%"
         textAlign="center"
+        className="flex justify-center"
       >
         <Typography >
-          <img src={Logoalumni} style={{borderRadius: "7px", height:"70px"}} alt="Alumni Logo" />
+          <img src={Logoalumni} style={{borderRadius: "7px", height:"70px", marginLeft:"-32px"}} alt="Alumni Logo" />
         </Typography>
       </Box>
 
