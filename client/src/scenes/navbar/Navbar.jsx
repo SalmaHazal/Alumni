@@ -79,6 +79,10 @@ const Navbar = () => {
     }
   };
 
+  useEffect(() => {
+    handleSearch();
+  }, [searchTerm]);
+
   const transitions = useTransition(isMobileMenuToggled, {
     from: { transform: "translateX(100%)" },
     enter: { transform: "translateX(0%)" },
@@ -145,6 +149,7 @@ const Navbar = () => {
                 }}
               >
                 <Badge
+                  title="Home"
                   badgeContent={posts.length <= 15 ? posts.length : "+15"}
                   color="error"
                   sx={{ fontSize: "25px" }}
@@ -163,25 +168,30 @@ const Navbar = () => {
                   background: isChatPath ? backgroundColor : "transparent",
                 }}
               >
-                <Message
+                <Badge
+                  title="Messages"
+                  badgeContent={"+1"}
+                  color="error"
                   sx={{ fontSize: "25px" }}
                   style={{ margin: "0 17px" }}
-                />
+                >
+                  <Message />
+                </Badge>
               </ListItem>
 
-              <ListItem button>
+              <ListItem title="Notifications"  button>
                 <NotificationsActiveIcon
                   sx={{ fontSize: "25px" }}
                   style={{ margin: "0 17px" }}
                 />
               </ListItem>
-              <ListItem button>
+              <ListItem title="Jobs" button>
                 <WorkHistoryIcon
                   sx={{ fontSize: "25px" }}
                   style={{ margin: "0 17px" }}
                 />
               </ListItem>
-              <ListItem button onClick={() => dispatch(setMode())}>
+              <ListItem title="Mode" button onClick={() => dispatch(setMode())}>
                 {theme.palette.mode === "dark" ? (
                   <DarkMode sx={{ fontSize: "25px" }} />
                 ) : (
@@ -211,7 +221,7 @@ const Navbar = () => {
           <FlexBetween
             backgroundColor={neutralLight}
             borderRadius="9px"
-            gap="3rem"
+            gap="5rem"
             padding="0.1rem 1.2rem"
           >
             <InputBase
@@ -220,7 +230,7 @@ const Navbar = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
             <IconButton onClick={handleSearch}>
-              <Search style={{ marginRight: "-10px" }} />
+              <Search style={{ borderRadius: "50%", marginRight: "" }} />
             </IconButton>
           </FlexBetween>
         )}
@@ -270,11 +280,10 @@ const Navbar = () => {
                   <Badge
                     badgeContent={posts.length <= 15 ? posts.length : "+15"}
                     color="error"
+                    sx={{ fontSize: "25px" }}
+                    style={{ margin: "0 17px" }}
                   >
-                    <HomeIcon
-                      sx={{ fontSize: "25px" }}
-                      style={{ margin: "0 17px" }}
-                    />
+                    <HomeIcon />
                   </Badge>
                 </ListItem>
 
@@ -287,10 +296,14 @@ const Navbar = () => {
                     background: isChatPath ? backgroundColor : "transparent",
                   }}
                 >
-                  <Message
+                  <Badge
+                    badgeContent={"+1"}
+                    color="error"
                     sx={{ fontSize: "25px" }}
                     style={{ margin: "0 17px" }}
-                  />
+                  >
+                    <Message />
+                  </Badge>
                 </ListItem>
 
                 <ListItem button>
