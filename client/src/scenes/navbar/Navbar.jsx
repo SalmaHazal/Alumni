@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Logoalumni from "/public/assets/logoalumni.png";
 import hashtag from "/public/assets/hashtag.01.png";
-import Grid from "@mui/material/Grid";
 import {
   Box,
   IconButton,
@@ -11,13 +10,9 @@ import {
   useMediaQuery,
   List,
   ListItem,
+  Badge,
 } from "@mui/material";
-import {
-  Search,
-  Message,
-  DarkMode,
-  LightMode,
-} from "@mui/icons-material";
+import { Search, Message, DarkMode, LightMode } from "@mui/icons-material";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import WorkHistoryIcon from "@mui/icons-material/WorkHistory";
 import HomeIcon from "@mui/icons-material/Home";
@@ -29,11 +24,12 @@ import { Link, useLocation } from "react-router-dom";
 import AccountMenu from "../prof/prof";
 import { Fade as Hamburger } from "hamburger-react";
 import { useTransition, animated } from "@react-spring/web";
-import Badge from "@mui/material/Badge"; // Import the Badge component
+import axios from "axios";
 
 const Navbar = () => {
   const [isMobileMenuToggled, setIsMobileMenuToggled] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [notifications, setNotifications] = useState([]); // Track notifications
   const [unreadCount, setUnreadCount] = useState(0); // State to track unread notifications
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -47,7 +43,6 @@ const Navbar = () => {
   const neutralLight = theme.palette.neutral.light;
   const dark = theme.palette.neutral.dark;
   const background = theme.palette.background.default;
-  const primaryLight = theme.palette.primary.light;
   const alt = theme.palette.background.alt;
 
   const isChatPath = /\/chat(\/\d+)?/.test(location.pathname);
@@ -89,7 +84,11 @@ const Navbar = () => {
         );
         const data = await response.json();
 
-        const unreadNotifications = data.filter((notification) => !notification.read).length;
+        setNotifications(data); // Update notifications state
+
+        const unreadNotifications = data.filter(
+          (notification) => !notification.read
+        ).length;
         setUnreadCount(unreadNotifications);
       } catch (error) {
         console.error("Failed to fetch notifications:", error);
@@ -98,6 +97,30 @@ const Navbar = () => {
 
     fetchNotifications();
   }, [user, token]);
+
+  const markAllAsRead = async () => {
+    if (notifications.length === 0) return; // No notifications to mark as read
+
+    try {
+      await Promise.all(
+        notifications.map((notification) =>
+          axios.put(
+            `http://localhost:3001/notifications/read/${notification._id}`,
+            {},
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          )
+        )
+      );
+      setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+      setUnreadCount(0);
+    } catch (error) {
+      console.error("Failed to mark notifications as read:", error);
+    }
+  };
 
   const transitions = useTransition(isMobileMenuToggled, {
     from: { transform: "translateX(100%)" },
@@ -187,6 +210,7 @@ const Navbar = () => {
                 button
                 component={Link}
                 to="/notifications"
+                onClick={markAllAsRead} // Call markAllAsRead when the notifications icon is clicked
                 sx={{
                   borderRadius: "10px",
                   background:
@@ -263,55 +287,29 @@ const Navbar = () => {
         item ? (
           <animated.div
             style={{
-              ...style,
-              position: "fixed",
+              position: "absolute",
               right: 0,
-              top: "70px",
-              bottom: 0,
-              height: "100%",
-              zIndex: 10,
-              maxWidth: "500px",
-              minWidth: "300px",
-              backgroundColor: background,
+              top: "60px",
+              width: "200px",
+              ...style,
             }}
           >
             <FlexBetween
-              style={{ marginTop: "15px", justifyContent: "center" }}
+              backgroundColor={neutralLight}
+              borderRadius="9px"
+              gap="3rem"
+              padding="0.5rem 1rem"
+              flexDirection="column"
             >
-              <List
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  gap: "3rem",
-                }}
-              >
-                <ListItem
-                  button
-                  component={Link}
-                  to="/home"
-                  sx={{
-                    borderRadius: "10px",
-                    background:
-                      location.pathname === "/home" ? "#C7C8CC" : "transparent",
-                  }}
-                >
+              <List>
+                <ListItem button component={Link} to="/home">
                   <HomeIcon
                     sx={{ fontSize: "25px" }}
                     style={{ margin: "0 17px" }}
                   />
                 </ListItem>
 
-                <ListItem
-                  button
-                  component={Link}
-                  to="/chat"
-                  sx={{
-                    borderRadius: "10px",
-                    background: isChatPath ? "#C7C8CC" : "transparent",
-                  }}
-                >
+                <ListItem button component={Link} to="/chat">
                   <Message
                     sx={{ fontSize: "25px" }}
                     style={{ margin: "0 17px" }}
@@ -322,15 +320,8 @@ const Navbar = () => {
                   button
                   component={Link}
                   to="/notifications"
-                  sx={{
-                    borderRadius: "10px",
-                    background:
-                      location.pathname === "/notifications"
-                        ? "#C7C8CC"
-                        : "transparent",
-                  }}
+                  onClick={markAllAsRead} // Call markAllAsRead when the notifications icon is clicked
                 >
-                  {/* Badge Component around Notifications Icon */}
                   <Badge
                     badgeContent={unreadCount} // Display unread count
                     color="error" // Set the color of the badge to red
@@ -342,27 +333,8 @@ const Navbar = () => {
                     />
                   </Badge>
                 </ListItem>
-                <ListItem button>
-                  <WorkHistoryIcon
-                    sx={{ fontSize: "25px" }}
-                    style={{ margin: "0 17px" }}
-                  />
-                </ListItem>
-                <ListItem button onClick={() => dispatch(setMode())}>
-                  {theme.palette.mode === "dark" ? (
-                    <DarkMode
-                      style={{ margin: "0 17px" }}
-                      sx={{ fontSize: "25px" }}
-                    />
-                  ) : (
-                    <LightMode
-                      style={{ margin: "0 17px" }}
-                      sx={{ color: dark, fontSize: "25px" }}
-                    />
-                  )}
-                </ListItem>
 
-                <AccountMenu />
+                
               </List>
             </FlexBetween>
           </animated.div>

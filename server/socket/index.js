@@ -247,7 +247,7 @@ io.on("connection", async (socket) => {
           userId: post.userId._id,
           type: "comment",
           text: `${commentingUser.firstName} commented on your post`,
-          link: `/posts/${postId}`,
+          link: `/posts/${postId}#comment-${newComment._id}`,
           senderPhoto: commentingUser.picturePath,
           createdAt: new Date(),
           read: false,

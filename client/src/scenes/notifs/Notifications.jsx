@@ -1,10 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useSocketContext } from "../../context/SocketContext";
-import { Box, Avatar, Typography, List, ListItem, ListItemAvatar, ListItemText, IconButton } from "@mui/material";
+import { Box, Avatar, Typography, List, ListItem, ListItemAvatar, ListItemText, IconButton, useMediaQuery } from "@mui/material";
 import RefreshIcon from '@mui/icons-material/Refresh';
+import Navbar from "../navbar/Navbar";
+import UserWidget from "../widgets/UserWidget";
+import AdvertWidget from "../widgets/AdvertWidget";
 
 const Notifications = () => {
+  const isNonMobileScreens = useMediaQuery("(min-width:1000px)");
   const user = useSelector((state) => state?.user);
   const token = useSelector((state) => state.token);
   const { socket } = useSocketContext();
@@ -54,40 +58,54 @@ const Notifications = () => {
   }, [user?._id, socket]);
 
   return (
-    <Box 
-      sx={{ 
-        padding: 2, 
-        display: 'flex', 
-        flexDirection: 'column', 
-        alignItems: 'center' 
-      }}
-    >
-      <Typography variant="h5" component="h2" gutterBottom>
-        Notifications
-      </Typography>
-      <IconButton onClick={fetchNotifications} sx={{ mb: 2 }}>
-        <RefreshIcon />
-      </IconButton>
-      <List 
-        ref={notificationRef} 
-        sx={{ width: '100%', maxWidth: 600 }}
+    <Box>
+      <Navbar />
+      <Box
+        width="100%"
+        padding="2rem 6%"
+        display={isNonMobileScreens ? "flex" : "block"}
+        gap="0.5rem"
+        justifyContent="space-between"
       >
-        {notifications.map((notification) => (
-          <ListItem key={notification._id} alignItems="flex-start">
-            <ListItemAvatar>
-              <Avatar src={`http://localhost:3001/assets/${notification.senderPhoto}`} alt={notification.senderName} />
-            </ListItemAvatar>
-            <ListItemText
-              primary={<Typography variant="body1">{notification.text}</Typography>}
-              secondary={
-                <Typography variant="caption" color="text.secondary">
-                  <a href={notification.link}>View</a>
-                </Typography>
-              }
-            />
-          </ListItem>
-        ))}
-      </List>
+        <Box flexBasis={isNonMobileScreens ? "26%" : undefined}>
+          <UserWidget userId={user?._id} picturePath={user?.picturePath} />
+        </Box>
+        <Box
+          flexBasis={isNonMobileScreens ? "42%" : undefined}
+          mt={isNonMobileScreens ? undefined : "2rem"}
+        >
+          <Box sx={{ padding: 2 }}>
+            <Typography variant="h5" component="h2" gutterBottom>
+              Notifications
+            </Typography>
+            <IconButton onClick={fetchNotifications} sx={{ mb: 2 }}>
+              <RefreshIcon />
+            </IconButton>
+            <List ref={notificationRef} sx={{ width: '100%', maxWidth: 600 }}>
+              {notifications.map((notification) => (
+                <ListItem key={notification._id} alignItems="flex-start">
+                  <ListItemAvatar>
+                    <Avatar src={`http://localhost:3001/assets/${notification.senderPhoto}`} alt={notification.senderName} />
+                  </ListItemAvatar>
+                  <ListItemText
+                    primary={<Typography variant="body1">{notification.text}</Typography>}
+                    secondary={
+                      <Typography variant="caption" color="text.secondary">
+                        <a href={notification.link}>View</a>
+                      </Typography>
+                    }
+                  />
+                </ListItem>
+              ))}
+            </List>
+          </Box>
+        </Box>
+        {isNonMobileScreens && (
+          <Box flexBasis="26%">
+            <AdvertWidget />
+          </Box>
+        )}
+      </Box>
     </Box>
   );
 };

@@ -49,7 +49,7 @@ export const addComment = async (req, res) => {
         userId: post.userId,
         type: "comment",
         text: `${commentingUser.firstName} commented on your post`,
-        link: `/posts/${postId}`,
+        link: `/posts/${postId}#comment-${newComment._id}`,
         senderPhoto: commentingUser.picturePath,
         createdAt: new Date(),
         read: false,
