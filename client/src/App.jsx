@@ -8,7 +8,8 @@ import LoginPage from "./scenes/loginPage/LoginPage";
 import ForgotPassword from "./scenes/loginPage/ForgotPassword";
 import ResetPassword from "./scenes/loginPage/ResetPassword";
 import ProfilePage from "./scenes/profilePage/ProfilePage";
-import EditProfilePage from "./scenes/modify/EditProfilePage";
+import NotificationsPage from "./scenes/notifs/Notifications";
+import SinglePostPage from "./scenes/widgets/SinglePostPage";
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { CssBaseline, ThemeProvider } from "@mui/material";
@@ -39,10 +40,6 @@ function App() {
       element: <ProfilePage />,
     },
     {
-      path: "/edit-profile",
-      element: <EditProfilePage />,
-    },
-    {
       path: "/forgot-password",
       element: <ForgotPassword />,
 
@@ -66,6 +63,14 @@ function App() {
         },
 
       ],
+    },
+    {
+      path: "/notifications",
+      element: <NotificationsPage />,
+    },
+    {
+      path: "/posts/:postId",
+      element: isAuth ? <SinglePostPage /> : <Navigate to="/" />, 
     },
   ]);
 

@@ -17,6 +17,7 @@ import locationRoutes from "./routes/locations.js";
 import commentRoutes from "./routes/comments.js";
 import searchRoutes from "./routes/search.js";
 import updateLinks from "./routes/updateLinks.js";
+import notificationRoutes from "./routes/notification.js";
 import { register } from "./controllers/auth.js";
 import { createPost } from "./controllers/posts.js";
 import { updateUserProfile } from "./controllers/users.js";
@@ -147,6 +148,7 @@ app.use("/api/comments", commentRoutes);
 app.use("/locations", locationRoutes);
 app.use("/search", searchRoutes);
 app.use("/api", updateLinks);
+app.use("/notifications", notificationRoutes);
 
 /* MONGOOSE SETUP */
 const PORT = process.env.PORT || 6001;

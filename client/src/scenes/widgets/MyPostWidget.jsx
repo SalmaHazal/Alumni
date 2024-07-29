@@ -40,6 +40,8 @@ import {
   faBriefcase,
   faHandsHelping,
 } from "@fortawesome/free-solid-svg-icons";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 
 const MyPostWidget = ({ picturePath }) => {
@@ -70,6 +72,7 @@ const MyPostWidget = ({ picturePath }) => {
     });
     const posts = await response.json();
     dispatch(setPosts({ posts }));
+    toast.success("Post added successfully");
     setImage(null);
     setPost("");
   };

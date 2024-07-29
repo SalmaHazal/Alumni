@@ -1,47 +1,40 @@
 import React, { useEffect, useState } from "react";
 import Logoalumni from "/public/assets/logoalumni.png";
 import hashtag from "/public/assets/hashtag.01.png";
-import Grid from "@mui/material/Grid";
 import {
   Box,
   IconButton,
   InputBase,
   Typography,
-  Select,
-  MenuItem,
-  FormControl,
   useTheme,
   useMediaQuery,
   List,
   ListItem,
-  Button,
 } from "@mui/material";
 import {
   Search,
   Message,
   DarkMode,
   LightMode,
-  Menu,
-  Grade,
 } from "@mui/icons-material";
-import AccountCircle from "@mui/icons-material/AccountCircle";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import WorkHistoryIcon from "@mui/icons-material/WorkHistory";
 import HomeIcon from "@mui/icons-material/Home";
 import { useDispatch, useSelector } from "react-redux";
-import { setMode, setLogout, setPosts } from "../../state/index";
-import { useNavigate } from "react-router-dom";
+import { setMode, setPosts } from "../../state/index";
 import FlexBetween from "../../components/FlexBetween";
 import { Link, useLocation } from "react-router-dom";
 import AccountMenu from "../prof/prof";
 import { Fade as Hamburger } from "hamburger-react";
 import { useTransition, animated } from "@react-spring/web";
 import Badge from "@mui/material/Badge";
+import axios from "axios";
 
 const Navbar = () => {
   const [isMobileMenuToggled, setIsMobileMenuToggled] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
@@ -58,6 +51,8 @@ const Navbar = () => {
     theme.palette.mode === "light" ? "#C7C8CC" : "#3b3b3b";
 
   const isChatPath = /\/chat(\/\d+)?/.test(location.pathname);
+
+  const fullName = `${user.firstName} ${user.lastName}`;
 
   const posts = useSelector((state) => state.posts);
 
@@ -82,6 +77,61 @@ const Navbar = () => {
   useEffect(() => {
     handleSearch();
   }, [searchTerm]);
+
+  // Fetch notifications and update unread count
+  const fetchNotifications = async () => {
+    if (!user?._id) return;
+
+    try {
+      const response = await fetch(
+        `http://localhost:3001/notifications/${user._id}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data = await response.json();
+
+      setNotifications(data); // Update notifications state
+
+      const unreadNotifications = data.filter(
+        (notification) => !notification.read
+      ).length;
+      setUnreadCount(unreadNotifications);
+    } catch (error) {
+      console.error("Failed to fetch notifications:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotifications();
+  }, [user, token]);
+
+  const markAllAsRead = async () => {
+    if (notifications.length === 0) return; // No notifications to mark as read
+
+    try {
+      await Promise.all(
+        notifications.map((notification) =>
+          axios.put(
+            `http://localhost:3001/notifications/read/${notification._id}`,
+            {},
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          )
+        )
+      );
+      setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+      setUnreadCount(0);
+    } catch (error) {
+      console.error("Failed to mark notifications as read:", error);
+    }
+  };
 
   const transitions = useTransition(isMobileMenuToggled, {
     from: { transform: "translateX(100%)" },
@@ -179,12 +229,32 @@ const Navbar = () => {
                 </Badge>
               </ListItem>
 
-              <ListItem title="Notifications"  button>
-                <NotificationsActiveIcon
+              <ListItem
+                button
+                component={Link}
+                to="/notifications"
+                onClick={markAllAsRead} // Call markAllAsRead when the notifications icon is clicked
+                sx={{
+                  borderRadius: "10px",
+                  background:
+                    location.pathname === "/notifications"
+                      ? backgroundColor
+                      : "transparent",
+                }}
+              >
+                {/* Badge Component around Notifications Icon */}
+                <Badge
+                  title="Notifications"
+                  badgeContent={unreadCount} // Display unread count
+                  color="error"
+                  max={99} // Maximum number to display before showing '+'
                   sx={{ fontSize: "25px" }}
                   style={{ margin: "0 17px" }}
-                />
+                >
+                  <NotificationsActiveIcon />
+                </Badge>
               </ListItem>
+
               <ListItem title="Jobs" button>
                 <WorkHistoryIcon
                   sx={{ fontSize: "25px" }}
@@ -306,12 +376,32 @@ const Navbar = () => {
                   </Badge>
                 </ListItem>
 
-                <ListItem button>
-                  <NotificationsActiveIcon
+                <ListItem
+                  button
+                  component={Link}
+                  to="/notifications"
+                  onClick={markAllAsRead} // Call markAllAsRead when the notifications icon is clicked
+                  sx={{
+                    borderRadius: "10px",
+                    background:
+                      location.pathname === "/notifications"
+                        ? "#C7C8CC"
+                        : "transparent",
+                  }}
+                >
+                  {/* Badge Component around Notifications Icon */}
+                  <Badge
+                    title="Notifications"
+                    badgeContent={unreadCount} // Display unread count
+                    color="error"
+                    max={99} // Maximum number to display before showing '+'
                     sx={{ fontSize: "25px" }}
                     style={{ margin: "0 17px" }}
-                  />
+                  >
+                    <NotificationsActiveIcon />
+                  </Badge>
                 </ListItem>
+
                 <ListItem button>
                   <WorkHistoryIcon
                     sx={{ fontSize: "25px" }}
