@@ -31,9 +31,12 @@ const ProfilePage = () => {
 
   return (
     <Box>
-      <Navbar />
+      <Box className="fixed-navbar">
+        <Navbar />
+      </Box>
       <Box
         width="100%"
+        marginTop="80px"
         padding="2rem 6%"
         display={isNonMobileScreens ? "flex" : "block"}
         gap="2rem"
