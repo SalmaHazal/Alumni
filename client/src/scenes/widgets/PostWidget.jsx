@@ -88,9 +88,10 @@ useEffect(() => {
   };
 
   const handleReact = async (reaction) => {
-    setSelectedReaction(reaction); // Store the selected reaction
-    setShowReactions(false); // Hide reactions after selection
-    await patchLike(reaction); // Update the reaction on the backend
+    setSelectedReaction(reaction);
+    setShowReactions(false);
+    await patchLike(reaction);
+    
   };
 
   const handleShareClick = () => {

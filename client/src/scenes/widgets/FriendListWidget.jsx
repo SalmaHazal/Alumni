@@ -20,7 +20,11 @@ const FriendListWidget = ({ userId }) => {
       }
     );
     const data = await response.json();
-    dispatch(setFriends({ friends: data }));
+    if (Array.isArray(data)) {
+      dispatch(setFriends({ friends: data }));
+    } else {
+      console.error("Fetched data is not an array:", data);
+    }
   };
 
   useEffect(() => {

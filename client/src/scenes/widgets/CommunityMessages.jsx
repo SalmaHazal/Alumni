@@ -192,7 +192,7 @@ const CommunityMessages = () => {
             return (
               <div
                 className={`flex gap-3 px-3 py-1 rounded w-fit max-x-[230px] md:max-w-sm lg:max-w-md shadow ${
-                  user._id === msg.msgByUserId._id
+                  user._id === msg.msgByUserId?._id
                     ? `ml-auto ${
                         theme.palette.mode === "light"
                           ? "bg-teal-100"
@@ -209,14 +209,14 @@ const CommunityMessages = () => {
                   <Avatar
                     width={40}
                     height={40}
-                    imageUrl={msg.msgByUserId.picturePath}
-                    name={`${msg.msgByUserId.firstName} ${msg.msgByUserId.lastName}`}
-                    userId={msg.msgByUserId._id}
+                    imageUrl={msg.msgByUserId?.picturePath}
+                    name={`${msg.msgByUserId?.firstName} ${msg.msgByUserId?.lastName}`}
+                    userId={msg.msgByUserId?._id}
                   />
                 </div>
 
                 <div>
-                  <h6>{`${msg.msgByUserId.firstName} ${msg.msgByUserId.lastName}`}</h6>
+                  <h6>{`${msg.msgByUserId?.firstName} ${msg.msgByUserId?.lastName}`}</h6>
                   <div className=" w-full">
                     {msg?.imageUrl && (
                       <img

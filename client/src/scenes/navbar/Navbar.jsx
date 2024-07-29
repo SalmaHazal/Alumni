@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Logoalumni from "/public/assets/logoalumni.png";
-import hashtag from "/public/assets/hashtag.02.png";
+import hashtag from "/public/assets/hashtag.01.png";
 import Grid from "@mui/material/Grid";
 import {
   Box,
