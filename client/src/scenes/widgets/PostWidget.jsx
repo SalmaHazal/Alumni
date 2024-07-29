@@ -37,7 +37,7 @@ const PostWidget = ({
   location,
   picturePath,
   userPicturePath,
-  likes,
+  likes={},
 }) => {
   const [isComments, setIsComments] = useState(false);
   const [showReactions, setShowReactions] = useState(false);
