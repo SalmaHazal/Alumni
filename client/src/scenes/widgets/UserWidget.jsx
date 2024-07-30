@@ -206,7 +206,7 @@ const UserWidget = ({ userId, picturePath }) => {
 
       {/* THIRD ROW */}
       <Box p="1rem 0">
-        <Typography fontSize="1rem" fontWeight="500" mb="1rem">
+        <Typography fontSize="1rem" fontWeight="500" mb="0.5rem" mt="-15px">
           Professional Summary
         </Typography>
 
@@ -270,7 +270,7 @@ const UserWidget = ({ userId, picturePath }) => {
 
         <Divider />
 
-        <Typography fontSize="1rem" fontWeight="500" mt="15px" mb="1rem">
+        <Typography fontSize="1rem" fontWeight="500" mt="4px" mb="10px">
           Social Profiles
         </Typography>
 

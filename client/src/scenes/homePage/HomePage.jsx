@@ -14,28 +14,33 @@ const HomePage = () => {
   return (
     <Box>
       <Box className="fixed-navbar">
-         <Navbar />
+        <Navbar />
       </Box>
       <Box
         width="100%"
         padding="2rem 6%"
-        display={isNonMobileScreens ? "flex" : "block"}
+        display="flex"
+        flexDirection={isNonMobileScreens ? "row" : "column"}
+        justifyContent="center"
+        alignItems={isNonMobileScreens ? "flex-start" : "center"}
         gap="0.5rem"
-        justifyContent="space-between"
         marginTop="85px"
       >
-        <Box flexBasis={isNonMobileScreens ? "26%" : undefined}>
-          <UserWidget userId={_id} picturePath={picturePath} />
-        </Box>
+        {isNonMobileScreens && (
+          <Box className="fixed left-20" minWidth="200px" width="23%">
+            <UserWidget userId={_id} picturePath={picturePath} />
+          </Box>
+        )}
         <Box
-          flexBasis={isNonMobileScreens ? "42%" : undefined}
+          minWidth="500px"
+          width={isNonMobileScreens ? "42%" : "100%"}
           mt={isNonMobileScreens ? undefined : "2rem"}
         >
           <MyPostWidget picturePath={picturePath} />
           <PostsWidget userId={_id} />
         </Box>
         {isNonMobileScreens && (
-          <Box flexBasis="26%">
+          <Box className="fixed right-20" minWidth="200px" width="23%">
             <AdvertWidget />
             <Box m="2rem 0" />
             <FriendListWidget userId={_id} />
@@ -45,4 +50,5 @@ const HomePage = () => {
     </Box>
   );
 };
+
 export default HomePage;
