@@ -37,6 +37,25 @@ io.on("connection", async (socket) => {
   // current user detail
   const user = await getUserDetailsFromToken(token);
 
+  // Community Side Bar
+  socket.on("community side bar", async () => {
+    const getLastMessage = await CommunityConversation.findById(ID).populate({
+      path: "messages",
+      populate: {
+        path: "msgByUserId",
+        model: "User",
+      },
+      options: {
+        sort: { updatedAt: -1 },
+        limit: 1,
+      },
+    });
+
+    const lastMessage = getLastMessage.messages[0];
+
+    io.emit("community last message", lastMessage);
+  });
+
   // Community Messages
   socket.on("community", async () => {
     // get previous message
@@ -80,24 +99,24 @@ io.on("connection", async (socket) => {
       .sort({ updatedAt: -1 });
 
     io.emit("community messages", getConversationMessage?.messages || []);
+
+    // Community Side Bar
+    const getLastMessage = await CommunityConversation.findById(ID).populate({
+      path: "messages",
+      populate: {
+        path: "msgByUserId",
+        model: "User",
+      },
+      options: {
+        sort: { updatedAt: -1 },
+        limit: 1,
+      },
+    });
+
+    const lastMessage = getLastMessage.messages[0];
+
+    io.emit("community last message", lastMessage);
   });
-
-  // Community Side Bar
-  const getLastMessage = await CommunityConversation.findById(ID).populate({
-    path: "messages",
-    populate: {
-      path: "msgByUserId",
-      model: "User",
-    },
-    options: {
-      sort: { updatedAt: -1 },
-      limit: 1,
-    },
-  });
-
-  const lastMessage = getLastMessage.messages[0];
-
-  socket.emit("community last message", lastMessage);
 
   //create a room
   socket.join(user?._id.toString());

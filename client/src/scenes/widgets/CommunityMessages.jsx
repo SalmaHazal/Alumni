@@ -98,7 +98,6 @@ const CommunityMessages = () => {
       socket.emit("community");
 
       socket.on("community messages", (data) => {
-        console.log(data);
         setAllMessage(data);
       });
 

@@ -50,11 +50,20 @@ const Sidebar = () => {
         setAllUser(conversationUserData);
       });
 
-      socket.on("community last message", (data) => {
+      socket.emit("community side bar");
+
+      const handleCommunityLastMessage = (data) => {
         setCommunityConv(data);
-      });
+        console.log(data);
+      };
+
+      socket.on("community last message", handleCommunityLastMessage);
+
+      return () => {
+        socket.off("community last message", handleCommunityLastMessage);
+      };
     }
-  }, [socket, user, communityConv]);
+  }, [socket, user]);
 
   return (
     <div
@@ -137,7 +146,11 @@ const Sidebar = () => {
             Community Messages
           </button>
         </div>
-        <div className={`${theme.palette.mode === "light" ? "bg-slate-200" : "bg-slate-600"} p-[0.5px]`}></div>
+        <div
+          className={`${
+            theme.palette.mode === "light" ? "bg-slate-200" : "bg-slate-600"
+          } p-[0.5px]`}
+        ></div>
 
         <div className="h-[calc(90vh-65px)] overflow-x-hidden overflow-y-auto scrollbar">
           {activeTab === "personal" ? (
@@ -171,7 +184,13 @@ const Sidebar = () => {
                     />
                   </div>
                   <div>
-                    <h6 className={`text-ellipsis line-clamp-1 font-semibold text-base ${theme.palette.mode === "light" ? "text-black" : "text-white"} `}>{`${conv?.userDetails?.firstName} ${conv?.userDetails?.lastName}`}</h6>
+                    <h6
+                      className={`text-ellipsis line-clamp-1 font-semibold text-base ${
+                        theme.palette.mode === "light"
+                          ? "text-black"
+                          : "text-white"
+                      } `}
+                    >{`${conv?.userDetails?.firstName} ${conv?.userDetails?.lastName}`}</h6>
                     <div className="text-slate-500 text-sm flex items-center gap-1">
                       <div>
                         {conv?.lastMsg?.imageUrl && (
@@ -209,10 +228,10 @@ const Sidebar = () => {
             <NavLink
               to={"/chat/community"}
               className={`flex items-center gap-3 py-3 px-2 cursor-pointer rounded no-underline ${
-                    theme.palette.mode === "light"
-                      ? "hover:bg-slate-100"
-                      : "hover:bg-[#383838]"
-                  }`}
+                theme.palette.mode === "light"
+                  ? "hover:bg-slate-100"
+                  : "hover:bg-[#383838]"
+              }`}
             >
               <div>
                 <Avatar
@@ -223,10 +242,14 @@ const Sidebar = () => {
                 />
               </div>
               <div>
-                <h6 className={`text-ellipsis line-clamp-1 font-semibold text-base ${theme.palette.mode === "light" ? "text-black" : "text-white"}`}>
+                <h6
+                  className={`text-ellipsis line-clamp-1 font-semibold text-base ${
+                    theme.palette.mode === "light" ? "text-black" : "text-white"
+                  }`}
+                >
                   Cloud Community
                 </h6>
-                {/* <div className="text-slate-500 text-sm flex items-center gap-1">
+                <div className="text-slate-500 text-sm flex items-center gap-1">
                   <div className="flex gap-2">
                     <strong>{communityConv?.msgByUserId?.firstName}: </strong>
                     <div className="flex gap-2">
@@ -255,7 +278,7 @@ const Sidebar = () => {
                       </p>
                     </div>
                   </div>
-                </div> */}
+                </div>
               </div>
 
               {/* {Boolean(conv?.unseenMsg) && (
