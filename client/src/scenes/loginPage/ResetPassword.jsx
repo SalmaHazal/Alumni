@@ -4,26 +4,48 @@ import axios from "axios";
 import { Button, TextField, Typography, Box } from "@mui/material";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import * as yup from "yup"; // Import Yup for validation
+import { useFormik } from "formik"; // Use Formik for handling form state and validation
 
 function ResetPassword() {
-  const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const { id, token } = useParams();
 
   axios.defaults.withCredentials = true;
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    axios
-      .post(`http://localhost:3001/reset-password/${id}/${token}`, { password })
-      .then((res) => {
-        if (res.data.Status === "Success") {
-          toast.success("Password Successfully Updated")
-          navigate("/");
-        }
-      })
-      .catch((err) => toast.error("An Error Occurred"));
-  };
+  // Define validation schema using Yup
+  const validationSchema = yup.object({
+    password: yup
+      .string()
+      .required("Password is required")
+      .min(8, "Password must be at least 8 characters"),
+    confirmPassword: yup
+      .string()
+      .required("Confirm Password is required")
+      .oneOf([yup.ref("password"), null], "Passwords must match"),
+  });
+
+  // Use Formik for form handling
+  const formik = useFormik({
+    initialValues: {
+      password: "",
+      confirmPassword: "",
+    },
+    validationSchema: validationSchema,
+    onSubmit: (values) => {
+      axios
+        .post(`http://localhost:3001/reset-password/${id}/${token}`, {
+          password: values.password,
+        })
+        .then((res) => {
+          if (res.data.Status === "Success") {
+            toast.success("Password Successfully Updated");
+            navigate("/");
+          }
+        })
+        .catch((err) => toast.error("An Error Occurred"));
+    },
+  });
 
   const handleCancel = () => {
     navigate("/");
@@ -47,7 +69,7 @@ function ResetPassword() {
         <Typography variant="h4" align="center" gutterBottom>
           Reset Password
         </Typography>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={formik.handleSubmit}>
           <Box className="mb-3" sx={{ mb: 3 }}>
             <TextField
               label="New Password"
@@ -57,7 +79,32 @@ function ResetPassword() {
               name="password"
               fullWidth
               variant="outlined"
-              onChange={(e) => setPassword(e.target.value)}
+              value={formik.values.password} // Bind value to Formik state
+              onChange={formik.handleChange} // Use Formik change handler
+              onBlur={formik.handleBlur} // Use Formik blur handler
+              error={formik.touched.password && Boolean(formik.errors.password)} // Show error if field is touched and has an error
+              helperText={formik.touched.password && formik.errors.password} // Show helper text for the error
+            />
+          </Box>
+          <Box className="mb-3" sx={{ mb: 3 }}>
+            <TextField
+              label="Confirm Password"
+              type="password"
+              placeholder="Confirm Password"
+              autoComplete="off"
+              name="confirmPassword"
+              fullWidth
+              variant="outlined"
+              value={formik.values.confirmPassword} // Bind value to Formik state
+              onChange={formik.handleChange} // Use Formik change handler
+              onBlur={formik.handleBlur} // Use Formik blur handler
+              error={
+                formik.touched.confirmPassword &&
+                Boolean(formik.errors.confirmPassword)
+              } // Show error if field is touched and has an error
+              helperText={
+                formik.touched.confirmPassword && formik.errors.confirmPassword
+              } // Show helper text for the error
             />
           </Box>
           <Box className="d-flex gap-2" sx={{ display: "flex", gap: 2 }}>

@@ -10,8 +10,8 @@ import CommunityConversation from "../models/CommunityConversation.js";
 
 const app = express();
 
-// online user
-const onlineUser = new Set();
+// online users
+const onlineUsers = new Set();
 
 // socket connection
 const server = http.createServer(app);
@@ -28,198 +28,258 @@ io.on("connection", async (socket) => {
   // Get the id of the community Conversation
   const communityConversationID = async () => {
     const getConversationMessage = await CommunityConversation.find();
+    if (!getConversationMessage || getConversationMessage.length === 0) {
+      console.error("No community conversation found.");
+      return null; // Handle case where no community conversation exists
+    }
     return getConversationMessage[0]._id;
   };
   const ID = await communityConversationID();
 
   const token = socket.handshake.auth.token;
 
+  if (!token) {
+    console.error("No authentication token provided.");
+    return; // Ensure the token is provided
+  }
+
   // current user detail
   const user = await getUserDetailsFromToken(token);
 
+  if (!user) {
+    console.error("Invalid or expired token.");
+    return; // Handle the case where user details can't be fetched
+  }
+
   // Community Messages
   socket.on("community", async () => {
-    // get previous message
-    const getConversationMessage = await CommunityConversation.findById(ID)
-      .populate({
-        path: "messages",
-        populate: {
-          path: "msgByUserId",
-          model: "User",
-        },
-      })
-      .sort({ updatedAt: -1 });
+    if (!ID) {
+      socket.emit("community messages", []); // Emit empty array if no community ID
+      return;
+    }
 
-    socket.emit("community messages", getConversationMessage?.messages || []);
+    // get previous messages
+    try {
+      const getConversationMessage = await CommunityConversation.findById(ID)
+        .populate({
+          path: "messages",
+          populate: {
+            path: "msgByUserId",
+            model: "User",
+          },
+        })
+        .sort({ updatedAt: -1 });
+
+      socket.emit("community messages", getConversationMessage?.messages || []);
+    } catch (error) {
+      console.error("Error fetching community messages:", error);
+      socket.emit("community messages", []); // Emit empty array on error
+    }
   });
 
   socket.on("new community message", async (data) => {
-    const message = new Message({
-      text: data.text,
-      imageUrl: data.imageUrl,
-      videoUrl: data.videoUrl,
-      msgByUserId: data?.msgByUserId,
-    });
-    const saveMessage = await message.save();
+    if (!ID) {
+      return; // Return if community ID is not available
+    }
 
-    await CommunityConversation.updateOne(
-      { _id: ID },
-      {
-        $push: { messages: saveMessage._id },
-      }
-    );
+    try {
+      const message = new Message({
+        text: data.text,
+        imageUrl: data.imageUrl,
+        videoUrl: data.videoUrl,
+        msgByUserId: data?.msgByUserId,
+      });
+      const saveMessage = await message.save();
 
-    const getConversationMessage = await CommunityConversation.findById(ID)
-      .populate({
-        path: "messages",
-        populate: {
-          path: "msgByUserId",
-          model: "User",
-        },
-      })
-      .sort({ updatedAt: -1 });
+      await CommunityConversation.updateOne(
+        { _id: ID },
+        {
+          $push: { messages: saveMessage._id },
+        }
+      );
 
-    io.emit("community messages", getConversationMessage?.messages || []);
+      const getConversationMessage = await CommunityConversation.findById(ID)
+        .populate({
+          path: "messages",
+          populate: {
+            path: "msgByUserId",
+            model: "User",
+          },
+        })
+        .sort({ updatedAt: -1 });
+
+      io.emit("community messages", getConversationMessage?.messages || []);
+    } catch (error) {
+      console.error("Error saving new community message:", error);
+    }
   });
 
   // Community Side Bar
-  const getLastMessage = await CommunityConversation.findById(ID).populate({
-    path: "messages",
-    populate: {
-      path: "msgByUserId",
-      model: "User",
-    },
-    options: {
-      sort: { updatedAt: -1 },
-      limit: 1,
-    },
-  });
+  try {
+    const getLastMessage = await CommunityConversation.findById(ID).populate({
+      path: "messages",
+      populate: {
+        path: "msgByUserId",
+        model: "User",
+      },
+      options: {
+        sort: { updatedAt: -1 },
+        limit: 1,
+      },
+    });
 
-  const lastMessage = getLastMessage.messages[0];
+    const lastMessage = getLastMessage?.messages[0];
 
-  socket.emit("community last message", lastMessage);
+    socket.emit("community last message", lastMessage || {});
+  } catch (error) {
+    console.error("Error fetching last community message:", error);
+    socket.emit("community last message", {}); // Emit empty object on error
+  }
 
-  //create a room
-  socket.join(user?._id.toString());
-  onlineUser.add(user?._id?.toString());
+  // Create a room
+  socket.join(user._id.toString());
+  onlineUsers.add(user._id.toString());
 
-  io.emit("getOnlineUsers", Array.from(onlineUser));
+  io.emit("getOnlineUsers", Array.from(onlineUsers));
 
   socket.on("message-page", async (userId) => {
-    const userDetails = await User.findById(userId).select("-password");
+    try {
+      const userDetails = await User.findById(userId).select("-password");
 
-    const payload = {
-      _id: userDetails?._id,
-      name: `${userDetails?.firstName} ${userDetails?.lastName}`,
-      email: userDetails?.email,
-      picturePath: userDetails?.picturePath,
-      online: onlineUser.has(userId),
-    };
-    socket.emit("message-user", payload);
-
-    // get previous message
-    const getConversationMessage = await Conversation.findOne({
-      $or: [
-        { sender: user?._id, receiver: userId },
-        { sender: userId, receiver: user?._id },
-      ],
-    })
-      .populate("messages")
-      .sort({ updatedAt: -1 });
-
-    socket.emit("message", getConversationMessage?.messages || []);
-  });
-
-  // new message
-  socket.on("new message", async (data) => {
-    // check if the conversation between the sender and the receiver exists
-    let conversation = await Conversation.findOne({
-      $or: [
-        { sender: data?.sender, receiver: data?.receiver },
-        { sender: data?.receiver, receiver: data?.sender },
-      ],
-    });
-
-    // if conversation is not available
-    if (!conversation) {
-      const createConversation = new Conversation({
-        sender: data?.sender,
-        receiver: data?.receiver,
-      });
-      conversation = await createConversation.save();
-    }
-    const message = new Message({
-      text: data.text,
-      imageUrl: data.imageUrl,
-      videoUrl: data.videoUrl,
-      msgByUserId: data?.msgByUserId,
-    });
-    const saveMessage = await message.save();
-
-    const updateConversation = await Conversation.updateOne(
-      { _id: conversation?._id },
-      {
-        $push: { messages: saveMessage?._id },
+      if (!userDetails) {
+        console.error("User not found with id:", userId);
+        return;
       }
-    );
 
-    const getConversationMessage = await Conversation.findOne({
-      $or: [
-        { sender: data?.sender, receiver: data?.receiver },
-        { sender: data?.receiver, receiver: data?.sender },
-      ],
-    })
-      .populate("messages")
-      .sort({ updatedAt: -1 });
+      const payload = {
+        _id: userDetails._id,
+        name: `${userDetails.firstName} ${userDetails.lastName}`,
+        email: userDetails.email,
+        picturePath: userDetails.picturePath,
+        online: onlineUsers.has(userId),
+      };
+      socket.emit("message-user", payload);
 
-    io.to(data?.sender).emit("message", getConversationMessage?.messages || []);
-    io.to(data?.receiver).emit(
-      "message",
-      getConversationMessage?.messages || []
-    );
+      // get previous messages
+      const getConversationMessage = await Conversation.findOne({
+        $or: [
+          { sender: user._id, receiver: userId },
+          { sender: userId, receiver: user._id },
+        ],
+      })
+        .populate("messages")
+        .sort({ updatedAt: -1 });
 
-    // send conversation
-    const conversationSender = await getConversation(data?.sender);
-    const conversationReceiver = await getConversation(data?.receiver);
-
-    io.to(data?.sender).emit("conversation", conversationSender);
-    io.to(data?.receiver).emit("conversation", conversationReceiver);
+      socket.emit("message", getConversationMessage?.messages || []);
+    } catch (error) {
+      console.error("Error fetching user messages:", error);
+      socket.emit("message", []); // Emit empty array on error
+    }
   });
 
-  // sidebar
-  socket.on("sidebar", async (currentUserId) => {
-    const conversation = await getConversation(currentUserId);
+  // New message
+  socket.on("new message", async (data) => {
+    try {
+      // Check if the conversation between the sender and the receiver exists
+      let conversation = await Conversation.findOne({
+        $or: [
+          { sender: data?.sender, receiver: data?.receiver },
+          { sender: data?.receiver, receiver: data?.sender },
+        ],
+      });
 
-    socket.emit("conversation", conversation);
+      // If conversation is not available, create a new one
+      if (!conversation) {
+        const createConversation = new Conversation({
+          sender: data?.sender,
+          receiver: data?.receiver,
+        });
+        conversation = await createConversation.save();
+      }
+
+      const message = new Message({
+        text: data.text,
+        imageUrl: data.imageUrl,
+        videoUrl: data.videoUrl,
+        msgByUserId: data?.msgByUserId,
+      });
+      const saveMessage = await message.save();
+
+      await Conversation.updateOne(
+        { _id: conversation._id },
+        {
+          $push: { messages: saveMessage._id },
+        }
+      );
+
+      const getConversationMessage = await Conversation.findOne({
+        $or: [
+          { sender: data?.sender, receiver: data?.receiver },
+          { sender: data?.receiver, receiver: data?.sender },
+        ],
+      })
+        .populate("messages")
+        .sort({ updatedAt: -1 });
+
+      io.to(data?.sender).emit("message", getConversationMessage?.messages || []);
+      io.to(data?.receiver).emit("message", getConversationMessage?.messages || []);
+
+      // Send conversation
+      const conversationSender = await getConversation(data?.sender);
+      const conversationReceiver = await getConversation(data?.receiver);
+
+      io.to(data?.sender).emit("conversation", conversationSender);
+      io.to(data?.receiver).emit("conversation", conversationReceiver);
+    } catch (error) {
+      console.error("Error sending new message:", error);
+    }
+  });
+
+  // Sidebar
+  socket.on("sidebar", async (currentUserId) => {
+    try {
+      const conversation = await getConversation(currentUserId);
+
+      socket.emit("conversation", conversation);
+    } catch (error) {
+      console.error("Error fetching conversations for sidebar:", error);
+      socket.emit("conversation", []); // Emit empty array on error
+    }
   });
 
   socket.on("seen", async (msgByUserId) => {
-    let conversation = await Conversation.findOne({
-      $or: [
-        { sender: user?._id, receiver: msgByUserId },
-        { sender: msgByUserId, receiver: user?._id },
-      ],
-    });
+    try {
+      const conversation = await Conversation.findOne({
+        $or: [
+          { sender: user._id, receiver: msgByUserId },
+          { sender: msgByUserId, receiver: user._id },
+        ],
+      });
 
-    const conversationMessageId = conversation?.messages || [];
+      const conversationMessageId = conversation?.messages || [];
 
-    const updateMessages = await Message.updateMany(
-      { _id: { $in: conversationMessageId }, msgByUserId: msgByUserId },
-      { $set: { seen: true } }
-    );
+      await Message.updateMany(
+        { _id: { $in: conversationMessageId }, msgByUserId: msgByUserId },
+        { $set: { seen: true } }
+      );
 
-    //send conversation
-    const conversationSender = await getConversation(user?._id?.toString());
-    const conversationReceiver = await getConversation(msgByUserId);
+      // Send conversation
+      const conversationSender = await getConversation(user._id.toString());
+      const conversationReceiver = await getConversation(msgByUserId);
 
-    io.to(user?._id?.toString()).emit("conversation", conversationSender);
-    io.to(msgByUserId).emit("conversation", conversationReceiver);
+      io.to(user._id.toString()).emit("conversation", conversationSender);
+      io.to(msgByUserId).emit("conversation", conversationReceiver);
+    } catch (error) {
+      console.error("Error marking messages as seen:", error);
+    }
   });
 
-  // disconnect
+  // Disconnect
   socket.on("disconnect", () => {
-    onlineUser.delete(user._id);
-    console.log("a user has disconnected", socket.id);
+    onlineUsers.delete(user._id.toString());
+    console.log("A user has disconnected", socket.id);
+
+    io.emit("getOnlineUsers", Array.from(onlineUsers));
   });
 });
 

@@ -10,12 +10,12 @@ import {
   useMediaQuery,
   List,
   ListItem,
+  Badge,
 } from "@mui/material";
 import {
   Search,
   Message,
-  DarkMode,
-  LightMode,
+  RateReview, // Import the RateReview icon
 } from "@mui/icons-material";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import WorkHistoryIcon from "@mui/icons-material/WorkHistory";
@@ -27,7 +27,6 @@ import { Link, useLocation } from "react-router-dom";
 import AccountMenu from "../prof/prof";
 import { Fade as Hamburger } from "hamburger-react";
 import { useTransition, animated } from "@react-spring/web";
-import Badge from "@mui/material/Badge";
 import axios from "axios";
 
 const Navbar = () => {
@@ -261,12 +260,10 @@ const Navbar = () => {
                   style={{ margin: "0 17px" }}
                 />
               </ListItem>
-              <ListItem title="Mode" button onClick={() => dispatch(setMode())}>
-                {theme.palette.mode === "dark" ? (
-                  <DarkMode sx={{ fontSize: "25px" }} />
-                ) : (
-                  <LightMode sx={{ color: dark, fontSize: "25px" }} />
-                )}
+
+              {/* Replace the light/dark mode icons with the RateReview icon */}
+              <ListItem title="Reviews" button>
+                <RateReview sx={{ fontSize: "25px" }} />
               </ListItem>
             </List>
 
@@ -408,18 +405,10 @@ const Navbar = () => {
                     style={{ margin: "0 17px" }}
                   />
                 </ListItem>
-                <ListItem button onClick={() => dispatch(setMode())}>
-                  {theme.palette.mode === "dark" ? (
-                    <DarkMode
-                      style={{ margin: "0 17px" }}
-                      sx={{ fontSize: "25px" }}
-                    />
-                  ) : (
-                    <LightMode
-                      style={{ margin: "0 17px" }}
-                      sx={{ color: dark, fontSize: "25px" }}
-                    />
-                  )}
+
+                {/* Replace the light/dark mode icons with the RateReview icon */}
+                <ListItem title="Reviews" button>
+                  <RateReview sx={{ fontSize: "25px" }} />
                 </ListItem>
 
                 <AccountMenu />

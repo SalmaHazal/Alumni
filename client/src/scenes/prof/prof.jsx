@@ -10,10 +10,12 @@ import Tooltip from '@mui/material/Tooltip';
 import PersonAdd from '@mui/icons-material/PersonAdd';
 import Settings from '@mui/icons-material/Settings';
 import Logout from '@mui/icons-material/Logout';
-import { setLogout } from "../../state/index";
+import { setLogout, setMode } from "../../state/index"; // Import setMode
 import { useDispatch, useSelector } from "react-redux";
 import { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
+import { DarkMode, LightMode } from "@mui/icons-material"; // Import icons for Dark and Light mode
+import { useTheme } from "@mui/material/styles"; // Import useTheme hook
 
 // Custom hook to get the first letter of a word
 const useFirstLetter = (word) => {
@@ -38,6 +40,9 @@ export default function AccountMenu() {
   
   const firstName = useSelector((state) => state.user.firstName); 
   const firstLetter = useFirstLetter(firstName);
+
+  // Access the theme from Material-UI
+  const theme = useTheme();
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -105,6 +110,19 @@ export default function AccountMenu() {
           <Avatar /> My account
         </MenuItem>
         <Divider />
+
+        {/* Add Dark Mode/Light Mode toggle item */}
+        <MenuItem onClick={() => dispatch(setMode())}>
+          <ListItemIcon>
+            {theme.palette.mode === "dark" ? (
+              <LightMode fontSize="small" />
+            ) : (
+              <DarkMode fontSize="small" />
+            )}
+          </ListItemIcon>
+          {theme.palette.mode === "dark" ? "Light Mode" : "Dark Mode"}
+        </MenuItem>
+
         <MenuItem onClick={() => {
           dispatch(setLogout());
           handleClose();
