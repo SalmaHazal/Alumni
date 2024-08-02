@@ -212,6 +212,27 @@ io.on("connection", async (socket) => {
     socket.emit("conversation", conversation);
   });
 
+  socket.on('fetch-conversations-unseen-count', async (userId) => {
+    try {
+      // Find conversations where the user is either the sender or receiver
+      const conversations = await Conversation.find({
+        $or: [{ sender: userId }, { receiver: userId }],
+      }).populate('messages');
+
+      // Calculate the number of conversations with at least one unseen message
+      const conversationsWithUnseen = conversations.filter(conversation =>
+        conversation.messages.some(message => !message.seen && message.msgByUserId.toString() !== userId)
+      );
+
+      const unseenConversationsCount = conversationsWithUnseen.length;
+
+      // Emit the count to the client
+      socket.emit('update-unseen-conversations-count', unseenConversationsCount);
+    } catch (error) {
+      console.error('Error fetching unseen conversations count:', error);
+    }
+  });
+
   socket.on("seen", async (msgByUserId) => {
     let conversation = await Conversation.findOne({
       $or: [
@@ -233,6 +254,20 @@ io.on("connection", async (socket) => {
 
     io.to(user?._id?.toString()).emit("conversation", conversationSender);
     io.to(msgByUserId).emit("conversation", conversationReceiver);
+
+    // Update the count of unseen conversations
+    const conversations = await Conversation.find({
+      $or: [{ sender: user._id }, { receiver: user._id }],
+    }).populate('messages');
+
+    const conversationsWithUnseen = conversations.filter(conversation =>
+      conversation.messages.some(message => !message.seen && message.msgByUserId.toString() !== user._id.toString())
+    );
+
+    const unseenConversationsCount = conversationsWithUnseen.length;
+
+    io.emit('update-unseen-conversations-count', unseenConversationsCount);
+  
   });
 
   // disconnect

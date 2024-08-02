@@ -29,6 +29,7 @@ import { Fade as Hamburger } from "hamburger-react";
 import { useTransition, animated } from "@react-spring/web";
 import Badge from "@mui/material/Badge";
 import axios from "axios";
+import { useUnseenMessages } from '../../context/UnseenMessagesContext';
 
 const Navbar = () => {
   const [isMobileMenuToggled, setIsMobileMenuToggled] = useState(false);
@@ -39,6 +40,7 @@ const Navbar = () => {
   const user = useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
+  const { unseenConversationsCount } = useUnseenMessages();
 
   const location = useLocation();
 
@@ -220,7 +222,7 @@ const Navbar = () => {
               >
                 <Badge
                   title="Messages"
-                  badgeContent={"+1"}
+                  badgeContent={unseenConversationsCount}
                   color="error"
                   sx={{ fontSize: "25px" }}
                   style={{ margin: "0 17px" }}
@@ -367,7 +369,7 @@ const Navbar = () => {
                   }}
                 >
                   <Badge
-                    badgeContent={"+1"}
+                    badgeContent={unseenConversationsCount}
                     color="error"
                     sx={{ fontSize: "25px" }}
                     style={{ margin: "0 17px" }}
