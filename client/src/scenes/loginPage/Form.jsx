@@ -7,6 +7,11 @@ import {
   Typography,
   useTheme,
   IconButton,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  FormHelperText,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { Formik } from "formik";
@@ -17,13 +22,6 @@ import { setLogin } from "../../state/index";
 import Dropzone from "react-dropzone";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import {
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  FormHelperText,
-} from "@mui/material";
 import villes from "../../Data/locat.json";
 
 const registerSchema = yup.object().shape({
@@ -31,7 +29,14 @@ const registerSchema = yup.object().shape({
   firstName: yup.string().required("required"),
   lastName: yup.string().required("required"),
   email: yup.string().email("invalid email").required("required"),
-  password: yup.string().required("required"),
+  password: yup
+    .string()
+    .required("required")
+    .min(8, "Password must be at least 8 characters"), // Added password length validation
+  confirmPassword: yup
+    .string()
+    .required("required")
+    .oneOf([yup.ref("password"), null], "Passwords must match"), // Added confirmPassword field with validation
   location: yup.string().required("required"),
   promotion: yup.string().required("required"),
   occupation: yup.string().required("required"),
@@ -48,6 +53,7 @@ const initialValuesRegister = {
   lastName: "",
   email: "",
   password: "",
+  confirmPassword: "", // Added confirmPassword initial value
   location: "",
   promotion: "",
   occupation: "",
@@ -87,7 +93,7 @@ const Form = () => {
     "2024",
     "2025",
     "2026",
-    "2027"
+    "2027",
   ];
 
   useEffect(() => {
@@ -376,6 +382,24 @@ const Form = () => {
               helperText={touched.password && errors.password}
               sx={{ gridColumn: "span 4" }}
             />
+
+            {isRegister && (
+              <TextField
+                label="Confirm Password"
+                title="Re-enter your password"
+                type="password"
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.confirmPassword}
+                name="confirmPassword"
+                error={
+                  Boolean(touched.confirmPassword) &&
+                  Boolean(errors.confirmPassword)
+                }
+                helperText={touched.confirmPassword && errors.confirmPassword}
+                sx={{ gridColumn: "span 4" }}
+              />
+            )}
 
             {isLogin && (
               <Box sx={{ gridColumn: "span 4", textAlign: "right" }}>

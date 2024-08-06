@@ -49,6 +49,7 @@ const MyPostWidget = ({ picturePath }) => {
   const [isImage, setIsImage] = useState(false);
   const [image, setImage] = useState(null);
   const [post, setPost] = useState("");
+  const [posttype, setPostType] = useState("");
   const { palette } = useTheme();
   const { _id } = useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
@@ -56,10 +57,25 @@ const MyPostWidget = ({ picturePath }) => {
   const mediumMain = palette.neutral.mediumMain;
   const medium = palette.neutral.medium;
 
+  const [anchorEl, setAnchorEl] = useState(null);
+  const handleMenuClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuItemClick = (type) => {
+    setPostType(type);
+    setAnchorEl(null);
+  };
+
+  const handleCloseMenu = () => {
+    setAnchorEl(null);
+  };
+
   const handlePost = async () => {
     const formData = new FormData();
     formData.append("userId", _id);
     formData.append("description", post);
+    formData.append("posttype", posttype);
     if (image) {
       formData.append("picture", image);
       formData.append("picturePath", image.name);
@@ -70,11 +86,12 @@ const MyPostWidget = ({ picturePath }) => {
       headers: { Authorization: `Bearer ${token}` },
       body: formData,
     });
+    toast.success("Post Added successfully");
     const posts = await response.json();
     dispatch(setPosts({ posts }));
-    toast.success("Post added successfully");
     setImage(null);
     setPost("");
+    setPostType("");
   };
 
   return (
@@ -92,6 +109,7 @@ const MyPostWidget = ({ picturePath }) => {
             padding: "1rem 2rem",
           }}
         />
+
       </FlexBetween>
       {isImage && (
         <Box
@@ -142,7 +160,7 @@ const MyPostWidget = ({ picturePath }) => {
 
       <FlexBetween>
         <Dropdown>
-          <MenuButton>
+          <MenuButton onClick={handleMenuClick}>
             <FontAwesomeIcon
               icon={faBriefcase}
               style={{ marginRight: "8px", color: "#3ABEF9" }}
@@ -151,11 +169,11 @@ const MyPostWidget = ({ picturePath }) => {
           </MenuButton>
 
           <Menu slots={{ listbox: AnimatedListbox }}>
-            <MenuItem onClick={() => setIsImage(!isImage)}>
+            <MenuItem onClick={() => {setIsImage(!isImage); handleMenuItemClick('💼Professionnel Post')}}>
               Offre de Stage & Emploi
             </MenuItem>
-            <MenuItem onClick={() => setIsImage(!isImage)}>Événement</MenuItem>
-            <MenuItem onClick={() => setIsImage(!isImage)}>
+            <MenuItem onClick={() => {setIsImage(!isImage); handleMenuItemClick('💼Professionnel Post')}}>Événement</MenuItem>
+            <MenuItem onClick={() => {setIsImage(!isImage); handleMenuItemClick('💼Professionnel Post')}}>
               {" "}
               Programmes & Formation
             </MenuItem>
@@ -163,7 +181,7 @@ const MyPostWidget = ({ picturePath }) => {
         </Dropdown>
 
         <Dropdown>
-          <MenuButton>
+          <MenuButton onClick={handleMenuClick}>
             <FontAwesomeIcon
               icon={faFutbol}
               style={{ marginRight: "8px", color: "#65B741" }}
@@ -171,16 +189,16 @@ const MyPostWidget = ({ picturePath }) => {
             Sport
           </MenuButton>
           <Menu slots={{ listbox: AnimatedListbox }}>
-            <MenuItem onClick={() => setIsImage(!isImage)}>
+            <MenuItem onClick={() => {setIsImage(!isImage); handleMenuItemClick('⚽Sport Post')}}>
               Organiser Un Match
             </MenuItem>
-            <MenuItem onClick={() => setIsImage(!isImage)}>Événement</MenuItem>
-            <MenuItem onClick={() => setIsImage(!isImage)}>Olumpiades</MenuItem>
+            <MenuItem onClick={() => {setIsImage(!isImage); handleMenuItemClick('⚽Sport Post')}}>Événement</MenuItem>
+            <MenuItem onClick={() => {setIsImage(!isImage); handleMenuItemClick('⚽Sport Post')}}>Olumpiades</MenuItem>
           </Menu>
         </Dropdown>
 
         <Dropdown>
-          <MenuButton>
+          <MenuButton onClick={handleMenuClick}>
             <FontAwesomeIcon
               icon={faHandsHelping}
               style={{ marginRight: "8px", color: "#EF5A6F" }}
@@ -188,9 +206,9 @@ const MyPostWidget = ({ picturePath }) => {
             Social
           </MenuButton>
           <Menu slots={{ listbox: AnimatedListbox }}>
-            <MenuItem onClick={() => setIsImage(!isImage)}>Donation</MenuItem>
-            <MenuItem onClick={() => setIsImage(!isImage)}>Événement</MenuItem>
-            <MenuItem onClick={() => setIsImage(!isImage)}>Aide</MenuItem>
+            <MenuItem onClick={() => {setIsImage(!isImage); handleMenuItemClick('🤝Social Post')}}>Donation</MenuItem>
+            <MenuItem onClick={() => {setIsImage(!isImage); handleMenuItemClick('🤝Social Post')}}>Événement</MenuItem>
+            <MenuItem onClick={() => {setIsImage(!isImage); handleMenuItemClick('🤝Social Post')}}>Aide</MenuItem>
           </Menu>
         </Dropdown>
 

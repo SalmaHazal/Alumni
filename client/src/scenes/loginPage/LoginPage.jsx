@@ -1,6 +1,7 @@
 import { Box, Typography, useTheme, useMediaQuery } from "@mui/material";
 import Form from "./Form";
 import Logoalumni from "/public/assets/logoalumni.png";
+import alumnidark2 from "/public/assets/alumnidark2.jpg"
 
 const LoginPage = () => {
   const theme = useTheme();
@@ -15,7 +16,10 @@ const LoginPage = () => {
         className="flex justify-center"
       >
         <Typography >
-          <img src={Logoalumni} style={{borderRadius: "7px", height:"70px", marginLeft:"-32px"}} alt="Alumni Logo" />
+          <img src={(theme.palette.mode === "dark"? alumnidark2: Logoalumni)} 
+          style={{borderRadius: "7px", height:"70px", marginLeft:"-32px"}}
+           alt="Alumni Logo"
+          />
         </Typography>
       </Box>
 

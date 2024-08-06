@@ -34,10 +34,11 @@ const PostWidget = ({
   postUserId,
   name,
   description,
+  posttype,
   location,
   picturePath,
   userPicturePath,
-  likes={},
+  likes,
 }) => {
   const [isComments, setIsComments] = useState(false);
   const [showReactions, setShowReactions] = useState(false);
@@ -47,14 +48,14 @@ const PostWidget = ({
   const token = useSelector((state) => state.token);
   const loggedInUserId = useSelector((state) => state.user._id);
   const loggedInUser = useSelector((state) => state.user);
-  const likeCount = Object.keys(likes).length;
+  const [likeCount, setLikeCount] = useState(Object.keys(likes).length);
 
   const { palette } = useTheme();
   const main = palette.neutral.main;
 
   // Fetch the current reaction for the post on mount
  // Fetch the current reaction for the post on mount
-useEffect(() => {
+ useEffect(() => {
   const fetchCurrentReaction = async () => {
     const response = await fetch(`http://localhost:3001/posts/${postId}/reaction?userId=${loggedInUserId}`, {
       method: "GET",
@@ -64,7 +65,6 @@ useEffect(() => {
       },
     });
     const data = await response.json();
-    console.log(data);
     if (data.reaction) {
       setSelectedReaction(data.reaction);
     }
@@ -74,25 +74,55 @@ useEffect(() => {
 }, [postId, token, loggedInUserId]);
 
 
-  const patchLike = async (reaction) => {
-    const response = await fetch(`http://localhost:3001/posts/${postId}/like`, {
-      method: "PATCH",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ userId: loggedInUserId, reaction }),
-    });
-    const updatedPost = await response.json();
-    dispatch(setPost({ post: updatedPost }));
-  };
 
-  const handleReact = async (reaction) => {
+
+ //
+
+ const patchLike = async (reaction) => {
+  const response = await fetch(`http://localhost:3001/posts/${postId}/like`, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ userId: loggedInUserId, reaction }),
+  });
+  const updatedPost = await response.json();
+  dispatch(setPost({ post: updatedPost }));
+  setLikeCount(updatedPost.likes.length);
+};
+
+const patchUnlike = async () => {
+  const response = await fetch(`http://localhost:3001/posts/${postId}/unlike`, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ userId: loggedInUserId }),
+  });
+  const updatedPost = await response.json();
+  dispatch(setPost({ post: updatedPost }));
+  setLikeCount(updatedPost.likes.length);
+};
+
+
+const handleReact = async (reaction) => {
+  if (selectedReaction === reaction) {
+    // If the same reaction is clicked again, unlike the post
+    setSelectedReaction(null);
+    setLikeCount(prevCount => prevCount - 1);
+    await patchUnlike();
+  } else {
+    // Otherwise, update the reaction
     setSelectedReaction(reaction);
-    setShowReactions(false);
     await patchLike(reaction);
-    
-  };
+  }
+  setShowReactions(false); // Hide reactions after selection
+};
+
+ //
+
 
   const handleShareClick = () => {
     setSharePopupOpen(true);
@@ -101,13 +131,23 @@ useEffect(() => {
   const handleShareClose = () => {
     setSharePopupOpen(false);
   };
-
+ //
+ const getSubtitle = () => {
+  if (posttype === "💼Professionnel Post") {
+    return <span style={{color: "#36C2CE"}}>💼Professionnel Post</span>;
+  } else if (posttype === "⚽Sport Post") {
+    return <span style={{color: "#65B741"}}>⚽Sport Post</span>;
+  } else {
+    return <span style={{color: "#EF5A6F"}}>🤝Social Post</span>;
+  }
+};
+ //
   return (
     <WidgetWrapper m="2rem 0">
       <Friend
         friendId={postUserId}
         name={name}
-        subtitle={location}
+        subtitle={getSubtitle()}
         userPicturePath={userPicturePath}
       />
       <Typography color={main} sx={{ mt: "1rem" }}>
@@ -128,6 +168,7 @@ useEffect(() => {
             <IconButton
               onClick={() => setShowReactions((prev) => !prev)}
               onMouseEnter={() => setShowReactions(true)}
+              onMouseDown={()  => setShowReactions(false)}
             >
               {selectedReaction ? (
                 reactionIcons[selectedReaction]

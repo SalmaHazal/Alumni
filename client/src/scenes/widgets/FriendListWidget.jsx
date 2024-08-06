@@ -1,16 +1,23 @@
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, Typography, useTheme,Divider } from "@mui/material";
 import Friend from "../../components/Friend";
 import WidgetWrapper from "../../components/WidgetWrapper";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setFriends } from "../../state/index";
+import { FaUserFriends } from "react-icons/fa";
+import { IoSchoolSharp } from "react-icons/io5";
+import SearchUser from "../widgets/Allfriend";
+import SearchPromoFriend from "../widgets/SearchPromoFriend";
+import {useState } from "react";
 
 const FriendListWidget = ({ userId }) => {
   const dispatch = useDispatch();
   const { palette } = useTheme();
   const token = useSelector((state) => state.token);
   const friends = useSelector((state) => state.user.friends);
-
+  const [showSearchUser, setShowSearchUser] = useState(false);
+  const [showSearchPromoFriend, setShowSearchPromoFriend] = useState(false);
+ 
   const getFriends = async () => {
     const response = await fetch(
       `http://localhost:3001/users/${userId}/friends`,
@@ -20,11 +27,7 @@ const FriendListWidget = ({ userId }) => {
       }
     );
     const data = await response.json();
-    if (Array.isArray(data)) {
-      dispatch(setFriends({ friends: data }));
-    } else {
-      console.error("Fetched data is not an array:", data);
-    }
+    dispatch(setFriends({ friends: data }));
   };
 
   useEffect(() => {
@@ -37,23 +40,25 @@ const FriendListWidget = ({ userId }) => {
         color={palette.neutral.dark}
         variant="h5"
         fontWeight="500"
-        sx={{ mb: "1.5rem" }}
+        sx={{ mb: "1.5rem", marginLeft:"110px" }}
       >
         Friend List
       </Typography>
-      <Box display="flex" flexDirection="column" gap="1.5rem">
-        {friends.map((friend) => {
-          return (
-            <Friend
-              key={friend._id}
-              friendId={friend._id}
-              name={`${friend.firstName} ${friend.lastName}`}
-              subtitle={friend.occupation}
-              userPicturePath={friend.picturePath}
-            />
-          );
-        })}
-      </Box>
+      <Divider />
+        <Box p="1rem 0" marginTop={"9px"} display="flex" alignItems="center" gap="1rem">
+          <FaUserFriends  size={"25px"} color="#3ABEF9" />
+          <Box >
+            <Typography fontWeight="500"> <button onClick={() => setShowSearchUser(true)}> All Friends</button> </Typography>
+          </Box>
+        </Box>
+                <Box p="1rem 0" marginTop={"9px"} display="flex" alignItems="center" gap="1rem">
+          <IoSchoolSharp size={"25px"} color="#EF5A6F" />
+          <Box>
+            <Typography fontWeight="500"> <button onClick={() => setShowSearchPromoFriend(true)}> Promo Friends </button> </Typography>
+          </Box>
+        </Box>
+      {showSearchUser && <SearchUser onClose={() => setShowSearchUser(false)}/>}
+      {showSearchPromoFriend && <SearchPromoFriend onClose={() => setShowSearchPromoFriend(false)}/>}
     </WidgetWrapper>
   );
 };

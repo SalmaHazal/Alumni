@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Logoalumni from "/public/assets/logoalumni.png";
+import alumnidark2 from "/public/assets/alumnidark2.jpg";
 import hashtag from "/public/assets/hashtag.01.png";
 import {
   Box,
@@ -11,12 +12,7 @@ import {
   List,
   ListItem,
 } from "@mui/material";
-import {
-  Search,
-  Message,
-  DarkMode,
-  LightMode,
-} from "@mui/icons-material";
+import { Search, Message, RateReview } from "@mui/icons-material";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import WorkHistoryIcon from "@mui/icons-material/WorkHistory";
 import HomeIcon from "@mui/icons-material/Home";
@@ -29,7 +25,7 @@ import { Fade as Hamburger } from "hamburger-react";
 import { useTransition, animated } from "@react-spring/web";
 import Badge from "@mui/material/Badge";
 import axios from "axios";
-import { useUnseenMessages } from '../../context/UnseenMessagesContext';
+import { useUnseenMessages } from "../../context/UnseenMessagesContext";
 
 const Navbar = () => {
   const [isMobileMenuToggled, setIsMobileMenuToggled] = useState(false);
@@ -154,7 +150,7 @@ const Navbar = () => {
         <Typography component="div">
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <img
-              src={Logoalumni}
+              src={theme.palette.mode === "dark" ? alumnidark2 : Logoalumni}
               alt="Logo"
               style={{
                 marginRight: "20px",
@@ -263,12 +259,11 @@ const Navbar = () => {
                   style={{ margin: "0 17px" }}
                 />
               </ListItem>
-              <ListItem title="Mode" button onClick={() => dispatch(setMode())}>
-                {theme.palette.mode === "dark" ? (
-                  <DarkMode sx={{ fontSize: "25px" }} />
-                ) : (
-                  <LightMode sx={{ color: dark, fontSize: "25px" }} />
-                )}
+              <ListItem title="Reviews" button>
+                <RateReview
+                  sx={{ fontSize: "25px" }}
+                  style={{ margin: "0 17px" }}
+                />
               </ListItem>
             </List>
 
@@ -410,18 +405,11 @@ const Navbar = () => {
                     style={{ margin: "0 17px" }}
                   />
                 </ListItem>
-                <ListItem button onClick={() => dispatch(setMode())}>
-                  {theme.palette.mode === "dark" ? (
-                    <DarkMode
-                      style={{ margin: "0 17px" }}
-                      sx={{ fontSize: "25px" }}
-                    />
-                  ) : (
-                    <LightMode
-                      style={{ margin: "0 17px" }}
-                      sx={{ color: dark, fontSize: "25px" }}
-                    />
-                  )}
+                <ListItem title="Jobs" button>
+                  <RateReview
+                    sx={{ fontSize: "25px" }}
+                    style={{ margin: "0 17px" }}
+                  />
                 </ListItem>
 
                 <AccountMenu />

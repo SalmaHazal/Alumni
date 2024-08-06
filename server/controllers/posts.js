@@ -5,7 +5,7 @@ import Notification from "../models/Notification.js";
 /* CREATE */
 export const createPost = async (req, res) => {
   try {
-    const { userId, description, picturePath } = req.body;
+    const { userId, description, picturePath, posttype } = req.body;
     const user = await User.findById(userId);
     const newPost = new Post({
       userId,
@@ -13,9 +13,10 @@ export const createPost = async (req, res) => {
       lastName: user.lastName,
       location: user.location,
       description,
+      posttype,
       userPicturePath: user.picturePath,
       picturePath,
-      likes: new Map(), // Initialize likes as a Map
+      likes: new Map(),
       comments: [],
     });
     await newPost.save();
@@ -74,7 +75,7 @@ export const getUserPosts = async (req, res) => {
 };
 
 /* UPDATE */
-const validReactions = ["like", "love", "haha", "wow", "sad", "angry"]; 
+const validReactions = ["like", "love", "haha", "wow", "sad", "angry"];
 export const likePost = async (req, res) => {
   try {
     const { id } = req.params; // Get post ID from URL parameters
@@ -91,13 +92,7 @@ export const likePost = async (req, res) => {
     }
 
     // Set or update the user's reaction
-    const isLiked = post.likes.get(userId);
-
-    if (isLiked) {
-      post.likes.delete(userId);
-    } else {
-      post.likes.set(userId, reaction);
-    }
+    post.likes.set(userId, reaction);
 
     // Save the updated post
     const updatedPost = await post.save();
@@ -119,7 +114,29 @@ export const likePost = async (req, res) => {
       await newNotification.save();
     }
 
-    res.status(200).json(updatedPost); 
+    res.status(200).json(updatedPost);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+export const unlikePost = async (req, res) => {
+  try {
+    const { id } = req.params; // Get post ID from URL parameters
+    const { userId } = req.body; // Get userId from request body
+
+    const post = await Post.findById(id); // Find the post by ID
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
+    // Remove the user's reaction
+    post.likes.delete(userId);
+
+    // Save the updated post
+    const updatedPost = await post.save();
+
+    res.status(200).json(updatedPost);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -137,7 +154,7 @@ export const getPostReaction = async (req, res) => {
 
     const userReaction = post.likes.get(userId);
     if (!userReaction) {
-      return res.status(200).json({ reaction: null }); 
+      return res.status(200).json({ reaction: null });
     }
 
     res.status(200).json({ reaction: userReaction });

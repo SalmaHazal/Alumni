@@ -11,25 +11,35 @@ const PostsWidget = ({ userId, isProfile = false }) => {
   const { palette } = useTheme();
   const [visiblePosts, setVisiblePosts] = useState(5); // Initial number of visible posts
   const main = palette.primary.main;
+
   const getPosts = async () => {
-    const response = await fetch("http://localhost:3001/posts", {
-      method: "GET",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await response.json();
-    dispatch(setPosts({ posts: data }));
+    try {
+      const response = await fetch("http://localhost:3001/posts", {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+      dispatch(setPosts({ posts: data }));
+    } catch (error) {
+      console.error("Error fetching posts:", error);
+    }
   };
 
   const getUserPosts = async () => {
-    const response = await fetch(
-      `http://localhost:3001/posts/${userId}/posts`,
-      {
-        method: "GET",
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
-    const data = await response.json();
-    dispatch(setPosts({ posts: data }));
+    try {
+      const response = await fetch(
+        `http://localhost:3001/posts/${userId}/posts`,
+        {
+          method: "GET",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      const data = await response.json();
+      console.log("Fetched user posts data:", data); // Log the response data
+      dispatch(setPosts({ posts: data }));
+    } catch (error) {
+      console.error("Error fetching user posts:", error);
+    }
   };
 
   useEffect(() => {
@@ -46,13 +56,14 @@ const PostsWidget = ({ userId, isProfile = false }) => {
 
   return (
     <>
-      {posts.slice(0, visiblePosts).map(
+      {Array.isArray(posts) && posts.slice(0, visiblePosts).map(
         ({
           _id,
           userId,
           firstName,
           lastName,
           description,
+          posttype,
           location,
           picturePath,
           userPicturePath,
@@ -65,6 +76,7 @@ const PostsWidget = ({ userId, isProfile = false }) => {
             postUserId={userId}
             name={`${firstName} ${lastName}`}
             description={description}
+            posttype={posttype}
             location={location}
             picturePath={picturePath}
             userPicturePath={userPicturePath}
@@ -73,12 +85,12 @@ const PostsWidget = ({ userId, isProfile = false }) => {
           />
         )
       )}
-      {visiblePosts < posts.length && (
+      {visiblePosts < (Array.isArray(posts) ? posts.length : 0) && (
         <div style={{ textAlign: 'center', margin: '20px 0' }}>
-          <button onClick={handleShowMore} >
-          <Typography color={main} >
-             Show more posts
-          </Typography>
+          <button onClick={handleShowMore}>
+            <Typography color={main}>
+              Show more posts
+            </Typography>
           </button>
         </div>
       )}
