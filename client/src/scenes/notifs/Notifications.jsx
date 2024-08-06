@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import {
   Box,
@@ -9,13 +9,22 @@ import {
   ListItemText,
   useMediaQuery,
 } from "@mui/material";
+import { Link } from "react-router-dom";
+import { useTheme } from "@mui/material/styles";
+import io from "socket.io-client"; // Import Socket.IO
+
 import Navbar from "../navbar/Navbar";
 import UserWidget from "../widgets/UserWidget";
 import FriendListWidget from "../widgets/FriendListWidget";
 import WidgetWrapper from "../../components/WidgetWrapper";
-import { Link } from "react-router-dom";
 import Avatar from "../widgets/Avatar";
-import { useTheme } from "@mui/material/styles";
+
+// Initialize socket connection
+const socket = io("http://localhost:3001", {
+  auth: {
+    token: localStorage.getItem("token"), // Assuming token is stored in localStorage
+  },
+});
 
 const Notifications = () => {
   const isNonMobileScreens = useMediaQuery("(min-width:1000px)");
@@ -48,7 +57,18 @@ const Notifications = () => {
     if (user?._id) {
       fetchNotifications();
     }
-  }, [user?._id, notifications]);
+  }, [user?._id]); // Removed `notifications` from dependencies
+
+  useEffect(() => {
+    // Connect to the socket
+    socket.on("notification", (notification) => {
+      setNotifications((prevNotifications) => [notification, ...prevNotifications]);
+    });
+
+    return () => {
+      socket.off("notification"); // Cleanup on unmount
+    };
+  }, []); // Empty dependency array to run only once on mount
 
   return (
     <Box>
@@ -82,30 +102,48 @@ const Notifications = () => {
             </Typography>
             <List sx={{ width: "100%", maxWidth: 600 }}>
               {notifications.map((notification) => (
-                <ListItem key={notification._id} className={`py-3 flex flex-start ${
+                <ListItem
+                  key={notification._id}
+                  className={`py-3 flex flex-start ${
                     theme.palette.mode === "light"
                       ? "hover:bg-slate-100"
                       : "hover:bg-[#383838]"
-                  }`} >
-                <Link to={notification.link} style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', gap: '8px'}}>
-                  <ListItemAvatar>
-                  <Avatar
+                  }`}
+                >
+                  <Link
+                    to={notification.link}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      textDecoration: "none",
+                      gap: "8px",
+                    }}
+                  >
+                    <ListItemAvatar>
+                      <Avatar
                         imageUrl={notification.senderPhoto}
                         name={notification.senderName}
                         width={40}
                         height={40}
                         userId={notification.userId}
                       />
-                  </ListItemAvatar>
-                  <ListItemText
-                    primary={
-                      <Typography variant="body1" className={`${theme.palette.mode === "light" ? "text-black" : "text-white"}`}>
-                        {notification.text}
-                      </Typography>
-                    }
-                  />
-                </Link>
-              </ListItem>
+                    </ListItemAvatar>
+                    <ListItemText
+                      primary={
+                        <Typography
+                          variant="body1"
+                          className={`${
+                            theme.palette.mode === "light"
+                              ? "text-black"
+                              : "text-white"
+                          }`}
+                        >
+                          {notification.text}
+                        </Typography>
+                      }
+                    />
+                  </Link>
+                </ListItem>
               ))}
             </List>
           </Box>

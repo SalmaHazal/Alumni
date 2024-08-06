@@ -22,10 +22,11 @@ import FlexBetween from "../../components/FlexBetween";
 import Dropzone from "react-dropzone";
 import UserImage from "../../components/UserImage";
 import WidgetWrapper from "../../components/WidgetWrapper";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setPosts } from "../../state/index";
 
+import { io } from "socket.io-client"; // Import Socket.IO client
 import PropTypes from "prop-types";
 import { Dropdown } from "@mui/base/Dropdown";
 import { Menu } from "@mui/base/Menu";
@@ -39,23 +40,27 @@ import {
   faFutbol,
   faBriefcase,
   faHandsHelping,
+  faBroadcastTower,
 } from "@fortawesome/free-solid-svg-icons";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
 
 const MyPostWidget = ({ picturePath }) => {
   const dispatch = useDispatch();
   const [isImage, setIsImage] = useState(false);
   const [image, setImage] = useState(null);
   const [post, setPost] = useState("");
+  const [isStreaming, setIsStreaming] = useState(false); // State to manage streaming
   const { palette } = useTheme();
   const { _id } = useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
   const mediumMain = palette.neutral.mediumMain;
   const medium = palette.neutral.medium;
+  const videoRef = useRef(null); // Ref for video element
+  const socket = useRef(null); // Socket.IO instance
 
+  // Handle post submission
   const handlePost = async () => {
     const formData = new FormData();
     formData.append("userId", _id);
@@ -75,6 +80,67 @@ const MyPostWidget = ({ picturePath }) => {
     toast.success("Post added successfully");
     setImage(null);
     setPost("");
+  };
+
+  // Start live streaming
+  const startStreaming = () => {
+    setIsStreaming(true);
+
+    // Access the user's camera
+    navigator.mediaDevices
+      .getUserMedia({ video: true, audio: true })
+      .then((stream) => {
+        const videoElement = videoRef.current;
+        if (videoElement) {
+          videoElement.srcObject = stream;
+        }
+
+        // Initialize Socket.IO client
+        socket.current = io("http://localhost:3001", {
+          auth: {
+            token: token,
+          },
+        });
+
+        // Notify server about the start of the live stream
+        socket.current.emit("start-live-stream");
+
+        // Send video stream to server
+        const videoTrack = stream.getVideoTracks()[0];
+        const mediaRecorder = new MediaRecorder(stream);
+
+        mediaRecorder.ondataavailable = (event) => {
+          if (event.data.size > 0) {
+            socket.current.emit("stream-video", event.data);
+          }
+        };
+
+        mediaRecorder.start(1000); // Send video data every second
+      })
+      .catch((error) => {
+        console.error("Error accessing media devices.", error);
+      });
+  };
+
+  // Stop live streaming
+  const stopStreaming = () => {
+    setIsStreaming(false);
+    const videoElement = videoRef.current;
+    if (videoElement) {
+      const stream = videoElement.srcObject;
+      if (stream) {
+        const tracks = stream.getTracks();
+        tracks.forEach((track) => track.stop());
+      }
+      videoElement.srcObject = null;
+    }
+
+    // Notify server about the end of the live stream
+    if (socket.current) {
+      socket.current.emit("stop-live-stream");
+      socket.current.disconnect();
+      socket.current = null;
+    }
   };
 
   return (
@@ -141,7 +207,7 @@ const MyPostWidget = ({ picturePath }) => {
       <Divider sx={{ margin: "1.25rem 0" }} />
 
       <FlexBetween>
-        <Dropdown>
+      <Dropdown>
           <MenuButton>
             <FontAwesomeIcon
               icon={faBriefcase}
@@ -178,7 +244,6 @@ const MyPostWidget = ({ picturePath }) => {
             <MenuItem onClick={() => setIsImage(!isImage)}>Olumpiades</MenuItem>
           </Menu>
         </Dropdown>
-
         <Dropdown>
           <MenuButton>
             <FontAwesomeIcon
@@ -207,24 +272,14 @@ const MyPostWidget = ({ picturePath }) => {
             {/*<FlexBetween gap="0.25rem">
               <GifBoxOutlined sx={{ color: mediumMain }} />
               <Typography color={mediumMain}>Clip</Typography>
-            </FlexBetween>
-
-            <FlexBetween gap="0.25rem">
-              <AttachFileOutlined sx={{ color: mediumMain }} />
-              <Typography color={mediumMain}>Attachment</Typography>
-            </FlexBetween>
-
-            <FlexBetween gap="0.25rem">
-              <MicOutlined sx={{ color: mediumMain }} />
-              <Typography color={mediumMain}>Audio</Typography>
             </FlexBetween>*/}
+
           </>
         ) : (
           <FlexBetween gap="0.25rem">
             <MoreHorizOutlined sx={{ color: mediumMain }} />
           </FlexBetween>
         )}
-
         <Button
           disabled={!post}
           onClick={handlePost}
@@ -237,11 +292,50 @@ const MyPostWidget = ({ picturePath }) => {
           POST
         </Button>
       </FlexBetween>
+
+      <FlexBetween mt="1rem">
+        {!isStreaming ? (
+          <Button
+            onClick={startStreaming}
+            sx={{
+              color: palette.background.alt,
+              backgroundColor: palette.primary.main,
+              borderRadius: "3rem",
+            }}
+          >
+            Start Streaming
+          </Button>
+        ) : (
+          <Button
+            onClick={stopStreaming}
+            sx={{
+              color: palette.background.alt,
+              backgroundColor: palette.error.main,
+              borderRadius: "3rem",
+            }}
+          >
+            Stop Streaming
+          </Button>
+        )}
+      </FlexBetween>
+
+      {/* Video element for displaying the stream */}
+      <Box mt="1rem" style={{ display: isStreaming ? "block" : "none" }}>
+        <video
+          ref={videoRef}
+          style={{ width: "100%", height: "auto" }}
+          autoPlay
+          muted
+          controls
+        />
+      </Box>
     </WidgetWrapper>
   );
 };
 
+
 export default MyPostWidget;
+
 
 ////
 const blue = {
