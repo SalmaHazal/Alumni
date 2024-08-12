@@ -1,22 +1,16 @@
 import express from "express";
 import { Server } from "socket.io";
 import http from "http";
+import { exec } from "child_process";
 import getUserDetailsFromToken from "../helpers/getUserDetailsFromToken.js";
 import User from "../models/User.js";
 import Conversation from "../models/Conversation.js";
 import Message from "../models/Message.js";
 import getConversation from "../helpers/getConversation.js";
 import CommunityConversation from "../models/CommunityConversation.js";
+import Notification from "../models/Notification.js";
 
 const app = express();
-
-// Online users
-const onlineUsers = new Set();
-
-// Live stream viewers tracking
-const liveStreamViewers = {};
-
-// Socket connection
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
@@ -25,61 +19,58 @@ const io = new Server(server, {
   },
 });
 
+// Online users and live stream viewers
+const onlineUsers = new Set();
+const liveStreamViewers = {};
+
+// Object to track live stream sessions and processes
+const liveStreamSessions = {};
+
 io.on("connection", async (socket) => {
   console.log("A user has connected", socket.id);
 
-  // Handle authentication
   const token = socket.handshake.auth.token;
   if (!token) {
     console.error("No authentication token provided.");
-    socket.disconnect(); // Terminate connection if no token is provided
+    socket.disconnect();
     return;
   }
 
   const user = await getUserDetailsFromToken(token);
   if (!user) {
     console.error("Invalid or expired token.");
-    socket.disconnect(); // Terminate connection if user details can't be fetched
+    socket.disconnect();
     return;
   }
 
-  // Store user in online users
   socket.join(user._id.toString());
   onlineUsers.add(user._id.toString());
   io.emit("getOnlineUsers", Array.from(onlineUsers));
 
-  // Fetch community conversation ID
   let communityConversationID;
   try {
     const communityConversation = await CommunityConversation.findOne().select(
       "_id"
     );
-    if (!communityConversation) {
-      console.error("No community conversation found.");
-    } else {
+    if (communityConversation) {
       communityConversationID = communityConversation._id.toString();
     }
   } catch (error) {
     console.error("Error fetching community conversation ID:", error);
   }
 
-  // Handle community messages
   socket.on("community", async () => {
     if (!communityConversationID) {
-      socket.emit("community messages", []); // Emit empty array if no community ID
+      socket.emit("community messages", []);
       return;
     }
-
     try {
       const getConversationMessage = await CommunityConversation.findById(
         communityConversationID
       )
         .populate({
           path: "messages",
-          populate: {
-            path: "msgByUserId",
-            model: "User",
-          },
+          populate: { path: "msgByUserId", model: "User" },
         })
         .sort({ updatedAt: -1 });
 
@@ -89,17 +80,15 @@ io.on("connection", async (socket) => {
       );
     } catch (error) {
       console.error("Error fetching community messages:", error);
-      socket.emit("community messages", []); // Emit empty array on error
+      socket.emit("community messages", []);
     }
   });
 
-  // Handle new community message
   socket.on("new community message", async (data) => {
     if (!communityConversationID) {
       console.error("Community conversation ID is not available.");
       return;
     }
-
     try {
       const message = new Message({
         text: data.text,
@@ -111,9 +100,7 @@ io.on("connection", async (socket) => {
 
       await CommunityConversation.updateOne(
         { _id: communityConversationID },
-        {
-          $push: { messages: savedMessage._id },
-        }
+        { $push: { messages: savedMessage._id } }
       );
 
       const updatedConversation = await CommunityConversation.findById(
@@ -121,10 +108,7 @@ io.on("connection", async (socket) => {
       )
         .populate({
           path: "messages",
-          populate: {
-            path: "msgByUserId",
-            model: "User",
-          },
+          populate: { path: "msgByUserId", model: "User" },
         })
         .sort({ updatedAt: -1 });
 
@@ -134,13 +118,11 @@ io.on("connection", async (socket) => {
     }
   });
 
-  // Handle community last message for the sidebar
   socket.on("get community last message", async () => {
     if (!communityConversationID) {
-      socket.emit("community last message", null); // Emit null if no community ID
+      socket.emit("community last message", null);
       return;
     }
-
     try {
       const getLastMessage = await CommunityConversation.findById(
         communityConversationID
@@ -151,10 +133,7 @@ io.on("connection", async (socket) => {
             path: "msgByUserId",
             model: "User",
           },
-          options: {
-            sort: { updatedAt: -1 },
-            limit: 1,
-          },
+          options: { sort: { updatedAt: -1 }, limit: 1 },
         })
         .sort({ updatedAt: -1 });
 
@@ -162,20 +141,17 @@ io.on("connection", async (socket) => {
       socket.emit("community last message", lastMessage);
     } catch (error) {
       console.error("Error fetching last community message:", error);
-      socket.emit("community last message", null); // Emit null on error
+      socket.emit("community last message", null);
     }
   });
 
-  // Handle direct messages
   socket.on("message-page", async (userId) => {
     try {
       const userDetails = await User.findById(userId).select("-password");
-
       if (!userDetails) {
         console.error("User not found with id:", userId);
         return;
       }
-
       const payload = {
         _id: userDetails._id,
         name: `${userDetails.firstName} ${userDetails.lastName}`,
@@ -185,7 +161,6 @@ io.on("connection", async (socket) => {
       };
       socket.emit("message-user", payload);
 
-      // Get previous messages
       const getConversationMessage = await Conversation.findOne({
         $or: [
           { sender: user._id, receiver: userId },
@@ -198,14 +173,12 @@ io.on("connection", async (socket) => {
       socket.emit("message", getConversationMessage?.messages || []);
     } catch (error) {
       console.error("Error fetching user messages:", error);
-      socket.emit("message", []); // Emit empty array on error
+      socket.emit("message", []);
     }
   });
 
-  // Handle new direct message
   socket.on("new message", async (data) => {
     try {
-      // Check if the conversation between the sender and the receiver exists
       let conversation = await Conversation.findOne({
         $or: [
           { sender: data.sender, receiver: data.receiver },
@@ -213,7 +186,6 @@ io.on("connection", async (socket) => {
         ],
       });
 
-      // If conversation is not available, create a new one
       if (!conversation) {
         conversation = new Conversation({
           sender: data.sender,
@@ -232,25 +204,19 @@ io.on("connection", async (socket) => {
 
       await Conversation.updateOne(
         { _id: conversation._id },
-        {
-          $push: { messages: savedMessage._id },
-        }
+        { $push: { messages: savedMessage._id } }
       );
 
       const updatedConversation = await Conversation.findById(conversation._id)
         .populate({
           path: "messages",
-          populate: {
-            path: "msgByUserId",
-            model: "User",
-          },
+          populate: { path: "msgByUserId", model: "User" },
         })
         .sort({ updatedAt: -1 });
 
       io.to(data.sender).emit("message", updatedConversation?.messages || []);
       io.to(data.receiver).emit("message", updatedConversation?.messages || []);
 
-      // Send updated conversation lists
       const conversationSender = await getConversation(data.sender);
       const conversationReceiver = await getConversation(data.receiver);
 
@@ -261,18 +227,16 @@ io.on("connection", async (socket) => {
     }
   });
 
-  // Handle sidebar
   socket.on("sidebar", async (currentUserId) => {
     try {
       const conversation = await getConversation(currentUserId);
       socket.emit("conversation", conversation);
     } catch (error) {
       console.error("Error fetching conversations for sidebar:", error);
-      socket.emit("conversation", []); // Emit empty array on error
+      socket.emit("conversation", []);
     }
   });
 
-  // Mark messages as seen
   socket.on("seen", async (msgByUserId) => {
     try {
       const conversation = await Conversation.findOne({
@@ -294,7 +258,6 @@ io.on("connection", async (socket) => {
         { $set: { seen: true } }
       );
 
-      // Send updated conversations
       const conversationSender = await getConversation(user._id.toString());
       const conversationReceiver = await getConversation(msgByUserId);
 
@@ -305,8 +268,6 @@ io.on("connection", async (socket) => {
     }
   });
 
-  // **Live Streaming Section**
-  // Start live stream
   socket.on("start-live-stream", async () => {
     try {
       const friends = await getFriends(user._id);
@@ -316,16 +277,43 @@ io.on("connection", async (socket) => {
         return;
       }
 
-      // Initialize live stream viewers for this user
-      liveStreamViewers[user._id.toString()] = new Set();
+      // Start the live stream using ffmpeg
+      const ffmpegCommand = `ffmpeg -re -i video.mp4 -f mpegts -codec:v mpeg1video -s 640x480 -b:v 500k -bf 0 -`;
+      const ffmpegProcess = exec(ffmpegCommand);
 
-      // Notify friends about the live stream start
-      friends.forEach((friendId) => {
-        io.to(friendId._id.toString()).emit("live-stream-started", {
-          userId: user._id.toString(),
-          name: `${user.firstName} ${user.lastName}`,
-          picturePath: user.picturePath,
+      liveStreamSessions[user._id.toString()] = {
+        viewers: new Set(),
+        ffmpegProcess: ffmpegProcess,
+      };
+
+      // Broadcast the stream to all viewers
+      ffmpegProcess.stdout.on("data", (data) => {
+        io.to(user._id.toString()).emit("stream-video", data);
+      });
+
+      ffmpegProcess.on("error", (err) => {
+        console.error("FFmpeg error:", err);
+        io.to(user._id.toString()).emit("stream-error", "Error starting video stream.");
+      });
+
+      const notifications = friends.map((friend) => {
+        const newNotification = new Notification({
+          userId: friend._id,
+          type: "liveStream",
+          text: `${user.firstName} ${user.lastName} has started a live stream!`,
+          link: `/live/${user._id}`,
+          senderPhoto: user.picturePath,
+          senderName: `${user.firstName} ${user.lastName}`,
+          read: false,
         });
+
+        newNotification.save().catch((err) => {
+          console.error("Error saving notification:", err.message);
+        });
+
+        io.to(friend._id.toString()).emit("notification", newNotification);
+
+        return newNotification;
       });
 
       console.log(`${user.firstName} ${user.lastName} started a live stream.`);
@@ -334,27 +322,24 @@ io.on("connection", async (socket) => {
     }
   });
 
-  // Stop live stream
   socket.on("stop-live-stream", () => {
-    if (liveStreamViewers[user._id.toString()]) {
-      delete liveStreamViewers[user._id.toString()]; // Remove viewers tracking
+    if (liveStreamSessions[user._id.toString()]) {
+      liveStreamSessions[user._id.toString()].ffmpegProcess.kill();
+      delete liveStreamSessions[user._id.toString()];
     }
 
     io.emit("live-stream-stopped", user._id.toString());
     console.log(`${user.firstName} ${user.lastName} stopped the live stream.`);
   });
 
-  // Join live stream
   socket.on("join-live-stream", (streamerId) => {
-    if (!liveStreamViewers[streamerId]) {
+    if (!liveStreamSessions[streamerId]) {
       console.error("No such live stream exists.");
       return;
     }
 
-    // Add the current user to the live stream viewers set
-    liveStreamViewers[streamerId].add(user._id.toString());
+    liveStreamSessions[streamerId].viewers.add(user._id.toString());
 
-    // Notify the streamer that a user has joined
     io.to(streamerId).emit("live-stream-viewer-joined", {
       userId: user._id.toString(),
       name: `${user.firstName} ${user.lastName}`,
@@ -366,12 +351,10 @@ io.on("connection", async (socket) => {
     );
   });
 
-  // Leave live stream
   socket.on("leave-live-stream", (streamerId) => {
-    if (liveStreamViewers[streamerId]) {
-      liveStreamViewers[streamerId].delete(user._id.toString());
+    if (liveStreamSessions[streamerId]) {
+      liveStreamSessions[streamerId].viewers.delete(user._id.toString());
 
-      // Notify the streamer that a user has left
       io.to(streamerId).emit("live-stream-viewer-left", {
         userId: user._id.toString(),
         name: `${user.firstName} ${user.lastName}`,
@@ -383,16 +366,26 @@ io.on("connection", async (socket) => {
     }
   });
 
-  // Handle disconnection
   socket.on("disconnect", () => {
     onlineUsers.delete(user._id.toString());
     console.log("A user has disconnected", socket.id);
 
     io.emit("getOnlineUsers", Array.from(onlineUsers));
+
+    // Remove the user from any live streams they were viewing
+    for (const sessionId in liveStreamSessions) {
+      const session = liveStreamSessions[sessionId];
+      if (session.viewers.has(socket.id)) {
+        session.viewers.delete(socket.id);
+        if (session.viewers.size === 0) {
+          session.ffmpegProcess.kill();
+          delete liveStreamSessions[sessionId];
+        }
+      }
+    }
   });
 });
 
-// Helper function to get user's friends
 const getFriends = async (userId) => {
   try {
     const user = await User.findById(userId);

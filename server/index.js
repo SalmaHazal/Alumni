@@ -18,6 +18,8 @@ import commentRoutes from "./routes/comments.js";
 import searchRoutes from "./routes/search.js";
 import updateLinks from "./routes/updateLinks.js";
 import notificationRoutes from "./routes/notification.js";
+import jobPostRoutes from "./routes/jobPostRoutes.js";
+
 import { register } from "./controllers/auth.js";
 import { createPost } from "./controllers/posts.js";
 import { updateUserProfile } from "./controllers/users.js";
@@ -122,7 +124,7 @@ app.post('/reset-password/:id/:token', (req, res) => {
     }
   });
 });
-
+app.use('/api', jobPostRoutes);
 
 /* FILE STORAGE */
 const storage = multer.diskStorage({
@@ -149,6 +151,7 @@ app.use("/locations", locationRoutes);
 app.use("/search", searchRoutes);
 app.use("/api", updateLinks);
 app.use("/notifications", notificationRoutes);
+app.use('/public', express.static(path.join(__dirname, 'public')));
 
 /* MONGOOSE SETUP */
 const PORT = process.env.PORT || 6001;

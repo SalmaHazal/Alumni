@@ -45,6 +45,8 @@ import {
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+
+
 const MyPostWidget = ({ picturePath }) => {
   const dispatch = useDispatch();
   const [isImage, setIsImage] = useState(false);
@@ -59,6 +61,8 @@ const MyPostWidget = ({ picturePath }) => {
   const medium = palette.neutral.medium;
   const videoRef = useRef(null); // Ref for video element
   const socket = useRef(null); // Socket.IO instance
+
+  
 
   // Handle post submission
   const handlePost = async () => {

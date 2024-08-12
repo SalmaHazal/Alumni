@@ -15,7 +15,7 @@ import {
 import {
   Search,
   Message,
-  RateReview, // Import the RateReview icon
+  RateReview,
 } from "@mui/icons-material";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import WorkHistoryIcon from "@mui/icons-material/WorkHistory";
@@ -77,7 +77,6 @@ const Navbar = () => {
     handleSearch();
   }, [searchTerm]);
 
-  // Fetch notifications and update unread count
   const fetchNotifications = async () => {
     if (!user?._id) return;
 
@@ -109,7 +108,7 @@ const Navbar = () => {
   }, [user, token]);
 
   const markAllAsRead = async () => {
-    if (notifications.length === 0) return; // No notifications to mark as read
+    if (notifications.length === 0) return;
 
     try {
       await Promise.all(
@@ -254,7 +253,19 @@ const Navbar = () => {
                 </Badge>
               </ListItem>
 
-              <ListItem title="Jobs" button>
+              {/* Wrap the jobs icon with a Link */}
+              <ListItem
+                button
+                component={Link}
+                to="/post-jobs"
+                sx={{
+                  borderRadius: "10px",
+                  background:
+                    location.pathname === "/post-jobs"
+                      ? backgroundColor
+                      : "transparent",
+                }}
+              >
                 <WorkHistoryIcon
                   sx={{ fontSize: "25px" }}
                   style={{ margin: "0 17px" }}
@@ -294,131 +305,168 @@ const Navbar = () => {
             <InputBase
               placeholder="Search..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+              style={{ width: "100%" }}
             />
             <IconButton onClick={handleSearch}>
-              <Search style={{ borderRadius: "50%", marginRight: "" }} />
+              <Search />
             </IconButton>
           </FlexBetween>
         )}
       </FlexBetween>
 
       {/* MOBILE NAV */}
-      {transitions((style, item) =>
-        item ? (
-          <animated.div
-            style={{
-              ...style,
-              position: "fixed",
-              right: 0,
-              top: "70px",
-              bottom: 0,
-              height: "100%",
-              zIndex: 10,
-              maxWidth: "500px",
-              minWidth: "300px",
-              backgroundColor: background,
-            }}
-          >
-            <FlexBetween
-              style={{ marginTop: "15px", justifyContent: "center" }}
-            >
-              <List
+      {!isNonMobileScreens &&
+        transitions(
+          (style, item) =>
+            item && (
+              <animated.div
                 style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  gap: "3rem",
+                  ...style,
+                  position: "fixed",
+                  top: "0",
+                  right: "0",
+                  width: "100%",
+                  height: "100%",
+                  zIndex: 1000,
+                  backgroundColor: alt,
+                  padding: "1.5rem",
                 }}
               >
-                <ListItem
-                  button
-                  component={Link}
-                  to="/home"
-                  sx={{
-                    borderRadius: "10px",
-                    background:
-                      location.pathname === "/home"
-                        ? backgroundColor
-                        : "transparent",
-                  }}
-                >
-                  <Badge
-                    badgeContent={posts.length <= 15 ? posts.length : "+15"}
-                    color="error"
-                    sx={{ fontSize: "25px" }}
-                    style={{ margin: "0 17px" }}
+                <Box display="flex" justifyContent="flex-end">
+                  <IconButton
+                    onClick={() => setIsMobileMenuToggled(!isMobileMenuToggled)}
                   >
-                    <HomeIcon />
-                  </Badge>
-                </ListItem>
+                    <Hamburger
+                      direction="right"
+                      size={25}
+                      duration={0.2}
+                      color="#526482"
+                      toggled={isMobileMenuToggled}
+                    />
+                  </IconButton>
+                </Box>
 
-                <ListItem
-                  button
-                  component={Link}
-                  to="/chat"
-                  sx={{
-                    borderRadius: "10px",
-                    background: isChatPath ? backgroundColor : "transparent",
-                  }}
+                {/* Mobile Menu Items */}
+                <FlexBetween
+                  display="flex"
+                  flexDirection="column"
+                  alignItems="center"
+                  gap="3rem"
+                  mt="3rem"
                 >
-                  <Badge
-                    badgeContent={"+1"}
-                    color="error"
-                    sx={{ fontSize: "25px" }}
-                    style={{ margin: "0 17px" }}
-                  >
-                    <Message />
-                  </Badge>
-                </ListItem>
+                  <List>
+                    <ListItem
+                      button
+                      component={Link}
+                      to="/home"
+                      onClick={() => setIsMobileMenuToggled(false)}
+                      sx={{
+                        borderRadius: "10px",
+                        background:
+                          location.pathname === "/home"
+                            ? backgroundColor
+                            : "transparent",
+                      }}
+                    >
+                      <Badge
+                        title="Home"
+                        badgeContent={posts.length <= 15 ? posts.length : "+15"}
+                        color="error"
+                        sx={{ fontSize: "25px" }}
+                        style={{ margin: "0 17px" }}
+                      >
+                        <HomeIcon />
+                      </Badge>
+                    </ListItem>
 
-                <ListItem
-                  button
-                  component={Link}
-                  to="/notifications"
-                  onClick={markAllAsRead} // Call markAllAsRead when the notifications icon is clicked
-                  sx={{
-                    borderRadius: "10px",
-                    background:
-                      location.pathname === "/notifications"
-                        ? "#C7C8CC"
-                        : "transparent",
-                  }}
-                >
-                  {/* Badge Component around Notifications Icon */}
-                  <Badge
-                    title="Notifications"
-                    badgeContent={unreadCount} // Display unread count
-                    color="error"
-                    max={99} // Maximum number to display before showing '+'
-                    sx={{ fontSize: "25px" }}
-                    style={{ margin: "0 17px" }}
-                  >
-                    <NotificationsActiveIcon />
-                  </Badge>
-                </ListItem>
+                    <ListItem
+                      button
+                      component={Link}
+                      to="/chat"
+                      onClick={() => setIsMobileMenuToggled(false)}
+                      sx={{
+                        borderRadius: "10px",
+                        background: isChatPath
+                          ? backgroundColor
+                          : "transparent",
+                      }}
+                    >
+                      <Badge
+                        title="Messages"
+                        badgeContent={"+1"}
+                        color="error"
+                        sx={{ fontSize: "25px" }}
+                        style={{ margin: "0 17px" }}
+                      >
+                        <Message />
+                      </Badge>
+                    </ListItem>
 
-                <ListItem button>
-                  <WorkHistoryIcon
-                    sx={{ fontSize: "25px" }}
-                    style={{ margin: "0 17px" }}
-                  />
-                </ListItem>
+                    <ListItem
+                      button
+                      component={Link}
+                      to="/notifications"
+                      onClick={() => {
+                        markAllAsRead();
+                        setIsMobileMenuToggled(false);
+                      }}
+                      sx={{
+                        borderRadius: "10px",
+                        background:
+                          location.pathname === "/notifications"
+                            ? backgroundColor
+                            : "transparent",
+                      }}
+                    >
+                      <Badge
+                        title="Notifications"
+                        badgeContent={unreadCount}
+                        color="error"
+                        max={99}
+                        sx={{ fontSize: "25px" }}
+                        style={{ margin: "0 17px" }}
+                      >
+                        <NotificationsActiveIcon />
+                      </Badge>
+                    </ListItem>
 
-                {/* Replace the light/dark mode icons with the RateReview icon */}
-                <ListItem title="Reviews" button>
-                  <RateReview sx={{ fontSize: "25px" }} />
-                </ListItem>
+                    <ListItem
+                      button
+                      component={Link}
+                      to="/joblist"
+                      onClick={() => setIsMobileMenuToggled(false)}
+                      sx={{
+                        borderRadius: "10px",
+                        background:
+                          location.pathname === "/joblist"
+                            ? backgroundColor
+                            : "transparent",
+                      }}
+                    >
+                      <WorkHistoryIcon
+                        sx={{ fontSize: "25px" }}
+                        style={{ margin: "0 17px" }}
+                      />
+                    </ListItem>
 
-                <AccountMenu />
-              </List>
-            </FlexBetween>
-          </animated.div>
-        ) : null
-      )}
+                    <ListItem
+                      button
+                      onClick={() => setIsMobileMenuToggled(false)}
+                      sx={{
+                        borderRadius: "10px",
+                      }}
+                    >
+                      <RateReview sx={{ fontSize: "25px" }} />
+                    </ListItem>
+                  </List>
+                </FlexBetween>
+              </animated.div>
+            )
+        )}
     </FlexBetween>
   );
 };
 
 export default Navbar;
+
