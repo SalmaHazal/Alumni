@@ -18,6 +18,7 @@ import Loading from "./Loading";
 import backgroundImage from "../../assets/wallpaper.jpeg";
 import backgroundImage1 from "../../assets/blackbaground.png";
 import { useTheme } from "@mui/material/styles";
+import { MdVideoCall } from "react-icons/md";
 
 const CommunityMessages = () => {
   const user = useSelector((state) => state?.user);
@@ -169,7 +170,14 @@ const CommunityMessages = () => {
           </div>
         </div>
 
-        <div>
+        <div className="flex gap-3">
+          <a
+            href="http://localhost:9000/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <MdVideoCall color={"black"} size={28} />
+          </a>
           <button className="cursor-pointer hover:text-slate-500">
             <HiDotsVertical size={20} />
           </button>

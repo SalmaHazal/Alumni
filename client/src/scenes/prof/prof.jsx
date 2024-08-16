@@ -1,13 +1,13 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Avatar from '@mui/material/Avatar';
+import Avatarr from "../widgets/Avatar";
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
-import PersonAdd from '@mui/icons-material/PersonAdd';
 import Settings from '@mui/icons-material/Settings';
 import Logout from '@mui/icons-material/Logout';
 import { setLogout, setMode } from "../../state/index"; // Import setMode
@@ -39,6 +39,9 @@ export default function AccountMenu() {
   const navigate = useNavigate();
   
   const firstName = useSelector((state) => state.user.firstName); 
+  const lastName = useSelector((state) => state.user.lastName); 
+  const picturePath = useSelector((state) => state.user.picturePath);
+  const userId = useSelector((state) => state.user._id);
   const firstLetter = useFirstLetter(firstName);
 
   // Access the theme from Material-UI
@@ -103,11 +106,14 @@ export default function AccountMenu() {
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
-        <MenuItem onClick={() => navigate(`/home`)} >
-          <Avatar /> {firstName}
-        </MenuItem>
-        <MenuItem>
-          <Avatar /> My account
+        <MenuItem onClick={() => navigate(`/profile/${userId}`)} >
+        <Avatarr
+              width={40}
+              height={40}
+              name={`${firstName} ${lastName}`}
+              imageUrl={picturePath}
+            /> 
+            <span style={{ marginLeft: "15px" }}>{firstName} {lastName}</span>
         </MenuItem>
         <Divider />
 
@@ -123,15 +129,6 @@ export default function AccountMenu() {
           {theme.palette.mode === "dark" ? "Light Mode" : "Dark Mode"}
         </MenuItem>
 
-        <MenuItem onClick={() => {
-          dispatch(setLogout());
-          handleClose();
-        }}>
-          <ListItemIcon>
-            <PersonAdd fontSize="small" />
-          </ListItemIcon>
-          Add another account
-        </MenuItem>
         <MenuItem>
           <ListItemIcon>
             <Settings fontSize="small" />
