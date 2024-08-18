@@ -20,6 +20,8 @@ import Loading from "./Loading";
 import backgroundImage from "../../assets/wallpaper.jpeg";
 import backgroundImage1 from "../../assets/blackbaground.png";
 import { useTheme } from "@mui/material/styles";
+import { AudioRecorder } from "react-audio-voice-recorder";
+import { MdVideoCall } from "react-icons/md";
 
 const MessagePage = () => {
   const params = useParams();
@@ -38,6 +40,7 @@ const MessagePage = () => {
     imageUrl: "",
     videoUrl: "",
   });
+  const [audio, setAudio] = useState(null);
   const [loading, setLoading] = useState(false);
   const [allMessage, setAllMessage] = useState([]);
   const currentMessage = useRef(null);
@@ -142,6 +145,7 @@ const MessagePage = () => {
           text: message.text,
           imageUrl: message.imageUrl,
           videoUrl: message.videoUrl,
+          audio: message.audio,
           msgByUserId: user?._id,
         });
         setMessage({
@@ -150,6 +154,30 @@ const MessagePage = () => {
           videoUrl: "",
         });
       }
+    }
+  };
+
+  const addAudioElement = async (blob) => {
+    setAudio(blob);
+    // Convert blob to an ArrayBuffer
+    const arrayBuffer = await blob.arrayBuffer();
+
+    // Convert ArrayBuffer to Uint8Array
+    const audioData = new Uint8Array(arrayBuffer);
+
+    // Send the audio message via socket
+    if (socket) {
+      socket.emit("new message", {
+        sender: user?._id,
+        receiver: params.userId,
+        text: message.text,
+        imageUrl: message.imageUrl,
+        videoUrl: message.videoUrl,
+        audio: audioData,
+        msgByUserId: user?._id,
+      });
+
+      setAudio(null);
     }
   };
 
@@ -193,7 +221,17 @@ const MessagePage = () => {
           </div>
         </div>
 
-        <div>
+        <div className="flex gap-3">
+          <a
+            href="http://localhost:9000/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <MdVideoCall
+              color={`${theme.palette.mode === "light" ? "black" : "white"}`}
+              size={28}
+            />
+          </a>
           <button className="cursor-pointer hover:text-slate-500">
             <HiDotsVertical size={20} />
           </button>
@@ -244,6 +282,19 @@ const MessagePage = () => {
                       className="w-full h-full object-scale-down"
                       controls
                     />
+                  )}
+                  {msg?.audio && (
+                    <audio controls className="custom-audio-player">
+                      <source
+                        src={URL.createObjectURL(
+                          new Blob([new Uint8Array(msg.audio.data)], {
+                            type: "audio/webm",
+                          })
+                        )}
+                        type="audio/webm"
+                      />
+                      Your browser does not support the audio element.
+                    </audio>
                   )}
                 </div>
                 <p className="px-2">{msg.text}</p>
@@ -389,15 +440,27 @@ const MessagePage = () => {
             value={message.text}
             onChange={handleOnChange}
           />
-          <button
-            className={`p-3 rounded ${
-              theme.palette.mode === "light"
-                ? "hover:bg-slate-100"
-                : "hover:bg-[#3b3b3b]"
-            }`}
-          >
-            <IoMdSend size={28} />
-          </button>
+          {message.text || message.imageUrl || message.videoUrl ? (
+            <button
+              className={`p-3 rounded ${
+                theme.palette.mode === "light"
+                  ? "hover:bg-slate-100"
+                  : "hover:bg-[#3b3b3b]"
+              }`}
+            >
+              <IoMdSend size={28} />
+            </button>
+          ) : (
+            <div className="flex items-center p-2 rounded-full">
+              <AudioRecorder
+                onRecordingComplete={addAudioElement}
+                audioTrackConstraints={{
+                  noiseSuppression: true,
+                  echoCancellation: true,
+                }}
+              />
+            </div>
+          )}
         </form>
       </section>
     </div>

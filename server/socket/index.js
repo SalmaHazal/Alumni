@@ -77,6 +77,7 @@ io.on("connection", async (socket) => {
       text: data.text,
       imageUrl: data.imageUrl,
       videoUrl: data.videoUrl,
+      audio: data.audio,
       msgByUserId: data?.msgByUserId,
     });
     const saveMessage = await message.save();
@@ -171,6 +172,7 @@ io.on("connection", async (socket) => {
       text: data.text,
       imageUrl: data.imageUrl,
       videoUrl: data.videoUrl,
+      audio: data.audio,
       msgByUserId: data?.msgByUserId,
     });
     const saveMessage = await message.save();

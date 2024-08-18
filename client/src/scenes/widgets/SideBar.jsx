@@ -12,6 +12,7 @@ import { FaVideo } from "react-icons/fa6";
 import { RiUserSearchFill } from "react-icons/ri";
 import { useSocketContext } from "../../context/SocketContext";
 import { useTheme } from "@mui/material/styles";
+import { MdOutlineSpatialAudioOff } from "react-icons/md";
 
 const Sidebar = () => {
   const user = useSelector((state) => state?.user);
@@ -195,7 +196,7 @@ const Sidebar = () => {
                       <div>
                         {conv?.lastMsg?.imageUrl && (
                           <div className="flex items-center gap-1">
-                            <span className="mb-3">
+                            <span className={`${conv?.lastMsg?.text && "-mt-4"} `}>
                               <FaRegImage />
                             </span>
                             {!conv?.lastMsg?.text && <span>Image</span>}
@@ -203,11 +204,21 @@ const Sidebar = () => {
                         )}
                         {conv?.lastMsg?.videoUrl && (
                           <div className="flex items-center gap-1">
-                            <span className="mb-3">
+                            <span className={`${conv?.lastMsg?.text && "-mt-4"} `}>
                               <FaVideo />
                             </span>
                             {!conv?.lastMsg?.text && <span>Video</span>}
                           </div>
+                        )}
+                        {conv?.lastMsg?.audio && (
+                          <div className="flex items-center gap-1">
+                          <span
+                            className={`${conv?.lastMsg?.text && "-mt-4"} `}
+                          >
+                            <MdOutlineSpatialAudioOff />
+                          </span>
+                          {!conv?.lastMsg?.text && <span>Audio</span>}
+                        </div>
                         )}
                       </div>
                       <p className="text-ellipsis line-clamp-1">
@@ -271,6 +282,16 @@ const Sidebar = () => {
                             <FaVideo />
                           </span>
                           {!communityConv?.text && <span>Video</span>}
+                        </div>
+                      )}
+                      {communityConv?.audio && (
+                        <div className="flex items-center gap-1">
+                          <span
+                            className={`${communityConv?.text && "-mt-4"} `}
+                          >
+                            <MdOutlineSpatialAudioOff />
+                          </span>
+                          {!communityConv?.text && <span>Audio</span>}
                         </div>
                       )}
                       <p className="text-ellipsis line-clamp-1">

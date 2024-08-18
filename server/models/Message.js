@@ -14,6 +14,9 @@ const messageSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    audio: {
+      type: Buffer,
+    },
     seen: {
       type: Boolean,
       default: false,
