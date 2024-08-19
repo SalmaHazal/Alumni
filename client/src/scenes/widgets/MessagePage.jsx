@@ -164,50 +164,44 @@ const MessagePage = () => {
 
   const handleSendMessage = (e) => {
     e.preventDefault();
-
+  
+    const messageData = {
+      sender: user?._id,
+      receiver: params.userId,
+      text: message.text,
+      imageUrl: message.imageUrl,
+      videoUrl: message.videoUrl,
+      audio: audio,
+      document: null, 
+      msgByUserId: user?._id,
+    };
+  
     if (message.document) {
       const reader = new FileReader();
+      
       reader.onloadend = () => {
         const fileBuffer = new Uint8Array(reader.result);
-        const documentData = {
+        messageData.document = {
           data: fileBuffer,
           contentType: message.document.type,
           filename: message.document.name,
         };
-
-        socket.emit("new message", {
-          sender: user?._id,
-          receiver: params.userId,
-          text: message.text,
-          imageUrl: message.imageUrl,
-          videoUrl: message.videoUrl,
-          audio: audio,
-          document: documentData,
-          msgByUserId: user?._id,
-        });
-        setMessage({
-          text: "",
-          imageUrl: "",
-          videoUrl: "",
-          document: null,
-        });
+  
+        if (socket) {
+          socket.emit("new message", messageData);
+          setMessage({
+            text: "",
+            imageUrl: "",
+            videoUrl: "",
+            document: null,
+          });
+        }
       };
-
+  
       reader.readAsArrayBuffer(message.document);
-    }
-
-    if (message.text || message.imageUrl || message.videoUrl) {
+    } else {
       if (socket) {
-        socket.emit("new message", {
-          sender: user?._id,
-          receiver: params.userId,
-          text: message.text,
-          imageUrl: message.imageUrl,
-          videoUrl: message.videoUrl,
-          audio: audio,
-          document: message.document,
-          msgByUserId: user?._id,
-        });
+        socket.emit("new message", messageData);
         setMessage({
           text: "",
           imageUrl: "",
@@ -217,6 +211,7 @@ const MessagePage = () => {
       }
     }
   };
+  
 
   const addAudioElement = async (blob) => {
     setAudio(blob);

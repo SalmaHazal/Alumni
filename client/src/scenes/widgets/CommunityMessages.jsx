@@ -149,48 +149,43 @@ const CommunityMessages = () => {
 
   const handleSendMessage = (e) => {
     e.preventDefault();
-
+  
+    const messageData = {
+      sender: user?._id,
+      text: message.text,
+      imageUrl: message.imageUrl,
+      videoUrl: message.videoUrl,
+      audio: audio,
+      document: null, // Default to null
+      msgByUserId: user?._id,
+    };
+  
     if (message.document) {
       const reader = new FileReader();
+      
       reader.onloadend = () => {
         const fileBuffer = new Uint8Array(reader.result);
-        const documentData = {
+        messageData.document = {
           data: fileBuffer,
           contentType: message.document.type,
           filename: message.document.name,
         };
-
-        socket.emit("new community message", {
-          sender: user,
-          text: message.text,
-          imageUrl: message.imageUrl,
-          videoUrl: message.videoUrl,
-          audio: audio,
-          document: documentData,
-          msgByUserId: user?._id,
-        });
-        setMessage({
-          text: "",
-          imageUrl: "",
-          videoUrl: "",
-          document: null,
-        });
+  
+        if (socket) {
+          socket.emit("new community message", messageData);
+          setMessage({
+            text: "",
+            imageUrl: "",
+            videoUrl: "",
+            document: null,
+          });
+        }
       };
-
+  
       reader.readAsArrayBuffer(message.document);
-    }
-
-    if (message.text || message.imageUrl || message.videoUrl) {
+    } else {
       if (socket) {
-        socket.emit("new community message", {
-          sender: user,
-          text: message.text,
-          imageUrl: message.imageUrl,
-          videoUrl: message.videoUrl,
-          audio: audio,
-          document: message.document,
-          msgByUserId: user?._id,
-        });
+        socket.emit("new community message", messageData);
         setMessage({
           text: "",
           imageUrl: "",
@@ -200,6 +195,7 @@ const CommunityMessages = () => {
       }
     }
   };
+  
 
   const addAudioElement = async (blob) => {
     setAudio(blob);
