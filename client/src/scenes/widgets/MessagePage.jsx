@@ -21,7 +21,15 @@ import backgroundImage from "../../assets/wallpaper.jpeg";
 import backgroundImage1 from "../../assets/blackbaground.png";
 import { useTheme } from "@mui/material/styles";
 import { AudioRecorder } from "react-audio-voice-recorder";
+import { IoDocumentAttach } from "react-icons/io5";
 import { MdVideoCall } from "react-icons/md";
+import {
+  FaFileWord,
+  FaFileExcel,
+  FaFileImage,
+  FaFileAlt,
+} from "react-icons/fa";
+import { FaFilePdf } from "react-icons/fa6";
 
 const MessagePage = () => {
   const params = useParams();
@@ -39,6 +47,7 @@ const MessagePage = () => {
     text: "",
     imageUrl: "",
     videoUrl: "",
+    document: null,
   });
   const [audio, setAudio] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -104,6 +113,25 @@ const MessagePage = () => {
     });
   };
 
+  const handleFileChange = async (e) => {
+    setOpenImageVideoUpload(false);
+    setMessage((prev) => {
+      return {
+        ...prev,
+        document: e.target.files[0],
+      };
+    });
+  };
+
+  const handleClearUploadFile = () => {
+    setMessage((prev) => {
+      return {
+        ...prev,
+        document: null,
+      };
+    });
+  };
+
   const { socket } = useSocketContext();
 
   useEffect(() => {
@@ -137,6 +165,37 @@ const MessagePage = () => {
   const handleSendMessage = (e) => {
     e.preventDefault();
 
+    if (message.document) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const fileBuffer = new Uint8Array(reader.result);
+        const documentData = {
+          data: fileBuffer,
+          contentType: message.document.type,
+          filename: message.document.name,
+        };
+
+        socket.emit("new message", {
+          sender: user?._id,
+          receiver: params.userId,
+          text: message.text,
+          imageUrl: message.imageUrl,
+          videoUrl: message.videoUrl,
+          audio: audio,
+          document: documentData,
+          msgByUserId: user?._id,
+        });
+        setMessage({
+          text: "",
+          imageUrl: "",
+          videoUrl: "",
+          document: null,
+        });
+      };
+
+      reader.readAsArrayBuffer(message.document);
+    }
+
     if (message.text || message.imageUrl || message.videoUrl) {
       if (socket) {
         socket.emit("new message", {
@@ -145,13 +204,15 @@ const MessagePage = () => {
           text: message.text,
           imageUrl: message.imageUrl,
           videoUrl: message.videoUrl,
-          audio: message.audio,
+          audio: audio,
+          document: message.document,
           msgByUserId: user?._id,
         });
         setMessage({
           text: "",
           imageUrl: "",
           videoUrl: "",
+          document: null,
         });
       }
     }
@@ -187,6 +248,23 @@ const MessagePage = () => {
         ? `url(${backgroundImage1})`
         : `url(${backgroundImage})`,
   };
+
+  const getFileIcon = (fileName) => {
+    if (fileName.endsWith(".pdf")) return <FaFilePdf size={"25px"} />;
+    if (fileName.endsWith(".doc") || fileName.endsWith(".docx"))
+      return <FaFileWord size={"25px"} />;
+    if (fileName.endsWith(".xls") || fileName.endsWith(".xlsx"))
+      return <FaFileExcel size={"25px"} />;
+    if (
+      fileName.endsWith(".jpg") ||
+      fileName.endsWith(".jpeg") ||
+      fileName.endsWith(".png")
+    )
+      return <FaFileImage size={"25px"} />;
+    return <FaFileAlt />;
+  };
+
+  const isDarkMode = theme.palette.mode === "dark";
 
   return (
     <div style={{ ...style11 }} className="bg-no-repeat bg-cover">
@@ -283,6 +361,57 @@ const MessagePage = () => {
                       controls
                     />
                   )}
+                  {msg?.document && (
+                    <>
+                      <div
+                        className={`flex items-center p-2 mb-1 rounded-lg shadow-sm ${
+                          isDarkMode
+                            ? "border-gray-700 bg-gray-800"
+                            : "border-gray-300 bg-white"
+                        }`}
+                      >
+                        <div
+                          className={`flex-shrink-0 w-12 h-12 flex items-center justify-center border rounded-lg ${
+                            isDarkMode
+                              ? "border-gray-700 bg-gray-600"
+                              : "border-gray-300 bg-gray-100"
+                          } mr-3`}
+                        >
+                          {getFileIcon(msg.document.split("/").pop())}
+                        </div>
+
+                        <div className="flex-1">
+                          <span
+                            className={`block font-semibold text-sm ${
+                              isDarkMode ? "text-gray-200" : "text-gray-800"
+                            }`}
+                          >
+                            {msg.document.split("/").pop()}
+                          </span>
+                        </div>
+                      </div>
+                      <div
+                        className={`flex justify-center items-center p-3 rounded-lg shadow-sm ${
+                          isDarkMode ? "bg-gray-800" : "bg-white"
+                        }`}
+                      >
+                        <button
+                          className={`text-xs font-semibold py-1 px-3 rounded-md`}
+                        >
+                          <a
+                            href={`http://localhost:3001${msg.document}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={`text-[15px] no-underline hover:underline ${
+                              isDarkMode ? "text-white" : "text-black"
+                            }`}
+                          >
+                            Download
+                          </a>
+                        </button>
+                      </div>
+                    </>
+                  )}
                   {msg?.audio && (
                     <audio controls className="custom-audio-player">
                       <source
@@ -350,6 +479,39 @@ const MessagePage = () => {
             </div>
           </div>
         )}
+
+        {/* upload document display */}
+        {message.document && (
+          <div className="w-full h-full sticky bottom-0 bg-slate-700 bg-opacity-30 flex justify-center items-center rounded overflow-hidden">
+            <div
+              className="w-fit p-2 absolute top-0 right-0 rounded-full cursor-pointer hover:bg-slate-400"
+              onClick={handleClearUploadFile}
+            >
+              <IoClose size={25} />
+            </div>
+
+            <div
+              style={{ backgroundColor: theme.palette.background.alt }}
+              className="w-11/12 md:w-3/4 lg:w-1/2 xl:w-1/3 p-4 flex flex-col items-center rounded-lg shadow-lg"
+            >
+              <div
+                className={`w-20 h-20 flex items-center justify-center mb-4 border ${
+                  !isDarkMode && "border-gray-300 bg-gray-100"
+                } rounded-lg`}
+              >
+                <FaFilePdf size={"25px"} />
+              </div>
+
+              <p
+                className={`text-sm font-semibold mb-2 ${
+                  isDarkMode ? "text-gray-200" : "text-gray-800"
+                }`}
+              >
+                {message.document.name}
+              </p>
+            </div>
+          </div>
+        )}
         {loading && (
           <div className="w-full h-full flex sticky bottom-0 justify-center items-center">
             <Loading />
@@ -408,6 +570,19 @@ const MessagePage = () => {
                   </div>
                   <p className="pt-3">Video</p>
                 </label>
+                <label
+                  htmlFor="uploadDocument"
+                  className={`flex items-center  px-3 gap-3 rounded cursor-pointer ${
+                    theme.palette.mode === "light"
+                      ? "hover:bg-slate-100"
+                      : "hover:bg-[#3b3b3b]"
+                  }`}
+                >
+                  <div className="text-slate-600">
+                    <IoDocumentAttach size={20} />
+                  </div>
+                  <p className="pt-3">Document</p>
+                </label>
 
                 <input
                   type="file"
@@ -419,6 +594,13 @@ const MessagePage = () => {
                   type="file"
                   id="uploadVideo"
                   onChange={handleUploadVideo}
+                  className="hidden"
+                />
+                <input
+                  type="file"
+                  id="uploadDocument"
+                  accept=".pdf,.doc,.docx,.txt"
+                  onChange={handleFileChange}
                   className="hidden"
                 />
               </form>
@@ -440,7 +622,10 @@ const MessagePage = () => {
             value={message.text}
             onChange={handleOnChange}
           />
-          {message.text || message.imageUrl || message.videoUrl ? (
+          {message.text ||
+          message.imageUrl ||
+          message.videoUrl ||
+          message.document ? (
             <button
               className={`p-3 rounded ${
                 theme.palette.mode === "light"

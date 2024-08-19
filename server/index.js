@@ -47,6 +47,7 @@ app.use(cors({
   credentials: true  // Enable credentials
 }));
 app.use("/assets", express.static(path.join(__dirname, "public/assets")));
+app.use("/documents", express.static(path.join(__dirname, "public/documents")));
 
 
 app.post('/forgot-password', (req, res) => {

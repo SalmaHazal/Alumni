@@ -7,8 +7,16 @@ import Conversation from "../models/Conversation.js";
 import Message from "../models/Message.js";
 import getConversation from "../helpers/getConversation.js";
 import CommunityConversation from "../models/CommunityConversation.js";
+import fs from "fs";
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 const app = express();
+
+
+// Generate __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // online user
 const onlineUser = new Set();
@@ -73,11 +81,30 @@ io.on("connection", async (socket) => {
   });
 
   socket.on("new community message", async (data) => {
+    let documentPath = null;
+
+    if (data.document) {
+      const { data: fileBuffer, contentType, filename } = data.document;
+      const timestamp = Date.now();
+      const storageFilename = `${timestamp}_${filename}`;
+      const storagePath = path.join(
+        __dirname,
+        "../public/documents",
+        storageFilename
+      );
+  
+      // Write the file to the filesystem
+      fs.writeFileSync(storagePath, Buffer.from(fileBuffer));
+  
+      // Store the relative path in the database
+      documentPath = `/documents/${storageFilename}`;
+    }
     const message = new Message({
       text: data.text,
       imageUrl: data.imageUrl,
       videoUrl: data.videoUrl,
       audio: data.audio,
+      document: documentPath,
       msgByUserId: data?.msgByUserId,
     });
     const saveMessage = await message.save();
@@ -168,11 +195,30 @@ io.on("connection", async (socket) => {
       });
       conversation = await createConversation.save();
     }
+    let documentPath = null;
+
+    if (data.document) {
+      const { data: fileBuffer, contentType, filename } = data.document;
+      const timestamp = Date.now();
+      const storageFilename = `${timestamp}_${filename}`;
+      const storagePath = path.join(
+        __dirname,
+        "../public/documents",
+        storageFilename
+      );
+  
+      // Write the file to the filesystem
+      fs.writeFileSync(storagePath, Buffer.from(fileBuffer));
+  
+      // Store the relative path in the database
+      documentPath = `/documents/${storageFilename}`;
+    }
     const message = new Message({
       text: data.text,
       imageUrl: data.imageUrl,
       videoUrl: data.videoUrl,
       audio: data.audio,
+      document: documentPath,
       msgByUserId: data?.msgByUserId,
     });
     const saveMessage = await message.save();
@@ -214,24 +260,30 @@ io.on("connection", async (socket) => {
     socket.emit("conversation", conversation);
   });
 
-  socket.on('fetch-conversations-unseen-count', async (userId) => {
+  socket.on("fetch-conversations-unseen-count", async (userId) => {
     try {
       // Find conversations where the user is either the sender or receiver
       const conversations = await Conversation.find({
         $or: [{ sender: userId }, { receiver: userId }],
-      }).populate('messages');
+      }).populate("messages");
 
       // Calculate the number of conversations with at least one unseen message
-      const conversationsWithUnseen = conversations.filter(conversation =>
-        conversation.messages.some(message => !message.seen && message.msgByUserId.toString() !== userId)
+      const conversationsWithUnseen = conversations.filter((conversation) =>
+        conversation.messages.some(
+          (message) =>
+            !message.seen && message.msgByUserId.toString() !== userId
+        )
       );
 
       const unseenConversationsCount = conversationsWithUnseen.length;
 
       // Emit the count to the client
-      socket.emit('update-unseen-conversations-count', unseenConversationsCount);
+      socket.emit(
+        "update-unseen-conversations-count",
+        unseenConversationsCount
+      );
     } catch (error) {
-      console.error('Error fetching unseen conversations count:', error);
+      console.error("Error fetching unseen conversations count:", error);
     }
   });
 
@@ -260,16 +312,19 @@ io.on("connection", async (socket) => {
     // Update the count of unseen conversations
     const conversations = await Conversation.find({
       $or: [{ sender: user._id }, { receiver: user._id }],
-    }).populate('messages');
+    }).populate("messages");
 
-    const conversationsWithUnseen = conversations.filter(conversation =>
-      conversation.messages.some(message => !message.seen && message.msgByUserId.toString() !== user._id.toString())
+    const conversationsWithUnseen = conversations.filter((conversation) =>
+      conversation.messages.some(
+        (message) =>
+          !message.seen &&
+          message.msgByUserId.toString() !== user._id.toString()
+      )
     );
 
     const unseenConversationsCount = conversationsWithUnseen.length;
 
-    io.emit('update-unseen-conversations-count', unseenConversationsCount);
-  
+    io.emit("update-unseen-conversations-count", unseenConversationsCount);
   });
 
   // disconnect
