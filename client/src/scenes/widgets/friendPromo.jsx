@@ -35,7 +35,7 @@ const SearchUser = ({ onClose }) => {
 
 
   return (
-    <div className="fixed top-0 bottom-0 left-0 right-0 bg-slate-700 bg-opacity-40 p-2 z-10">
+    <div className="fixed top-0 bottom-0 left-0 right-0 bg-slate-900 bg-opacity-40 p-2 z-10">
       <div className="w-full max-w-lg mx-auto mt-10">
         {/**input search user */}
         <div style={{ backgroundColor: theme.palette.sidebar.background}} className=" rounded h-14 overflow-hidden flex ">

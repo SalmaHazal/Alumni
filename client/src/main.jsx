@@ -1,4 +1,4 @@
-import React from "react";
+import React , {Suspense} from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
 import "./index.css";
@@ -22,6 +22,7 @@ import { PersistGate } from "redux-persist/integration/react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { SocketContextProvider } from "./context/SocketContext.jsx";
 import { UnseenMessagesProvider } from "./context/UnseenMessagesContext.jsx";
+import './i18n.js'
 
 const persistConfig = { key: "root", storage, version: 1 };
 const persistedReducer = persistReducer(persistConfig, authReducer);
@@ -48,7 +49,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         />
         <SocketContextProvider>
           <UnseenMessagesProvider>
-            <App />
+            <React.Suspense fallback="loading...">
+              <App />
+            </React.Suspense>
           </UnseenMessagesProvider>
         </SocketContextProvider>
       </PersistGate>

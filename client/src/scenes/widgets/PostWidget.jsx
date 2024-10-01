@@ -19,6 +19,7 @@ import { setPost } from "../../state/index";
 import Comment from "./Comment";
 import SharePopup from "./SharePopup";
 import Reactions from '../../components/Reaction';
+import { useTranslation } from 'react-i18next';
 
 const reactionIcons = {
   like: <ThumbUpIcon color="primary" />,
@@ -133,12 +134,13 @@ const handleReact = async (reaction) => {
   };
  //
  const getSubtitle = () => {
+  const { t } = useTranslation();
   if (posttype === "💼Professionnel Post") {
-    return <span style={{color: "#36C2CE"}}>💼Professionnel Post</span>;
+    return <span style={{color: "#36C2CE"}}>💼 { t ("Professionnel Post")}</span>;
   } else if (posttype === "⚽Sport Post") {
-    return <span style={{color: "#65B741"}}>⚽Sport Post</span>;
+    return <span style={{color: "#65B741"}}>⚽ { t ("Sport Post")}</span>;
   } else {
-    return <span style={{color: "#EF5A6F"}}>🤝Social Post</span>;
+    return <span style={{color: "#EF5A6F"}}>🤝 { t ("Social Post")}</span>;
   }
 };
  //

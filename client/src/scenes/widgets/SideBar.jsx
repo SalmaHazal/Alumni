@@ -14,6 +14,7 @@ import { useSocketContext } from "../../context/SocketContext";
 import { useTheme } from "@mui/material/styles";
 import { MdOutlineSpatialAudioOff } from "react-icons/md";
 import { FaFileAlt } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 
 const Sidebar = () => {
   const user = useSelector((state) => state?.user);
@@ -25,6 +26,7 @@ const Sidebar = () => {
 
   const { socket } = useSocketContext();
   const theme = useTheme();
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (socket) {
@@ -135,7 +137,7 @@ const Sidebar = () => {
             }`}
             onClick={() => setActiveTab("personal")}
           >
-            Personal Messages
+            { t ("Personal Messages")}
           </button>
           <button
             className={`py-1 px-3 rounded ${
@@ -145,7 +147,7 @@ const Sidebar = () => {
             }`}
             onClick={() => setActiveTab("community")}
           >
-            Community Messages
+            { t ("Community Messages")}
           </button>
         </div>
         <div
@@ -162,7 +164,7 @@ const Sidebar = () => {
                   <FiArrowUpLeft size={50} />
                 </div>
                 <p className="text-lg text-center text-slate-400">
-                  Explore users to start a conversation with.
+                  { t ("Explore users to start a conversation with.")}
                 </p>
               </div>
             ) : (
@@ -202,7 +204,7 @@ const Sidebar = () => {
                             >
                               <FaRegImage />
                             </span>
-                            {!conv?.lastMsg?.text && <span>Image</span>}
+                            {!conv?.lastMsg?.text && <span>{t ("Image")}</span>}
                           </div>
                         )}
                         {conv?.lastMsg?.videoUrl && (
@@ -212,7 +214,7 @@ const Sidebar = () => {
                             >
                               <FaVideo />
                             </span>
-                            {!conv?.lastMsg?.text && <span>Video</span>}
+                            {!conv?.lastMsg?.text && <span>{ t ("Video")}</span>}
                           </div>
                         )}
                         {conv?.lastMsg?.audio && (
@@ -222,7 +224,7 @@ const Sidebar = () => {
                             >
                               <MdOutlineSpatialAudioOff />
                             </span>
-                            {!conv?.lastMsg?.text && <span>Audio</span>}
+                            {!conv?.lastMsg?.text && <span>{ t ("Audio")}</span>}
                           </div>
                         )}
                         {conv?.lastMsg?.document && (
@@ -232,7 +234,7 @@ const Sidebar = () => {
                             >
                               <FaFileAlt />
                             </span>
-                            {!conv?.lastMsg?.text && <span>Document</span>}
+                            {!conv?.lastMsg?.text && <span>{ t ("Document")}</span>}
                           </div>
                         )}
                       </div>
@@ -286,7 +288,7 @@ const Sidebar = () => {
                           >
                             <FaRegImage />
                           </span>
-                          {!communityConv?.text && <span>Image</span>}
+                          {!communityConv?.text && <span>{ t ("Image")}</span>}
                         </div>
                       )}
                       {communityConv?.videoUrl && (
@@ -296,7 +298,7 @@ const Sidebar = () => {
                           >
                             <FaVideo />
                           </span>
-                          {!communityConv?.text && <span>Video</span>}
+                          {!communityConv?.text && <span>{ t ("Video")}</span>}
                         </div>
                       )}
                       {communityConv?.audio && (
@@ -306,7 +308,7 @@ const Sidebar = () => {
                           >
                             <MdOutlineSpatialAudioOff />
                           </span>
-                          {!communityConv?.text && <span>Audio</span>}
+                          {!communityConv?.text && <span>{ t ("Audio")}</span>}
                         </div>
                       )}
                       {communityConv?.document && (
@@ -316,7 +318,7 @@ const Sidebar = () => {
                           >
                             <FaFileAlt />
                           </span>
-                          {!communityConv?.text && <span>Document</span>}
+                          {!communityConv?.text && <span>{ t ("Document")}</span>}
                         </div>
                       )}
                       <p className="text-ellipsis line-clamp-1">

@@ -9,6 +9,7 @@ import { IoSchoolSharp } from "react-icons/io5";
 import SearchUser from "../widgets/Allfriend";
 import SearchPromoFriend from "../widgets/SearchPromoFriend";
 import {useState } from "react";
+import { useTranslation } from 'react-i18next';
 
 const FriendListWidget = ({ userId }) => {
   const dispatch = useDispatch();
@@ -17,7 +18,8 @@ const FriendListWidget = ({ userId }) => {
   const friends = useSelector((state) => state.user.friends);
   const [showSearchUser, setShowSearchUser] = useState(false);
   const [showSearchPromoFriend, setShowSearchPromoFriend] = useState(false);
- 
+  const { t } = useTranslation();
+
   const getFriends = async () => {
     const response = await fetch(
       `http://localhost:3001/users/${userId}/friends`,
@@ -42,19 +44,19 @@ const FriendListWidget = ({ userId }) => {
         fontWeight="500"
         sx={{ mb: "1.5rem", marginLeft:"110px" }}
       >
-        Friend List
+         { t ("Friend List")}
       </Typography>
       <Divider />
         <Box p="1rem 0" marginTop={"9px"} display="flex" alignItems="center" gap="1rem">
           <FaUserFriends  size={"25px"} color="#3ABEF9" />
           <Box >
-            <Typography fontWeight="500"> <button onClick={() => setShowSearchUser(true)}> All Friends</button> </Typography>
+            <Typography fontWeight="500"> <button onClick={() => setShowSearchUser(true)}>  { t ("All Friends")}</button> </Typography>
           </Box>
         </Box>
-                <Box p="1rem 0" marginTop={"9px"} display="flex" alignItems="center" gap="1rem">
+          <Box p="1rem 0" marginTop={"9px"} display="flex" alignItems="center" gap="1rem">
           <IoSchoolSharp size={"25px"} color="#EF5A6F" />
           <Box>
-            <Typography fontWeight="500"> <button onClick={() => setShowSearchPromoFriend(true)}> Promo Friends </button> </Typography>
+            <Typography fontWeight="500"> <button onClick={() => setShowSearchPromoFriend(true)}> { t ("Promo Friends")} </button> </Typography>
           </Box>
         </Box>
       {showSearchUser && <SearchUser onClose={() => setShowSearchUser(false)}/>}

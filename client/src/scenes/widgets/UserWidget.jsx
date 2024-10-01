@@ -31,6 +31,7 @@ import { FaLinkedinIn } from "react-icons/fa";
 import resume from "../../assets/cv.png";
 import portfolio from "../../assets/portfolio.png";
 import axios from "axios";
+import { useTranslation } from 'react-i18next';
 
 const UserWidget = ({ userId, picturePath }) => {
   const currentUser = useSelector((state) => state?.user);
@@ -50,6 +51,7 @@ const UserWidget = ({ userId, picturePath }) => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [linkedInlink, setLinkedInLink] = useState("");
   const [tempLink, setTempLink] = useState("");
+  const { t } = useTranslation();
 
   const handleClickOpen = (type) => {
     setDialogType(type);
@@ -161,7 +163,7 @@ const UserWidget = ({ userId, picturePath }) => {
             >
               {firstName} {lastName}
             </Typography>
-            <Typography color={medium}>{friends.length} friends</Typography>
+            <Typography color={medium}>{friends.length} { t ("friend")}</Typography>
           </Box>
         </FlexBetween>
         <IconButton onClick={() => setOpenEdit(true)}>
@@ -175,28 +177,28 @@ const UserWidget = ({ userId, picturePath }) => {
         <Box display="flex" alignItems="center" gap="1rem" mb="0.5rem">
           <LocationOnOutlined sx={{ color: "#3ABEF9", fontSize: "29px" }} />
           <Box>
-            <Typography fontWeight="500">Location</Typography>
+            <Typography fontWeight="500">{ t ("Location")}</Typography>
             <Typography color="textSecondary">{location}</Typography>
           </Box>
         </Box>
         <Box display="flex" alignItems="center" gap="1rem">
           <WorkOutlineOutlined sx={{ color: "#65B741", fontSize: "25px" }} />
           <Box>
-            <Typography fontWeight="500">Occupation</Typography>
+            <Typography fontWeight="500">{ t ("Occupation")}</Typography>
             <Typography color="textSecondary">{occupation}</Typography>
           </Box>
         </Box>
         <Box marginTop={"9px"} display="flex" alignItems="center" gap="1rem">
           <PiGraduationCapFill size={"28px"} color="#EF5A6F" />
           <Box>
-            <Typography fontWeight="500">Promotion</Typography>
+            <Typography fontWeight="500">{ t ("Promotion")}</Typography>
             <Typography color="textSecondary">{promotion}</Typography>
           </Box>
         </Box>
         <Box marginTop={"9px"} display="flex" alignItems="center" gap="1rem">
           <IoMailUnreadOutline size={"25px"} color="#de9f33" />
           <Box>
-            <Typography fontWeight="500">Email</Typography>
+            <Typography fontWeight="500">{ t ("Email")}</Typography>
             <Typography color="textSecondary">{email}</Typography>
           </Box>
         </Box>
@@ -207,7 +209,7 @@ const UserWidget = ({ userId, picturePath }) => {
       {/* THIRD ROW */}
       <Box p="1rem 0">
         <Typography fontSize="1rem" fontWeight="500" mb="0.5rem" mt="-15px">
-          Professional Summary
+        { t ("Professional Summary")}
         </Typography>
 
         {/* Resume */}
@@ -215,7 +217,7 @@ const UserWidget = ({ userId, picturePath }) => {
           <FlexBetween gap="1rem">
             <img width="29px" src={resume} alt="Resume Icon" />
             <Box>
-              <Typography fontWeight="500">Resume</Typography>
+              <Typography fontWeight="500">{ t ("Resume")}</Typography>
               <Typography color="textSecondary">
                 {resumeLink ? (
                   <a
@@ -224,7 +226,7 @@ const UserWidget = ({ userId, picturePath }) => {
                     rel="noopener noreferrer"
                     className="no-underline font-medium text-blue-600 dark:text-blue-500 hover:underline"
                   >
-                    Link to the resume
+                    { t ("Link to the resume")}
                   </a>
                 ) : (
                   "Link to the resume"
@@ -244,7 +246,7 @@ const UserWidget = ({ userId, picturePath }) => {
           <FlexBetween gap="1rem">
             <img width="29px" src={portfolio} alt="Portfolio Icon" />
             <Box>
-              <Typography fontWeight="500">Portfolio</Typography>
+              <Typography fontWeight="500">{ t ("Portfolio")}</Typography>
               <Typography marginBottom="15px" color="textSecondary">
                 {portfolioLink ? (
                   <a
@@ -253,7 +255,7 @@ const UserWidget = ({ userId, picturePath }) => {
                     rel="noopener noreferrer"
                     className="no-underline font-medium text-blue-600 dark:text-blue-500 hover:underline"
                   >
-                    Link to the portfolio
+                    { t ("Link to the portfolio")}
                   </a>
                 ) : (
                   "Link to the portfolio"
@@ -271,7 +273,7 @@ const UserWidget = ({ userId, picturePath }) => {
         <Divider />
 
         <Typography fontSize="1rem" fontWeight="500" mt="4px" mb="10px">
-          Social Profiles
+        { t ("Social Profiles")}
         </Typography>
 
         {/* Phone Number */}
@@ -279,7 +281,7 @@ const UserWidget = ({ userId, picturePath }) => {
           <FlexBetween gap="1rem">
             <FaWhatsapp color="#65B741" size={"25px"} />
             <Box>
-              <Typography fontWeight="500">Whatsapp Number</Typography>
+              <Typography fontWeight="500">{ t ("Whatsapp Number")}</Typography>
               <Typography color="textSecondary">
                 {phonenumber || "Add your phone number"}
               </Typography>
@@ -297,7 +299,7 @@ const UserWidget = ({ userId, picturePath }) => {
           <FlexBetween gap="1rem">
             <FaLinkedinIn color="#3ABEF9" size={"25px"} />
             <Box>
-              <Typography fontWeight="500">LinkedIn</Typography>
+              <Typography fontWeight="500">{ t ("LinkedIn")}</Typography>
               <Typography color="textSecondary">
                 {linkedInLink ? (
                   <a
@@ -306,7 +308,7 @@ const UserWidget = ({ userId, picturePath }) => {
                     rel="noopener noreferrer"
                     className="no-underline font-medium text-blue-600 dark:text-blue-500 hover:underline"
                   >
-                    Link to LinkedIn
+                    { t ("Link to LinkedIn")}
                   </a>
                 ) : (
                   "Link to LinkedIn"

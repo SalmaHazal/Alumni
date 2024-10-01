@@ -42,6 +42,8 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useTranslation } from 'react-i18next';
+
 
 
 const MyPostWidget = ({ picturePath }) => {
@@ -56,7 +58,7 @@ const MyPostWidget = ({ picturePath }) => {
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
   const mediumMain = palette.neutral.mediumMain;
   const medium = palette.neutral.medium;
-
+  const { t } = useTranslation();
   const [anchorEl, setAnchorEl] = useState(null);
   const handleMenuClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -99,7 +101,7 @@ const MyPostWidget = ({ picturePath }) => {
       <FlexBetween gap="1.5rem">
         <UserImage image={picturePath} />
         <InputBase
-          placeholder="What's on your mind..."
+          placeholder= { t ("What's on your mind...")}
           onChange={(e) => setPost(e.target.value)}
           value={post}
           sx={{
@@ -134,7 +136,7 @@ const MyPostWidget = ({ picturePath }) => {
                 >
                   <input {...getInputProps()} />
                   {!image ? (
-                    <p>Add Image Here</p>
+                    <p> { t ("Add Image Here")}</p>
                   ) : (
                     <FlexBetween>
                       <Typography>{image.name}</Typography>
@@ -163,19 +165,19 @@ const MyPostWidget = ({ picturePath }) => {
           <MenuButton onClick={handleMenuClick}>
             <FontAwesomeIcon
               icon={faBriefcase}
-              style={{ marginRight: "8px", color: "#3ABEF9" }}
+              style={{ marginRight: "8px", marginLeft: "8px" , color: "#3ABEF9" }}
             />
-            Professionnel
+            { t ("Professionnel")}
           </MenuButton>
 
           <Menu slots={{ listbox: AnimatedListbox }}>
             <MenuItem onClick={() => {setIsImage(!isImage); handleMenuItemClick('💼Professionnel Post')}}>
-              Offre de Stage & Emploi
+            { t ("Offre de Stage & Emploi")}
             </MenuItem>
-            <MenuItem onClick={() => {setIsImage(!isImage); handleMenuItemClick('💼Professionnel Post')}}>Événement</MenuItem>
+            <MenuItem onClick={() => {setIsImage(!isImage); handleMenuItemClick('💼Professionnel Post')}}>{ t ("Événement")}</MenuItem>
             <MenuItem onClick={() => {setIsImage(!isImage); handleMenuItemClick('💼Professionnel Post')}}>
               {" "}
-              Programmes & Formation
+              { t ("Programmes & Formation")}
             </MenuItem>
           </Menu>
         </Dropdown>
@@ -184,16 +186,16 @@ const MyPostWidget = ({ picturePath }) => {
           <MenuButton onClick={handleMenuClick}>
             <FontAwesomeIcon
               icon={faFutbol}
-              style={{ marginRight: "8px", color: "#65B741" }}
+              style={{ marginRight: "8px", marginLeft: "8px"  , color: "#65B741" }}
             />
-            Sport
+            { t ("Sport")}
           </MenuButton>
           <Menu slots={{ listbox: AnimatedListbox }}>
             <MenuItem onClick={() => {setIsImage(!isImage); handleMenuItemClick('⚽Sport Post')}}>
-              Organiser Un Match
+            { t ("Organiser Un Match")}
             </MenuItem>
-            <MenuItem onClick={() => {setIsImage(!isImage); handleMenuItemClick('⚽Sport Post')}}>Événement</MenuItem>
-            <MenuItem onClick={() => {setIsImage(!isImage); handleMenuItemClick('⚽Sport Post')}}>Olumpiades</MenuItem>
+            <MenuItem onClick={() => {setIsImage(!isImage); handleMenuItemClick('⚽Sport Post')}}>{ t ("Événement")}</MenuItem>
+            <MenuItem onClick={() => {setIsImage(!isImage); handleMenuItemClick('⚽Sport Post')}}>{ t ("Olumpiades")}</MenuItem>
           </Menu>
         </Dropdown>
 
@@ -201,14 +203,14 @@ const MyPostWidget = ({ picturePath }) => {
           <MenuButton onClick={handleMenuClick}>
             <FontAwesomeIcon
               icon={faHandsHelping}
-              style={{ marginRight: "8px", color: "#EF5A6F" }}
+              style={{ marginRight: "8px", marginLeft: "8px"  , color: "#EF5A6F" }}
             />
-            Social
+            { t ("Social")}
           </MenuButton>
           <Menu slots={{ listbox: AnimatedListbox }}>
-            <MenuItem onClick={() => {setIsImage(!isImage); handleMenuItemClick('🤝Social Post')}}>Donation</MenuItem>
-            <MenuItem onClick={() => {setIsImage(!isImage); handleMenuItemClick('🤝Social Post')}}>Événement</MenuItem>
-            <MenuItem onClick={() => {setIsImage(!isImage); handleMenuItemClick('🤝Social Post')}}>Aide</MenuItem>
+            <MenuItem onClick={() => {setIsImage(!isImage); handleMenuItemClick('🤝Social Post')}}>{ t ("Donation")}</MenuItem>
+            <MenuItem onClick={() => {setIsImage(!isImage); handleMenuItemClick('🤝Social Post')}}>{ t ("Événement")}</MenuItem>
+            <MenuItem onClick={() => {setIsImage(!isImage); handleMenuItemClick('🤝Social Post')}}>{ t ("Aide")}</MenuItem>
           </Menu>
         </Dropdown>
 
@@ -252,7 +254,7 @@ const MyPostWidget = ({ picturePath }) => {
             borderRadius: "3rem",
           }}
         >
-          POST
+          { t ("POST")}
         </Button>
       </FlexBetween>
     </WidgetWrapper>

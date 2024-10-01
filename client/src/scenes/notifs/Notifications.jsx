@@ -16,6 +16,7 @@ import WidgetWrapper from "../../components/WidgetWrapper";
 import { Link } from "react-router-dom";
 import Avatar from "../widgets/Avatar";
 import { useTheme } from "@mui/material/styles";
+import { useTranslation } from 'react-i18next';
 
 const Notifications = () => {
   const isNonMobileScreens = useMediaQuery("(min-width:1000px)");
@@ -50,6 +51,7 @@ const Notifications = () => {
       fetchNotifications();
     }
   }, [user?._id]);
+  const { t } = useTranslation();
 
   return (
     <Box>
@@ -82,7 +84,7 @@ const Notifications = () => {
               gutterBottom
               sx={{ marginBottom: "20px", textAlign: "center" }}
             >
-              Notifications
+              { t ("Notifications")}
             </Typography>
             <List sx={{ width: "100%", maxWidth: 600, marginLeft: "auto", marginRight: "auto" }}>
               {notifications.map((notification, index) => (

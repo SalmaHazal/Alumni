@@ -21,6 +21,7 @@ import { useTheme } from "@mui/material/styles";
 import { MdVideoCall } from "react-icons/md";
 import { IoDocumentAttach } from "react-icons/io5";
 import { AudioRecorder } from "react-audio-voice-recorder";
+import { useTranslation } from "react-i18next";
 import {
   FaFileWord,
   FaFileExcel,
@@ -242,7 +243,7 @@ const CommunityMessages = () => {
   };
 
   const isDarkMode = theme.palette.mode === "dark";
-
+  const { t } = useTranslation();
   return (
     <div style={{ ...style11 }} className="bg-no-repeat bg-cover">
       <header
@@ -263,7 +264,7 @@ const CommunityMessages = () => {
           </div>
           <div>
             <h6 className="font-semibold text-lg my-0 text-ellipsis line-clamp-1">
-              Cloud Community
+              { t ("Cloud Community") }
             </h6>
           </div>
         </div>
@@ -387,7 +388,7 @@ const CommunityMessages = () => {
                                 isDarkMode ? "text-white" : "text-black"
                               }`}
                             >
-                              Download
+                              { t ("Download")}
                             </a>
                           </button>
                         </div>
@@ -539,7 +540,7 @@ const CommunityMessages = () => {
                   <div className="text-slate-600">
                     <FaRegImage size={20} />
                   </div>
-                  <p className="pt-3">Image</p>
+                  <p className="pt-3">{ t ("Image")}</p>
                 </label>
                 <label
                   htmlFor="uploadVideo"
@@ -552,7 +553,7 @@ const CommunityMessages = () => {
                   <div className="text-slate-600">
                     <FaVideo size={20} />
                   </div>
-                  <p className="pt-3">Video</p>
+                  <p className="pt-3">{t ("Video")}</p>
                 </label>
                 <label
                   htmlFor="uploadDocument"
@@ -565,7 +566,7 @@ const CommunityMessages = () => {
                   <div className="text-slate-600">
                     <IoDocumentAttach size={20} />
                   </div>
-                  <p className="pt-3">Document</p>
+                  <p className="pt-3">{ t ("Document")}</p>
                 </label>
 
                 <input
@@ -601,7 +602,7 @@ const CommunityMessages = () => {
           <input
             style={{ backgroundColor: theme.palette.background.alt }}
             type="text"
-            placeholder="Type a message here..."
+            placeholder={ t ("Type a message here...")}
             className="py-1 px-4 outline-none w-full h-full"
             value={message.text}
             onChange={handleOnChange}

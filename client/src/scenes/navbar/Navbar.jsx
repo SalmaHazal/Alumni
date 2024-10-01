@@ -26,6 +26,7 @@ import { useTransition, animated } from "@react-spring/web";
 import Badge from "@mui/material/Badge";
 import axios from "axios";
 import { useUnseenMessages } from "../../context/UnseenMessagesContext";
+import { useTranslation } from 'react-i18next';
 
 const Navbar = () => {
   const [isMobileMenuToggled, setIsMobileMenuToggled] = useState(false);
@@ -137,7 +138,7 @@ const Navbar = () => {
     leave: { transform: "translateX(100%)" },
     config: { tension: 220, friction: 20 },
   });
-
+  const { t } = useTranslation();
   return (
     <FlexBetween
       padding="1rem 6%"
@@ -292,7 +293,7 @@ const Navbar = () => {
             padding="0.1rem 1.2rem"
           >
             <InputBase
-              placeholder="Search..."
+              placeholder={ t ("Search...")}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />

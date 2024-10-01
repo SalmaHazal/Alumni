@@ -30,6 +30,7 @@ import {
   FaFileAlt,
 } from "react-icons/fa";
 import { FaFilePdf } from "react-icons/fa6";
+import { useTranslation } from "react-i18next";
 
 const MessagePage = () => {
   const params = useParams();
@@ -53,6 +54,7 @@ const MessagePage = () => {
   const [loading, setLoading] = useState(false);
   const [allMessage, setAllMessage] = useState([]);
   const currentMessage = useRef(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (currentMessage.current) {
@@ -286,9 +288,9 @@ const MessagePage = () => {
             </h6>
             <p className="-my-1">
               {dataUser?.online ? (
-                <span className="text-[#648C6C]">online</span>
+                <span className="text-[#648C6C]">{ t ("online")}</span>
               ) : (
-                <span className="text-slate-400">offline</span>
+                <span className="text-slate-400">{ t ("offline")}</span>
               )}
             </p>
           </div>
@@ -401,7 +403,7 @@ const MessagePage = () => {
                               isDarkMode ? "text-white" : "text-black"
                             }`}
                           >
-                            Download
+                            { t ("Download")}
                           </a>
                         </button>
                       </div>
@@ -550,7 +552,7 @@ const MessagePage = () => {
                   <div className="text-slate-600">
                     <FaRegImage size={20} />
                   </div>
-                  <p className="pt-3">Image</p>
+                  <p className="pt-3">{ t ("Image")}</p>
                 </label>
                 <label
                   htmlFor="uploadVideo"
@@ -563,7 +565,7 @@ const MessagePage = () => {
                   <div className="text-slate-600">
                     <FaVideo size={20} />
                   </div>
-                  <p className="pt-3">Video</p>
+                  <p className="pt-3">{ t ("Video")}</p>
                 </label>
                 <label
                   htmlFor="uploadDocument"
@@ -576,7 +578,7 @@ const MessagePage = () => {
                   <div className="text-slate-600">
                     <IoDocumentAttach size={20} />
                   </div>
-                  <p className="pt-3">Document</p>
+                  <p className="pt-3">{ t ("Document")}</p>
                 </label>
 
                 <input

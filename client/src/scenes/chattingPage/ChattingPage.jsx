@@ -3,6 +3,7 @@ import Navbar from "../navbar/Navbar";
 import { Outlet, useLocation} from "react-router-dom";
 import SideBar from "../widgets/SideBar";
 import { FiUsers } from "react-icons/fi";
+import { useTranslation } from "react-i18next";
 
 const ChattingPage = () => {
   const location = useLocation();
@@ -12,6 +13,7 @@ const ChattingPage = () => {
   const token = JSON.parse(persistRootObject.token);
 
   const basePath = location.pathname === "/chat";
+  const { t } = useTranslation();
   return (
     <>
       <Navbar />
@@ -34,7 +36,7 @@ const ChattingPage = () => {
             <FiUsers size={90} color="#718096" />
           </div>
           <p className="text-lg mt-2 text-slate-500">
-            Select user to send message
+            { t ("Select user to send message")}
           </p>
         </div>
       </div>
