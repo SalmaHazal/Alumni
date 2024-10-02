@@ -254,12 +254,25 @@ const Navbar = () => {
                 </Badge>
               </ListItem>
 
-              <ListItem title="Jobs" button>
+              <ListItem
+                button
+                component={Link}
+                to="/post-jobs"
+                sx={{
+                  borderRadius: "10px",
+                  background:
+                    location.pathname === "/post-jobs"
+                      ? backgroundColor
+                      : "transparent",
+                }}
+              >
                 <WorkHistoryIcon
                   sx={{ fontSize: "25px" }}
                   style={{ margin: "0 17px" }}
                 />
               </ListItem>
+
+
               <ListItem title="Reviews" button>
                 <RateReview
                   sx={{ fontSize: "25px" }}
@@ -400,12 +413,23 @@ const Navbar = () => {
                   </Badge>
                 </ListItem>
 
-                <ListItem button>
-                  <WorkHistoryIcon
-                    sx={{ fontSize: "25px" }}
-                    style={{ margin: "0 17px" }}
-                  />
-                </ListItem>
+                <ListItem
+                button
+                component={Link}
+                to="/post-jobs"
+                sx={{
+                  borderRadius: "10px",
+                  background:
+                    location.pathname === "/post-jobs"
+                      ? backgroundColor
+                      : "transparent",
+                }}
+              >
+                <WorkHistoryIcon
+                  sx={{ fontSize: "25px" }}
+                  style={{ margin: "0 17px" }}
+                />
+              </ListItem>
                 <ListItem title="Jobs" button>
                   <RateReview
                     sx={{ fontSize: "25px" }}

@@ -26,6 +26,8 @@ import Feedbackpage from "./scenes/Feedbackpage/Feddbackpage";
 import Passwordpage from "./scenes/Passwordpage/Passwordpage";
 import "bootstrap/dist/css/bootstrap.min.css";
 import './App.css';
+import JobList from "./scenes/jobs/JobList";
+import JobPostForm from "./scenes/jobs/JobPostForm";
 
 function App() {
   const mode = useSelector((state) => state.mode);
@@ -67,6 +69,16 @@ function App() {
       path: "/reset_password/:id/:token",
       element: <ResetPassword />,
     },
+
+    {
+      path: "/post-jobs",
+      element: isAuth ? <JobList /> : <Navigate to="/" />,
+    },
+    {
+      path: "/job-form",
+      element: isAuth ? <JobPostForm /> : <Navigate to="/" />,
+    },
+
     {
       path: "/chat",
       element: <ChattingPage />,
