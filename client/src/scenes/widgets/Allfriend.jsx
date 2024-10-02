@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FaSearch } from "react-icons/fa";
 import Loading from "./Loading";
-import UserSearchCard from "./SearchPromoCard";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
@@ -10,10 +8,9 @@ import { useTheme } from "@mui/material/styles";
 import Friend from "../../components/Friend";
 import { setFriends } from "../../state/index";
 import { useDispatch, useSelector } from "react-redux";
-import Box from "@mui/material/Box";
+import { Dialog } from "@mui/material";
 
-
-const SearchUser = ({ onClose, userId }) => {
+const SearchUser = ({ onClose, userId, open }) => {
   const dispatch = useDispatch();
   const theme = useTheme();
   const token = useSelector((state) => state.token);
@@ -21,7 +18,6 @@ const SearchUser = ({ onClose, userId }) => {
   const [searchPromo, setSearchPromo] = useState([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
- console
   const getFriends = async () => {
     const response = await fetch(
       `http://localhost:3001/users/${userId}/friends`,
@@ -34,7 +30,6 @@ const SearchUser = ({ onClose, userId }) => {
     if (Array.isArray(data)) {
       dispatch(setFriends({ friends: data }));
     } else {
-
       dispatch(setFriends({ friends: [] })); // Set to an empty array if not an array
     }
   };
@@ -68,17 +63,13 @@ const SearchUser = ({ onClose, userId }) => {
     }
   }, [search]);
 
-
   return (
-    <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
-      <div
-        style={{ border: "2px solid #3ABEF9" }}
-        className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden w-full max-w-lg relative"
-      >
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
+      <div>
         <button
           className="absolute top-3 right-3 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
           onClick={onClose}
-          style={{marginTop:"-10px"}}
+          style={{ marginTop: "-10px" }}
         >
           <IoClose size={24} />
         </button>
@@ -101,13 +92,17 @@ const SearchUser = ({ onClose, userId }) => {
 
           {!loading && Array.isArray(friends) && friends.length > 0 ? (
             friends.map((friend) => (
-              <Friend
+              <div
                 key={friend._id}
-                friendId={friend._id}
-                name={`${friend.firstName} ${friend.lastName}`}
-                subtitle={friend.occupation}
-                userPicturePath={friend.picturePath}
-              />
+                className="friend-card border border-gray-300 rounded-lg p-2 mb-2 hover:bg-gray-100 hover:shadow-lg transition-all duration-200"
+              >
+                <Friend
+                  friendId={friend._id}
+                  name={`${friend.firstName} ${friend.lastName}`}
+                  subtitle={friend.occupation}
+                  userPicturePath={friend.picturePath}
+                />
+              </div>
             ))
           ) : (
             <p className="text-center text-gray-500 dark:text-gray-400">
@@ -116,7 +111,7 @@ const SearchUser = ({ onClose, userId }) => {
           )}
         </div>
       </div>
-    </div>
+    </Dialog>
   );
 };
 

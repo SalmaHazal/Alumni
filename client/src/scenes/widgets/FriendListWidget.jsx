@@ -59,8 +59,8 @@ const FriendListWidget = ({ userId }) => {
             <Typography fontWeight="500"> <button onClick={() => setShowSearchPromoFriend(true)}> { t ("Promo Friends")} </button> </Typography>
           </Box>
         </Box>
-      {showSearchUser && <SearchUser onClose={() => setShowSearchUser(false)}/>}
-      {showSearchPromoFriend && <SearchPromoFriend onClose={() => setShowSearchPromoFriend(false)}/>}
+      {showSearchUser && <SearchUser onClose={() => setShowSearchUser(false)} open={() => setShowSearchUser(true)}/>}
+      {showSearchPromoFriend && <SearchPromoFriend onClose={() => setShowSearchPromoFriend(false)} open={() => setShowSearchPromoFriend(true)}/>}
     </WidgetWrapper>
   );
 };

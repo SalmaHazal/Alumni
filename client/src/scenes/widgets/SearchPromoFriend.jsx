@@ -5,8 +5,9 @@ import UserSearchCard from "./UserSearchCard";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
-import { IoClose } from "react-icons/io5";
+import { IoIosCloseCircle } from "react-icons/io";
 import { useTheme } from "@mui/material/styles";
+import { Dialog } from "@mui/material";
 
 const SearchPromoFriend = ({ onClose }) => {
   const [searchUser, setSearchUser] = useState([]);
@@ -36,39 +37,39 @@ const SearchPromoFriend = ({ onClose }) => {
   }, [search]);
 
   return (
-    <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
-      <div style={{ border: "2px solid #EF5A6F" }} className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden w-full max-w-lg relative">
-        {/** Close button */}
-        <button
-          className="absolute top-3 right-3 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
-          onClick={onClose}
-        >
-          <IoClose size={24} />
-        </button>
-
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
+      <div>
         {/** Input search user */}
+
         <div
-          style={{ backgroundColor: theme.palette.background.paper }}
-          className="flex items-center border-b border-gray-300 dark:border-gray-700 p-2"
+          style={{ backgroundColor: theme.palette.sidebar.background }}
+          className=" rounded h-14 overflow-hidden flex border"
         >
           <input
-            style={{ backgroundColor: theme.palette.background.paper }}
+            style={{ backgroundColor: theme.palette.sidebar.background }}
             type="text"
-            placeholder="Search Friend by Promo..."
-            className=" py-1   w-full p-2 rounded-lg border  outline-none  "
+            placeholder="Search user by name, email...."
+            className="w-full outline-none py-1 h-full px-4"
             onChange={(e) => setSearch(e.target.value)}
             value={search}
           />
-          <div className="ml-3 text-gray-500 mr-12">
-            <FaSearch size={20} color="#EF5A6F" />
+          <div className="h-14 w-14 flex justify-center items-center">
+            <FaSearch size={25} />
           </div>
+          <button
+            className="hover:text-gray-500 dark:text-gray-400 dark:hover:text-gray-100 p-2"
+            onClick={onClose}
+          >
+            <IoIosCloseCircle size={28} />
+          </button>
         </div>
 
         {/** Display search user */}
         <div
-          style={{ backgroundColor: theme.palette.background.default }}
-          className="p-4 max-h-96 overflow-auto custom-scrollbar"
-        >{searchUser.length === 0 && !loading && (
+          style={{ backgroundColor: theme.palette.sidebar.background }}
+          className="mt-2 w-full p-4 rounded h-full max-h-[70vh] overflow-auto text-slate-400 scrollbar"
+        >
+          {searchUser.length === 0 && !loading && (
             <p className="text-center text-slate-500">no user found!</p>
           )}
 
@@ -87,7 +88,7 @@ const SearchPromoFriend = ({ onClose }) => {
             })}
         </div>
       </div>
-    </div>
+    </Dialog>
   );
 };
 
