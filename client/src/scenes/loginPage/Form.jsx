@@ -199,7 +199,7 @@ const Form = () => {
             {isRegister && (
               <>
                 <TextField
-                  label="First Name"
+                  label="First Name*"
                   title="Example : Ahmed"
                   onBlur={handleBlur}
                   onChange={handleChange}
@@ -212,7 +212,7 @@ const Form = () => {
                   sx={{ gridColumn: "span 2" }}
                 />
                 <TextField
-                  label="Last Name"
+                  label="Last Name*"
                   title="Example : EL IDRISSI"
                   onBlur={handleBlur}
                   onChange={handleChange}
@@ -228,7 +228,7 @@ const Form = () => {
                   sx={{ gridColumn: "span 4" }}
                   fullWidth
                 >
-                  <InputLabel id="promotion-label">Promotion</InputLabel>
+                  <InputLabel id="promotion-label">Promotion*</InputLabel>
                   <Select
                     labelId="promotion"
                     title="Select a field"
@@ -254,7 +254,7 @@ const Form = () => {
                   sx={{ gridColumn: "span 4" }}
                   fullWidth
                 >
-                  <InputLabel id="location-label">Location</InputLabel>
+                  <InputLabel id="location-label">Location*</InputLabel>
                   <Select
                     labelId="location-label"
                     title="Select a field"
@@ -279,7 +279,7 @@ const Form = () => {
                   )}
                 </FormControl>
                 <TextField
-                  label="Occupation"
+                  label="Occupation*"
                   title="Example : Engineer"
                   onBlur={handleBlur}
                   onChange={handleChange}
@@ -292,7 +292,7 @@ const Form = () => {
                   sx={{ gridColumn: "span 4" }}
                 />
                 <TextField
-                  label="Phone Number"
+                  label="Phone Number*"
                   title="Example : 0666666666"
                   onBlur={handleBlur}
                   onChange={handleChange}
@@ -360,7 +360,7 @@ const Form = () => {
             )}
 
             <TextField
-              label="Email"
+              label="Email*"
               title="Example : John@gmail.com"
               onBlur={handleBlur}
               onChange={handleChange}
@@ -371,7 +371,7 @@ const Form = () => {
               sx={{ gridColumn: "span 4" }}
             />
             <TextField
-              label="Password"
+              label="Password*"
               title="Example : 1234A567B8"
               type="password"
               onBlur={handleBlur}
@@ -385,7 +385,7 @@ const Form = () => {
 
             {isRegister && (
               <TextField
-                label="Confirm Password"
+                label="Confirm Password*"
                 title="Re-enter your password"
                 type="password"
                 onBlur={handleBlur}

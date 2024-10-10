@@ -31,6 +31,9 @@ import {
 } from "react-icons/fa";
 import { FaFilePdf } from "react-icons/fa6";
 import { useTranslation } from "react-i18next";
+import { MdDelete } from "react-icons/md";
+import { LuMailSearch } from "react-icons/lu";
+import { IoMdSettings } from "react-icons/io";
 
 const MessagePage = () => {
   const params = useParams();
@@ -55,6 +58,11 @@ const MessagePage = () => {
   const [allMessage, setAllMessage] = useState([]);
   const currentMessage = useRef(null);
   const { t } = useTranslation();
+  const [showPopup, setShowPopup] = useState(false);
+
+  const togglePopup = () => {
+    setShowPopup(!showPopup);
+  };
 
   useEffect(() => {
     if (currentMessage.current) {
@@ -166,7 +174,7 @@ const MessagePage = () => {
 
   const handleSendMessage = (e) => {
     e.preventDefault();
-  
+
     const messageData = {
       sender: user?._id,
       receiver: params.userId,
@@ -174,13 +182,13 @@ const MessagePage = () => {
       imageUrl: message.imageUrl,
       videoUrl: message.videoUrl,
       audio: audio,
-      document: null, 
+      document: null,
       msgByUserId: user?._id,
     };
-  
+
     if (message.document) {
       const reader = new FileReader();
-      
+
       reader.onloadend = () => {
         const fileBuffer = new Uint8Array(reader.result);
         messageData.document = {
@@ -188,7 +196,7 @@ const MessagePage = () => {
           contentType: message.document.type,
           filename: message.document.name,
         };
-  
+
         if (socket) {
           socket.emit("new message", messageData);
           setMessage({
@@ -199,7 +207,7 @@ const MessagePage = () => {
           });
         }
       };
-  
+
       reader.readAsArrayBuffer(message.document);
     } else {
       if (socket) {
@@ -213,7 +221,6 @@ const MessagePage = () => {
       }
     }
   };
-  
 
   const addAudioElement = async (blob) => {
     setAudio(blob);
@@ -288,9 +295,9 @@ const MessagePage = () => {
             </h6>
             <p className="-my-1">
               {dataUser?.online ? (
-                <span className="text-[#648C6C]">{ t ("online")}</span>
+                <span className="text-[#648C6C]">{t("online")}</span>
               ) : (
-                <span className="text-slate-400">{ t ("offline")}</span>
+                <span className="text-slate-400">{t("offline")}</span>
               )}
             </p>
           </div>
@@ -307,7 +314,10 @@ const MessagePage = () => {
               size={28}
             />
           </a>
-          <button className="cursor-pointer hover:text-slate-500">
+          <button
+            onClick={togglePopup}
+            className="cursor-pointer hover:text-slate-500"
+          >
             <HiDotsVertical size={20} />
           </button>
         </div>
@@ -403,7 +413,7 @@ const MessagePage = () => {
                               isDarkMode ? "text-white" : "text-black"
                             }`}
                           >
-                            { t ("Download")}
+                            {t("Download")}
                           </a>
                         </button>
                       </div>
@@ -552,7 +562,7 @@ const MessagePage = () => {
                   <div className="text-slate-600">
                     <FaRegImage size={20} />
                   </div>
-                  <p className="pt-3">{ t ("Image")}</p>
+                  <p className="pt-3">{t("Image")}</p>
                 </label>
                 <label
                   htmlFor="uploadVideo"
@@ -565,7 +575,7 @@ const MessagePage = () => {
                   <div className="text-slate-600">
                     <FaVideo size={20} />
                   </div>
-                  <p className="pt-3">{ t ("Video")}</p>
+                  <p className="pt-3">{t("Video")}</p>
                 </label>
                 <label
                   htmlFor="uploadDocument"
@@ -578,7 +588,7 @@ const MessagePage = () => {
                   <div className="text-slate-600">
                     <IoDocumentAttach size={20} />
                   </div>
-                  <p className="pt-3">{ t ("Document")}</p>
+                  <p className="pt-3">{t("Document")}</p>
                 </label>
 
                 <input
@@ -645,6 +655,49 @@ const MessagePage = () => {
           )}
         </form>
       </section>
+      {showPopup && (
+        <div
+          style={{ backgroundColor: theme.palette.background.alt }}
+          className="shadow rounded absolute right-0 top-[135px]  p-2"
+        >
+          <button
+            className={`flex items-center  px-3 gap-3 rounded cursor-pointer ${
+              theme.palette.mode === "light"
+                ? "hover:bg-slate-100"
+                : "hover:bg-[#3b3b3b]"
+            }`}
+          >
+            <div className="text-slate-600">
+              <LuMailSearch size={20} />
+            </div>
+            <p className="pt-3 w-19">Find</p>
+          </button>
+          <button
+            className={`flex items-center  px-3 gap-3 rounded cursor-pointer ${
+              theme.palette.mode === "light"
+                ? "hover:bg-slate-100"
+                : "hover:bg-[#3b3b3b]"
+            }`}
+          >
+            <div className="text-slate-600">
+              <MdDelete size={23} />
+            </div>
+            <p className="pt-3 w-18">Delete</p>
+          </button>
+          <button
+            className={`flex items-center  px-3 gap-3 rounded cursor-pointer ${
+              theme.palette.mode === "light"
+                ? "hover:bg-slate-100"
+                : "hover:bg-[#3b3b3b]"
+            }`}
+          >
+            <div className="text-slate-600">
+              <IoMdSettings size={20} />
+            </div>
+            <p className="pt-3 w-15">Settings</p>
+          </button>
+        </div>
+      )}
     </div>
   );
 };

@@ -1,7 +1,7 @@
 import { Box, Typography, useTheme, useMediaQuery } from "@mui/material";
 import Form from "./Form";
 import Logoalumni from "/public/assets/logoalumni.png";
-import alumnidark2 from "/public/assets/alumnidark2.jpg"
+import alumnidark2 from "/public/assets/alumnidark2.jpg";
 
 const LoginPage = () => {
   const theme = useTheme();
@@ -15,10 +15,11 @@ const LoginPage = () => {
         textAlign="center"
         className="flex justify-center"
       >
-        <Typography >
-          <img src={(theme.palette.mode === "dark"? alumnidark2: Logoalumni)} 
-          style={{borderRadius: "7px", height:"70px", marginLeft:"-32px"}}
-           alt="Alumni Logo"
+        <Typography>
+          <img
+            src={theme.palette.mode === "dark" ? alumnidark2 : Logoalumni}
+            style={{ borderRadius: "7px", height: "70px", marginLeft: "-32px" }}
+            alt="Alumni Logo"
           />
         </Typography>
       </Box>
@@ -30,8 +31,28 @@ const LoginPage = () => {
         borderRadius="1.5rem"
         backgroundColor={theme.palette.background.alt}
       >
-        <Typography fontSize="25px" fontWeight="500" variant="h5" sx={{ mb: "1.5rem" }}>
-          Welcome to <Typography fontSize="25px" fontWeight="500" component="span" sx={{ color: 'primary.main', mb: "1.5rem" }}>Alumni SUD</Typography> 
+        <Typography
+          fontSize="25px"
+          fontWeight="500"
+          variant="h5"
+          sx={{ mb: "1.5rem" }}
+        >
+          Welcome to{" "}
+          <Typography
+            fontSize="25px"
+            fontWeight="500"
+            component="span"
+            sx={{ color: "primary.main", mb: "1.5rem" }}
+          >
+            Alumni SUD
+          </Typography>
+        </Typography>
+        <Typography
+          fontSize="12px"
+          variant="h5"
+          sx={{ mb: "1.5rem" }}
+        >
+          Les champs marqués d'un * sont obligatoires
         </Typography>
         <Form />
       </Box>

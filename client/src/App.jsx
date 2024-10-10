@@ -28,6 +28,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import './App.css';
 import JobList from "./scenes/jobs/JobList";
 import JobPostForm from "./scenes/jobs/JobPostForm";
+import Services from "./scenes/widgets/Services";
 
 function App() {
   const mode = useSelector((state) => state.mode);
@@ -132,6 +133,10 @@ function App() {
     {
       path: "/Passwordpage",
       element: <Passwordpage />,
+    },
+    {
+      path: "/Services",
+      element: <Services />,
     },
   ]);
 

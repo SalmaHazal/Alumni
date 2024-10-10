@@ -18,6 +18,7 @@ import commentRoutes from "./routes/comments.js";
 import searchRoutes from "./routes/search.js";
 import updateLinks from "./routes/updateLinks.js";
 import notificationRoutes from "./routes/notification.js";
+import serviceRoutes from "./routes/service.js";
 import jobPostRoutes from "./routes/jobPostRoutes.js";
 import { register } from "./controllers/auth.js";
 import { createPost } from "./controllers/posts.js";
@@ -153,6 +154,7 @@ app.use("/search", searchRoutes);
 app.use("/api", updateLinks);
 app.use("/notifications", notificationRoutes);
 app.use("/api", jobPostRoutes);
+app.use("/services", serviceRoutes);
 
 /* MONGOOSE SETUP */
 const PORT = process.env.PORT || 6001;
@@ -165,7 +167,6 @@ const connectDB = async () => {
   }
 };
 
-// Listening to the requests
 server.listen(PORT, () => {
   connectDB();
   console.log("Server is running on port " + PORT);

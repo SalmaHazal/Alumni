@@ -29,6 +29,9 @@ import {
   FaFileAlt,
 } from "react-icons/fa";
 import { FaFilePdf } from "react-icons/fa6";
+import { MdDelete } from "react-icons/md";
+import { LuMailSearch } from "react-icons/lu";
+import { IoMdSettings } from "react-icons/io";
 
 const CommunityMessages = () => {
   const user = useSelector((state) => state?.user);
@@ -44,6 +47,11 @@ const CommunityMessages = () => {
   const [loading, setLoading] = useState(false);
   const [allMessage, setAllMessage] = useState([]);
   const currentMessage = useRef(null);
+  const [showPopup, setShowPopup] = useState(false);
+
+  const togglePopup = () => {
+    setShowPopup(!showPopup);
+  };
 
   useEffect(() => {
     if (currentMessage.current) {
@@ -150,7 +158,7 @@ const CommunityMessages = () => {
 
   const handleSendMessage = (e) => {
     e.preventDefault();
-  
+
     const messageData = {
       sender: user?._id,
       text: message.text,
@@ -160,10 +168,10 @@ const CommunityMessages = () => {
       document: null, // Default to null
       msgByUserId: user?._id,
     };
-  
+
     if (message.document) {
       const reader = new FileReader();
-      
+
       reader.onloadend = () => {
         const fileBuffer = new Uint8Array(reader.result);
         messageData.document = {
@@ -171,7 +179,7 @@ const CommunityMessages = () => {
           contentType: message.document.type,
           filename: message.document.name,
         };
-  
+
         if (socket) {
           socket.emit("new community message", messageData);
           setMessage({
@@ -182,7 +190,7 @@ const CommunityMessages = () => {
           });
         }
       };
-  
+
       reader.readAsArrayBuffer(message.document);
     } else {
       if (socket) {
@@ -196,7 +204,6 @@ const CommunityMessages = () => {
       }
     }
   };
-  
 
   const addAudioElement = async (blob) => {
     setAudio(blob);
@@ -264,7 +271,7 @@ const CommunityMessages = () => {
           </div>
           <div>
             <h6 className="font-semibold text-lg my-0 text-ellipsis line-clamp-1">
-              { t ("Cloud Community") }
+              {t("Cloud Community")}
             </h6>
           </div>
         </div>
@@ -280,7 +287,10 @@ const CommunityMessages = () => {
               size={28}
             />
           </a>
-          <button className="cursor-pointer hover:text-slate-500">
+          <button
+            onClick={togglePopup}
+            className="cursor-pointer hover:text-slate-500"
+          >
             <HiDotsVertical size={20} />
           </button>
         </div>
@@ -388,7 +398,7 @@ const CommunityMessages = () => {
                                 isDarkMode ? "text-white" : "text-black"
                               }`}
                             >
-                              { t ("Download")}
+                              {t("Download")}
                             </a>
                           </button>
                         </div>
@@ -540,7 +550,7 @@ const CommunityMessages = () => {
                   <div className="text-slate-600">
                     <FaRegImage size={20} />
                   </div>
-                  <p className="pt-3">{ t ("Image")}</p>
+                  <p className="pt-3">{t("Image")}</p>
                 </label>
                 <label
                   htmlFor="uploadVideo"
@@ -553,7 +563,7 @@ const CommunityMessages = () => {
                   <div className="text-slate-600">
                     <FaVideo size={20} />
                   </div>
-                  <p className="pt-3">{t ("Video")}</p>
+                  <p className="pt-3">{t("Video")}</p>
                 </label>
                 <label
                   htmlFor="uploadDocument"
@@ -566,7 +576,7 @@ const CommunityMessages = () => {
                   <div className="text-slate-600">
                     <IoDocumentAttach size={20} />
                   </div>
-                  <p className="pt-3">{ t ("Document")}</p>
+                  <p className="pt-3">{t("Document")}</p>
                 </label>
 
                 <input
@@ -602,7 +612,7 @@ const CommunityMessages = () => {
           <input
             style={{ backgroundColor: theme.palette.background.alt }}
             type="text"
-            placeholder={ t ("Type a message here...")}
+            placeholder={t("Type a message here...")}
             className="py-1 px-4 outline-none w-full h-full"
             value={message.text}
             onChange={handleOnChange}
@@ -633,6 +643,49 @@ const CommunityMessages = () => {
           )}
         </form>
       </section>
+      {showPopup && (
+        <div
+          style={{ backgroundColor: theme.palette.background.alt }}
+          className="shadow rounded absolute right-0 top-[135px]  p-2"
+        >
+          <button
+            className={`flex items-center  px-3 gap-3 rounded cursor-pointer ${
+              theme.palette.mode === "light"
+                ? "hover:bg-slate-100"
+                : "hover:bg-[#3b3b3b]"
+            }`}
+          >
+            <div className="text-slate-600">
+              <LuMailSearch size={20} />
+            </div>
+            <p className="pt-3 w-19">Find</p>
+          </button>
+          <button
+            className={`flex items-center  px-3 gap-3 rounded cursor-pointer ${
+              theme.palette.mode === "light"
+                ? "hover:bg-slate-100"
+                : "hover:bg-[#3b3b3b]"
+            }`}
+          >
+            <div className="text-slate-600">
+              <MdDelete size={23} />
+            </div>
+            <p className="pt-3 w-18">Delete</p>
+          </button>
+          <button
+            className={`flex items-center  px-3 gap-3 rounded cursor-pointer ${
+              theme.palette.mode === "light"
+                ? "hover:bg-slate-100"
+                : "hover:bg-[#3b3b3b]"
+            }`}
+          >
+            <div className="text-slate-600">
+              <IoMdSettings size={20} />
+            </div>
+            <p className="pt-3 w-15">Settings</p>
+          </button>
+        </div>
+      )}
     </div>
   );
 };
