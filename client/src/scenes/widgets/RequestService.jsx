@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const RequestService = () => {
   const [services, setServices] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchServices = async () => {
@@ -33,10 +35,24 @@ const RequestService = () => {
               <p>{service.description}</p>
               <p className="font-bold mt-2">Price: {service.price}</p>
               <p className="text-sm text-gray-500">
-                Offered by: {`${service.provider.firstName} ${service.provider.lastName}`}
+                Offered by:{" "}
+                {`${service.provider.firstName} ${service.provider.lastName}`}
               </p>
-              <button className="mt-4 bg-blue-500 text-white py-2 px-4 rounded">
+              <button
+                onClick={() => {
+                  navigate(`/chat/${service.provider._id}`);
+                }}
+                className="mt-4 bg-blue-500 text-white py-2 px-4 rounded"
+              >
                 Request Service
+              </button>
+              <button
+                onClick={() => {
+                  navigate(`/profile/${service.provider._id}`);
+                }}
+                className="ml-2 mt-4 bg-blue-500 text-white py-2 px-4 rounded"
+              >
+                Provider's Profile
               </button>
             </div>
           ))}
