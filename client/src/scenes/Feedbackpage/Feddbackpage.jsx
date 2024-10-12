@@ -14,6 +14,7 @@ import { FcPrivacy } from "react-icons/fc";
 import { MdArrowForward } from "react-icons/md"; // Icon for the arrow on the right
 import { TfiHelpAlt } from "react-icons/tfi";
 import { BiError } from "react-icons/bi";
+import { useNavigate } from "react-router-dom";
 
 
 
@@ -24,6 +25,7 @@ const Feedbackpage= () => {
   const theme = useTheme();
   const dispatch = useDispatch();
   const language = i18n.language;  // Get the current language
+  const navigate = useNavigate();
 
   return (
     <>
@@ -67,9 +69,9 @@ const Feedbackpage= () => {
           marginTop: "40px", // Contrôle de l'espace en haut
         }}
       >
-           <Button
+      <Button
           onClick={() => {
-          navigate('/Privacypage');
+          navigate('/Helptoimprove');
         }}
       sx={{
         boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
@@ -91,10 +93,8 @@ const Feedbackpage= () => {
         },
       }}
     >
-     <TfiHelpAlt  style={{ width: "40px", height: "40px", marginRight: "1rem" }}/> 
-     
+     <TfiHelpAlt  style={{ width: "40px", height: "40px", marginRight: "1rem", color:"#6EC207"}}/> 
       <Box sx={{ flexGrow: 1 }}>
-      
         <Typography
           variant="h6" // Adjust font size and weight
           color={palette.text.secondary}
@@ -110,8 +110,6 @@ const Feedbackpage= () => {
           { t ("Give feedback about your Alumni experience")}
         </Typography>
       </Box>
-
-
       <MdArrowForward style={{ width: "24px", height: "24px", color: palette.text.secondary }} />
     </Button>
       </Box>
@@ -125,7 +123,7 @@ const Feedbackpage= () => {
       >
            <Button
           onClick={() => {
-          navigate('/Privacypage');
+          navigate('/HelpSomeThingWrong');
         }}
       sx={{
         boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
@@ -148,7 +146,7 @@ const Feedbackpage= () => {
       }}
     >
     
-      <BiError  style={{ width: "40px", height: "40px", marginRight: "1rem" }} />
+      <BiError  style={{ width: "40px", height: "40px", marginRight: "1rem", color:"#FF6600" }} />
 
 
       <Box sx={{ flexGrow: 1 }}>

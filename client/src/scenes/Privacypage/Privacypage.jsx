@@ -93,7 +93,7 @@ const Privacypage = () => {
         },
       }}
     >
-     <RiLockPasswordFill style={{ width: "40px", height: "40px", marginRight: "1rem" }}/> 
+     <RiLockPasswordFill style={{ width: "40px", height: "40px", marginRight: "1rem", color:"#F3C623" }}/> 
      
       <Box sx={{ flexGrow: 1 }} >
       
@@ -127,7 +127,7 @@ const Privacypage = () => {
       >
            <Button
           onClick={() => {
-          navigate('/Privacypage');
+          navigate('/Persenaldetailspage');
         }}
       sx={{
         boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
@@ -150,7 +150,7 @@ const Privacypage = () => {
       }}
     >
     
-      <CiViewList  style={{ width: "40px", height: "40px", marginRight: "1rem" }} />
+      <CiViewList  style={{ width: "40px", height: "40px", marginRight: "1rem", color:"#73EC8B" }} />
 
 
       <Box sx={{ flexGrow: 1 }}>

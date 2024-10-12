@@ -17,7 +17,7 @@ import { BiError } from "react-icons/bi";
 import { TbHistoryToggle } from "react-icons/tb";
 import { FaPhone } from "react-icons/fa6";
 import { MdOutlineContactPhone } from "react-icons/md";
-
+import { useNavigate } from "react-router-dom";
 
 
 const Helppage = () => {
@@ -26,6 +26,7 @@ const Helppage = () => {
   const { t, i18n } = useTranslation();
   const theme = useTheme();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const language = i18n.language;  // Get the current language
 
   return (
@@ -94,7 +95,7 @@ const Helppage = () => {
         },
       }}
     >
-     <TbHistoryToggle  style={{ width: "40px", height: "40px", marginRight: "1rem" }}/> 
+     <TbHistoryToggle  style={{ width: "40px", height: "40px", marginRight: "1rem", color:"#8EACCD" }}/> 
      
       <Box sx={{ flexGrow: 1 }}>
       
@@ -129,7 +130,7 @@ const Helppage = () => {
       >
            <Button
           onClick={() => {
-          navigate('/Privacypage');
+          navigate('/ContactUs');
         }}
       sx={{
         boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
@@ -151,7 +152,7 @@ const Helppage = () => {
         },
       }}
     >
-     <FaPhone  style={{ width: "40px", height: "40px", marginRight: "1rem" }}/> 
+     <FaPhone  style={{ width: "40px", height: "40px", marginRight: "1rem", color:"#F95454" }}/> 
      
       <Box sx={{ flexGrow: 1 }}>
       
@@ -186,7 +187,7 @@ const Helppage = () => {
       >
            <Button
           onClick={() => {
-          navigate('/Privacypage');
+          navigate('/Planingcallpage');
         }}
       sx={{
         boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
@@ -209,7 +210,7 @@ const Helppage = () => {
       }}
     >
     
-      <MdOutlineContactPhone  style={{ width: "40px", height: "40px", marginRight: "1rem" }} />
+      <MdOutlineContactPhone  style={{ width: "40px", height: "40px", marginRight: "1rem" , color:"#08C2FF"}} />
 
 
       <Box sx={{ flexGrow: 1 }}>

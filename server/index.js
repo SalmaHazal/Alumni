@@ -18,9 +18,12 @@ import commentRoutes from "./routes/comments.js";
 import searchRoutes from "./routes/search.js";
 import updateLinks from "./routes/updateLinks.js";
 import notificationRoutes from "./routes/notification.js";
-import serviceRoutes from "./routes/service.js";
 import jobPostRoutes from "./routes/jobPostRoutes.js";
+import feedbackRoutes from "./routes/feedback.js";
+import serviceRoutes from "./routes/service.js";
+import wrongfeedbackRoutes from "./routes/wrongfeedback.js";
 import { register } from "./controllers/auth.js";
+import contactusRoutes from "./routes/contactus.js";
 import { createPost } from "./controllers/posts.js";
 import { updateUserProfile } from "./controllers/users.js";
 import { verifyToken } from "./middleware/auth.js";
@@ -28,12 +31,15 @@ import User from "./models/User.js";
 import Post from "./models/Post.js";
 import { users, posts } from "./data/index.js";
 import { app, server } from "./socket/index.js";
-import bcrypt from "bcrypt";
+import bcrypt from 'bcrypt';
+
 
 /* CONFIGURATIONS */
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 dotenv.config();
+//
+
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
@@ -95,16 +101,16 @@ app.post("/forgot-password", (req, res) => {
     });
   });
 });
-
+//Change password 
 app.post("/reset-password/:id/:token", (req, res) => {
   const { id, token } = req.params;
   const { password } = req.body;
 
-  console.log("Request received for reset password", id, token); // Debug log
+  console.log("Request received for reset password", id, token); 
 
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     if (err) {
-      console.error("Token verification error:", err); // Debug log
+      console.error("Token verification error:", err); 
       return res.json({ Status: "Error with token" });
     } else {
       bcrypt
@@ -112,16 +118,16 @@ app.post("/reset-password/:id/:token", (req, res) => {
         .then((hash) => {
           User.findByIdAndUpdate({ _id: id }, { password: hash })
             .then((u) => {
-              console.log("Password updated successfully"); // Debug log
+              console.log("Password updated successfully"); 
               res.send({ Status: "Success" });
             })
             .catch((err) => {
-              console.error("Error updating password:", err); // Debug log
+              console.error("Error updating password:", err); 
               res.send({ Status: err });
             });
         })
         .catch((err) => {
-          console.error("Error hashing password:", err); // Debug log
+          console.error("Error hashing password:", err);
           res.send({ Status: err });
         });
     }
@@ -139,6 +145,40 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
+//
+app.post('/changepassword/pass', async (req, res) => {
+  const token = req.headers.authorization?.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({ message: "Unauthorized: No token provided" });
+  }
+
+  try {
+    // Verify the token to get the user ID
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Hash the new password
+    const salt = await bcrypt.genSalt(10);
+    const hashedNewPassword = await bcrypt.hash(req.body.newPassword, salt);
+
+    // Update the user's password
+    user.password = hashedNewPassword;
+    await user.save();
+
+    res.json({ message: "Password updated successfully!" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "An error occurred while updating the password" });
+  }
+});
+//
+
+
 /*ROUTES WITH FILES */
 app.post("/auth/register", upload.single("picture"), register); // we we add new picture to our project
 app.post("/posts", verifyToken, upload.single("picture"), createPost);
@@ -147,6 +187,9 @@ app.put("/users/:id", verifyToken, upload.single("picture"), updateUserProfile);
 /* ROUTES */
 app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
+app.use("/api/feedbacks", upload.single('file'), feedbackRoutes);
+app.use("/api/wrongfeedbacks", upload.single('file'), wrongfeedbackRoutes);
+app.use("/api/contactus", contactusRoutes);
 app.use("/posts", postRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/locations", locationRoutes);
@@ -155,6 +198,8 @@ app.use("/api", updateLinks);
 app.use("/notifications", notificationRoutes);
 app.use("/api", jobPostRoutes);
 app.use("/services", serviceRoutes);
+
+
 
 /* MONGOOSE SETUP */
 const PORT = process.env.PORT || 6001;
@@ -167,6 +212,7 @@ const connectDB = async () => {
   }
 };
 
+// Listening to the requests
 server.listen(PORT, () => {
   connectDB();
   console.log("Server is running on port " + PORT);

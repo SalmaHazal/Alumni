@@ -18,17 +18,23 @@ import Choselang from "./scenes/language/choselang";
 import ChattingPage from "./scenes/chattingPage/ChattingPage";
 import MessagePage from "./scenes/widgets/MessagePage";
 import CommunityMessages from "./scenes/widgets/CommunityMessages";
+import Services from "./scenes/widgets/Services";
 import Light_Dark from "./scenes/Light&Dark_mode/Light_Dark";
 import Activitylog from "./scenes/Activity/Activitylog";
 import Privacypage from "./scenes/Privacypage/Privacypage";
 import Helppage from "./scenes/Helppage/Helppage";
 import Feedbackpage from "./scenes/Feedbackpage/Feddbackpage";
 import Passwordpage from "./scenes/Passwordpage/Passwordpage";
+import Helptoimprove from "./scenes/Helptoimprove/Helptoimprove";
+import HelpSomeThingWrong from "./scenes/HelpSomeThingWrong/HelpSomeThingWrong";
+import Persenaldetailspage from "./scenes/Persenaldetailspage/Persenaldetailspage";
+import Planingcallpage from "./scenes/Planingcallpage/Planingcallpage";
+import ContactUs from "./scenes/ContactUs/ContactUs";
 import "bootstrap/dist/css/bootstrap.min.css";
 import './App.css';
 import JobList from "./scenes/jobs/JobList";
 import JobPostForm from "./scenes/jobs/JobPostForm";
-import Services from "./scenes/widgets/Services";
+
 
 function App() {
   const mode = useSelector((state) => state.mode);
@@ -115,6 +121,10 @@ function App() {
       element: <Light_Dark />,
     },
     {
+      path: "/Persenaldetailspage",
+      element: <Persenaldetailspage />
+    },
+    {
       path: "/Activitylog",
       element: <Activitylog />,
     },
@@ -127,8 +137,24 @@ function App() {
       element: <Helppage />,
     },
     {
+      path:"/Helptoimprove",
+      element:<Helptoimprove />
+    },
+    {
       path: "/Feedbackpage",
       element: <Feedbackpage />,
+    },
+    {
+      path:"/HelpSomeThingWrong",
+      element: <HelpSomeThingWrong />, 
+    },
+    {
+       path:"/ContactUs",
+       element:<ContactUs />,
+    },
+    {
+      path:"/Planingcallpage",
+      element: <Planingcallpage />
     },
     {
       path: "/Passwordpage",

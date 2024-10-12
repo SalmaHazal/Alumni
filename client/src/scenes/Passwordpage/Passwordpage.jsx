@@ -1,66 +1,127 @@
 import React, { useState } from "react";
-import { Box, Typography, useMediaQuery, Button, TextField } from "@mui/material";
-import WidgetWrapper from "../../components/WidgetWrapper";
-import Settings from "../../scenes/settings/Settings";
-import DeleteIcon from '@mui/icons-material/Delete';
-import { useTheme } from "@mui/material";
-import { useTranslation } from 'react-i18next';
-import { useDispatch } from "react-redux";
+import {
+  Box,
+  Button,
+  TextField,
+  useMediaQuery,
+  useTheme,
+  Typography,
+} from "@mui/material";
+import { Formik } from "formik";
+import * as yup from "yup";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setLogin } from "../../state/index";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import Settings from "../../scenes/settings/Settings";
+import WidgetWrapper from "../../components/WidgetWrapper";
 
-const Passwordpage = () => {
-  const isNonMobileScreens = useMediaQuery("(min-width:1000px)");
+import { useTranslation } from 'react-i18next';
+
+
+const loginSchema = yup.object().shape({
+  email: yup.string().email("Invalid email").required("Required"),
+  password: yup.string().required("Required"),
+  newPassword: yup
+    .string()
+    .required("Required")
+    .min(8, "Password must be at least 8 characters"),
+  confirmpassword: yup
+    .string()
+    .required("Required")
+    .oneOf([yup.ref("newPassword"), null], "Passwords must match"),
+});
+
+const initialValuesLogin = {
+  email: "",
+  password: "",
+  newPassword: "",
+  confirmpassword: "",
+};
+
+const Form = () => {
   const { palette } = useTheme();
-  const { t, i18n } = useTranslation();
-  const theme = useTheme();
   const dispatch = useDispatch();
-  const language = i18n.language;  
   const navigate = useNavigate();
+  const isNonMobile = useMediaQuery("(min-width:600px)");
 
-  // State management for passwords
-  const [actualPassword, setActualPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
+  const { t, i18n } = useTranslation();
 
-  // Handle form submission
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const language = i18n.language; 
+
+ 
+  const changePassword = async (token, newPassword) => {
+    try {
+      const response = await fetch("http://localhost:3001/changepassword/pass", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // Include the token for authentication
+        },
+        body: JSON.stringify({ newPassword }), // Send the new password
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        toast.success(result.message || "Password updated successfully!");
+      } else {
+        toast.error(result.message || "Failed to update password.");
+      }
+    } catch (error) {
+      console.error("Error updating password:", error);
+      toast.error("An error occurred while updating the password.");
+    }
+  };
+
+ 
+  const login = async (values, onSubmitProps) => {
+    try {
     
-    // Validate passwords
-    if (newPassword !== confirmPassword) {
-      setErrorMessage("New password and confirm password do not match");
+      const loggedInResponse = await fetch("http://localhost:3001/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: values.email, password: values.password }),
+      });
+
+      const loggedIn = await loggedInResponse.json();
+
+ 
+      onSubmitProps.resetForm();
+
+      if (loggedIn && loggedIn.user && loggedIn.token) {
+     
+        dispatch(
+          setLogin({
+            user: loggedIn.user,
+            token: loggedIn.token,
+          })
+        );
+
+        
+        await changePassword(loggedIn.token, values.newPassword);
+
+        
+        navigate("/home");
+        toast.success("Password updated successfully!");
+      } else {
+        toast.error("Login failed. Please try again.");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      toast.error("An error occurred. Please try again.");
+    }
+  };
+
+  const handleFormSubmit = async (values, onSubmitProps) => {
+    
+    if (values.newPassword !== values.confirmpassword) {
+      toast.error("Passwords do not match. Please try again.");
       return;
     }
+
     
-    try {
-      
-      const response = await fetch(`http://localhost:3001/changepassword/pass`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          actualPassword,
-          newPassword,
-        }),
-      });
-     if (response.ok) {
-      const result= response.json();
-      setSuccessMessage(result.message || "Password updated successfully!");
-      setErrorMessage("");
-      setActualPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
-      
-     }
-
-    }
-    catch (error) {
-      setErrorMessage("An error occurred. Please try again later.");
-    }
-
+    await login(values, onSubmitProps);
   };
 
   return (
@@ -70,7 +131,7 @@ const Passwordpage = () => {
           display: "flex",
           flexDirection: "column",
           alignItems: "Right",
-          marginTop: "50px",
+          marginTop: "50px", // Contrôle de l'espace en haut
         }}
       >
         <Settings />
@@ -82,68 +143,116 @@ const Passwordpage = () => {
           flexDirection: "column",
           alignItems: "left",
           marginTop: "-600px",
-          marginRight: "600px",
+          marginRight: "600px", // Contrôle de l'espace en haut
         }}
       >
         <WidgetWrapper
           width="800px"
           sx={{
-            marginTop: "20px",
-            marginLeft: language === "ar" ? "-10%" : "60%",
+            marginTop: "-40px", // Contrôle de l'espace entre le texte et le widget
+            marginLeft: language === "ar" ? "-10%" : "60%", // Adjust positioning based on language
           }}
         >
-          <Typography color="#37B7C3" variant="h4" sx={{ marginLeft: language === "ar" ? "20%" : "39%" }}>
-            {t("Change your Password")}
-          </Typography>
-          
+             <Formik
+      onSubmit={handleFormSubmit}
+      initialValues={initialValuesLogin}
+      validationSchema={loginSchema}
+    >
+      {({
+        values,
+        errors,
+        touched,
+        handleBlur,
+        handleChange,
+        handleSubmit,
+      }) => (
+        <form onSubmit={handleSubmit}>
           <Box
+            display="grid"
+            gap="30px"
+            gridTemplateColumns="repeat(4, minmax(0, 1fr))"
             sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "Right",
-              marginTop: "40px",
+              "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
             }}
           >
-            <form onSubmit={handleSubmit}>
-              <TextField 
-                id="actual-password" 
-                label="Actual password" 
-                variant="outlined" 
-                fullWidth
-                value={actualPassword}
-                onChange={(e) => setActualPassword(e.target.value)}
-              />
-              
-              <TextField 
-                id="new-password" 
-                label="New password" 
-                variant="outlined" 
-                fullWidth
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-              />
-              
-              <TextField 
-                id="confirm-password" 
-                label="Confirm your password" 
-                variant="outlined" 
-                fullWidth
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-              />
-              
-              {errorMessage && <Typography color="error">{errorMessage}</Typography>}
-              {successMessage && <Typography color="success">{successMessage}</Typography>}
-              
-              <Button variant="outlined" startIcon={<DeleteIcon />} type="submit">
-                Update
-              </Button>
-            </form>
+            {/* Email field */}
+            <TextField
+              label="Email"
+              title="Example : John@gmail.com"
+              onBlur={handleBlur}
+              onChange={handleChange}
+              value={values.email}
+              name="email"
+              error={Boolean(touched.email) && Boolean(errors.email)}
+              helperText={touched.email && errors.email}
+              sx={{ gridColumn: "span 4" }}
+            />
+
+            {/* Current Password field */}
+            <TextField
+              label="Current Password"
+              type="password"
+              onBlur={handleBlur}
+              onChange={handleChange}
+              value={values.password}
+              name="password"
+              error={Boolean(touched.password) && Boolean(errors.password)}
+              helperText={touched.password && errors.password}
+              sx={{ gridColumn: "span 4" }}
+            />
+
+            {/* New Password field */}
+            <TextField
+              label="New Password"
+              type="password"
+              onBlur={handleBlur}
+              onChange={handleChange}
+              value={values.newPassword}
+              name="newPassword"
+              error={Boolean(touched.newPassword) && Boolean(errors.newPassword)}
+              helperText={touched.newPassword && errors.newPassword}
+              sx={{ gridColumn: "span 4" }}
+            />
+
+            {/* Confirm New Password field */}
+            <TextField
+              label="Confirm New Password"
+              type="password"
+              onBlur={handleBlur}
+              onChange={handleChange}
+              value={values.confirmpassword}
+              name="confirmpassword"
+              error={Boolean(touched.confirmpassword) && Boolean(errors.confirmpassword)}
+              helperText={touched.confirmpassword && errors.confirmpassword}
+              sx={{ gridColumn: "span 4" }}
+            />
           </Box>
-        </WidgetWrapper>
-      </Box>
+
+          {/* Submit Button */}
+          <Box>
+            <Button
+              fullWidth
+              type="submit"
+              sx={{
+                m: "2rem 0",
+                p: "1rem",
+                backgroundColor: palette.primary.main,
+                color: palette.background.alt,
+                "&:hover": { color: palette.primary.main },
+              }}
+            >
+              Update
+            </Button>
+          </Box>
+        </form>
+      )}
+    </Formik>
+    </WidgetWrapper>
+    </Box>
+    
+
     </>
   );
 };
 
-export default Passwordpage;
+export default Form;
