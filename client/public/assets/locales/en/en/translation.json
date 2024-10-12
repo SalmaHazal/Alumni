@@ -78,7 +78,10 @@
      "Document": "Document",
      "Explore users to start a conversation with.":"Explore users to start a conversation with.",
      "Audio": "Audio",
-     "Services": "Services"
+     "Services": "Services",
+     "Media": "Media",
+     "Article": "Article",
+     "Live": "Live"
 
 
 }
