@@ -68,6 +68,12 @@ const MyPostWidget = ({ picturePath }) => {
       formData.append("picture", selectedFile);
       formData.append("picturePath", selectedFile.name);
     }
+    if (articleTitle) {
+      formData.append("articleTitle", articleTitle);
+    }
+    if (articleContent) {
+      formData.append("articleContent", articleContent);
+    }
     const response = await fetch(`http://localhost:3001/posts`, {
       method: "POST",
       headers: { Authorization: `Bearer ${token}` },
@@ -79,6 +85,8 @@ const MyPostWidget = ({ picturePath }) => {
     setSelectedFile(null);
     setPostText("");
     setSelectedCategory("");
+    setArticleTitle("");
+    setArticleContent("");
   };
 
 
@@ -667,7 +675,10 @@ const MyPostWidget = ({ picturePath }) => {
             {t("Cancel")}
           </Button>
           <Button
-            onClick={handleArticleSubmit}
+            onClick={() => {
+              handlePost();
+              handleCloseArticle();
+            }}
             color="primary"
             variant="contained"
           >

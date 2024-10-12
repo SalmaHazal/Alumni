@@ -5,7 +5,7 @@ import Notification from "../models/Notification.js";
 /* CREATE */
 export const createPost = async (req, res) => {
   try {
-    const { userId, description, picturePath, posttype } = req.body;
+    const { userId, description, picturePath, posttype, articleContent, articleTitle } = req.body;
     const user = await User.findById(userId);
     const newPost = new Post({
       userId,
@@ -14,6 +14,8 @@ export const createPost = async (req, res) => {
       location: user.location,
       description,
       posttype,
+      articleContent,
+      articleTitle,
       userPicturePath: user.picturePath,
       picturePath,
       likes: new Map(),

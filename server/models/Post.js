@@ -16,6 +16,8 @@ const postSchema = mongoose.Schema(
     },
     location: String,
     description: String,
+    articleTitle: String,
+    articleContent: String,
     posttype: String,
     picturePath: String,
     userPicturePath: String,
